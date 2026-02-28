@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nucleo Empreende — Chat com a Diretoria</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.10);--amber-border:rgba(245,158,11,0.22);
+  --green:#10b981;--green-dim:rgba(16,185,129,0.10);
+  --red:#ef4444;--blue:#60a5fa;
+  --bg:#060a12;--bg2:#0b1018;--bg3:#0f1623;
+  --surface:#111c2b;--surface2:#172032;--surface3:#1d2840;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.10);
+  --text:#dde6f0;--muted:#4e6580;--muted2:#7a96b0;
+  --syne:'Syne',sans-serif;--dm:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--dm)}
+
+/* ── SHELL ── */
+.shell{display:grid;grid-template-columns:340px 1fr;grid-template-rows:100vh;height:100vh}
+
+/* ── LEFT PANEL ── */
+.left{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+
+.left-header{padding:20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.left-header h2{font-family:var(--syne);font-size:13px;font-weight:700;color:var(--muted2);letter-spacing:.5px;margin-bottom:14px;text-transform:uppercase}
+
+.agent-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.agent-tab{display:flex;align-items:center;gap:7px;padding:7px 11px;border-radius:8px;cursor:pointer;transition:all .15s;border:1px solid transparent;font-size:12px;font-weight:500;color:var(--muted2)}
+.agent-tab:hover{background:var(--surface)}
+.agent-tab.active{background:var(--surface);border-color:var(--amber-border);color:var(--text)}
+.agent-tab .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+.aprovacoes-section{flex:1;overflow-y:auto;padding:16px}
+.section-lbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.section-lbl span{background:var(--red);color:#fff;font-size:9px;padding:1px 6px;border-radius:10px}
+
+.apv-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px;transition:border-color .15s}
+.apv-card:hover{border-color:var(--border2)}
+.apv-card.urgente{border-left:2px solid var(--red)}
+.apv-card.media{border-left:2px solid var(--amber)}
+.apv-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.apv-agente{font-size:11px;color:var(--muted2);font-weight:500}
+.apv-ts{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.apv-desc{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.4}
+.apv-valor{font-family:var(--mono);font-size:13px;color:var(--amber);font-weight:600;margin-bottom:10px}
+.apv-btns{display:flex;gap:6px}
+.btn-sim{flex:1;background:var(--green-dim);border:1px solid rgba(16,185,129,.3);color:var(--green);padding:7px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;font-family:var(--dm)}
+.btn-sim:hover{background:var(--green);color:#000}
+.btn-nao{flex:1;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:var(--red);padding:7px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;font-family:var(--dm)}
+.btn-nao:hover{background:var(--red);color:#fff}
+.btn-adiar{background:transparent;border:1px solid var(--border2);color:var(--muted2);padding:7px 10px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .15s;font-family:var(--dm)}
+.btn-adiar:hover{border-color:var(--muted);color:var(--text)}
+
+.empty-state{text-align:center;padding:32px 16px;color:var(--muted)}
+.empty-state .ei{font-size:32px;margin-bottom:8px}
+.empty-state p{font-size:13px;line-height:1.6}
+
+/* ── RIGHT PANEL — CHAT ── */
+.right{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* Chat header */
+.chat-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-shrink:0;background:var(--bg2)}
+.agent-avatar{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid var(--border2);position:relative;flex-shrink:0}
+.status-ring{position:absolute;bottom:-2px;right:-2px;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg2)}
+.chat-agent-info h3{font-family:var(--syne);font-size:15px;font-weight:700;color:#fff}
+.chat-agent-info p{font-size:12px;color:var(--muted2);margin-top:1px}
+.chat-header-actions{margin-left:auto;display:flex;gap:8px}
+.header-btn{background:var(--surface);border:1px solid var(--border2);color:var(--muted2);padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;transition:all .15s;font-family:var(--dm);font-weight:500}
+.header-btn:hover{border-color:var(--amber-border);color:var(--amber)}
+
+/* Agent switcher chips */
+.agent-bar{padding:10px 20px;border-bottom:1px solid var(--border);display:flex;gap:6px;overflow-x:auto;flex-shrink:0;background:var(--bg3)}
+.agent-bar::-webkit-scrollbar{height:0}
+.agent-chip{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;border:1px solid var(--border2);font-size:11px;color:var(--muted2);cursor:pointer;transition:all .15s;white-space:nowrap;font-weight:500}
+.agent-chip:hover{border-color:var(--amber-border);color:var(--text)}
+.agent-chip.active{background:var(--amber-dim);border-color:var(--amber-border);color:var(--amber)}
+.chip-dot{width:6px;height:6px;border-radius:50%}
+
+/* Messages */
+.messages{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-track{background:transparent}
+.messages::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px}
+
+.msg{display:flex;gap:10px;max-width:75%;animation:msgIn .2s ease both}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg-avatar{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:1px solid var(--border2);margin-top:2px}
+.msg-body{display:flex;flex-direction:column;gap:4px}
+.msg.user .msg-body{align-items:flex-end}
+.msg-name{font-size:10px;color:var(--muted);font-weight:500;padding:0 4px;font-family:var(--mono)}
+.msg-bubble{padding:11px 15px;border-radius:12px;font-size:14px;line-height:1.65;position:relative;word-break:break-word}
+.msg.agent .msg-bubble{background:var(--surface);border:1px solid var(--border);border-radius:12px 12px 12px 3px;color:var(--text)}
+.msg.user .msg-bubble{background:var(--amber);color:#000;border-radius:12px 12px 3px 12px;font-weight:500}
+.msg-ts{font-family:var(--mono);font-size:9px;color:var(--muted);padding:0 4px}
+
+/* Typing indicator */
+.typing{display:flex;align-items:center;gap:10px;padding:8px 0;opacity:0;transition:opacity .2s}
+.typing.show{opacity:1}
+.typing-dots{display:flex;gap:4px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:12px 12px 12px 3px}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted2);animation:bounce .9s infinite}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.typing-label{font-size:11px;color:var(--muted);font-family:var(--dm)}
+
+/* WhatsApp hint */
+.wa-hint{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:8px;font-size:12px;color:var(--muted2);margin:0 28px 4px}
+.wa-hint strong{color:#25d366}
+
+/* Input area */
+.input-area{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-end;background:var(--bg2);flex-shrink:0}
+.input-wrap{flex:1;background:var(--surface);border:1px solid var(--border2);border-radius:12px;display:flex;align-items:flex-end;gap:8px;padding:10px 14px;transition:border-color .15s}
+.input-wrap:focus-within{border-color:var(--amber-border)}
+#msg-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px;font-family:var(--dm);resize:none;max-height:120px;line-height:1.5}
+#msg-input::placeholder{color:var(--muted)}
+.attach-btn{background:transparent;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px;transition:color .15s;line-height:1}
+.attach-btn:hover{color:var(--amber)}
+.send-btn{width:42px;height:42px;border-radius:10px;background:var(--amber);border:none;color:#000;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.send-btn:hover{background:color-mix(in srgb,var(--amber) 85%,#000);transform:scale(1.05)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* Quick replies */
+.quick-replies{display:flex;gap:6px;padding:0 24px 10px;flex-wrap:wrap;flex-shrink:0}
+.qr-btn{background:var(--surface);border:1px solid var(--border2);color:var(--muted2);padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:var(--dm);font-weight:500}
+.qr-btn:hover{border-color:var(--amber-border);color:var(--amber)}
+
+/* Approval toast */
+.toast{position:fixed;top:20px;right:20px;padding:14px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;animation:toastIn .3s ease;display:flex;align-items:center;gap:8px}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.toast-ok{background:var(--green);color:#fff}
+.toast-no{background:var(--red);color:#fff}
+
+/* Responsive */
+@media(max-width:900px){.shell{grid-template-columns:1fr}.left{display:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ── LEFT — AGENTES + APROVAÇÕES ── -->
+<div class="left">
+  <div class="left-header">
+    <h2>Agentes</h2>
+    <div class="agent-tabs" id="agentTabs">
+      <div class="agent-tab active" onclick="switchAgent('lucas_mendes',this)" data-id="lucas_mendes">
+        <div class="dot" style="background:#f59e0b"></div>🧠 Lucas CEO
+      </div>
+      <div class="agent-tab" onclick="switchAgent('mariana_oliveira',this)" data-id="mariana_oliveira">
+        <div class="dot" style="background:#ec4899"></div>📣 Mariana
+      </div>
+      <div class="agent-tab" onclick="switchAgent('pedro_lima',this)" data-id="pedro_lima">
+        <div class="dot" style="background:#ef4444"></div>💰 Pedro
+      </div>
+      <div class="agent-tab" onclick="switchAgent('carla_santos',this)" data-id="carla_santos">
+        <div class="dot" style="background:#10b981"></div>⚙️ Carla
+      </div>
+      <div class="agent-tab" onclick="switchAgent('dani_ferreira',this)" data-id="dani_ferreira">
+        <div class="dot" style="background:#06b6d4"></div>📊 Dani
+      </div>
+    </div>
+  </div>
+
+  <div class="aprovacoes-section">
+    <div class="section-lbl">
+      Aprovações pendentes
+      <span id="apv-count">2</span>
+    </div>
+    <div id="apv-list">
+      <div class="apv-card urgente" id="apv-1">
+        <div class="apv-meta">
+          <span class="apv-agente">📣 Mariana — CMO</span>
+          <span class="apv-ts">há 28 min</span>
+        </div>
+        <div class="apv-desc">Campanha Meta Ads — Instagram Q1 2026</div>
+        <div class="apv-valor">R$ 12.500,00</div>
+        <div class="apv-btns">
+          <button class="btn-sim" onclick="decidir('apv-1','sim')">✅ Sim</button>
+          <button class="btn-nao" onclick="decidir('apv-1','nao')">❌ Não</button>
+          <button class="btn-adiar" onclick="decidir('apv-1','adiar')">🔁</button>
+        </div>
+      </div>
+      <div class="apv-card media" id="apv-2">
+        <div class="apv-meta">
+          <span class="apv-agente">💰 Pedro — CFO</span>
+          <span class="apv-ts">há 2h</span>
+        </div>
+        <div class="apv-desc">Renovação Supabase Pro — plano anual</div>
+        <div class="apv-valor">R$ 3.200,00</div>
+        <div class="apv-btns">
+          <button class="btn-sim" onclick="decidir('apv-2','sim')">✅ Sim</button>
+          <button class="btn-nao" onclick="decidir('apv-2','nao')">❌ Não</button>
+          <button class="btn-adiar" onclick="decidir('apv-2','adiar')">🔁</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── RIGHT — CHAT ── -->
+<div class="right">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="agent-avatar" id="avatarEl" style="background:rgba(245,158,11,0.12)">
+      🧠
+      <div class="status-ring" style="background:#10b981"></div>
+    </div>
+    <div class="chat-agent-info">
+      <h3 id="agentName">Lucas Mendes</h3>
+      <p id="agentRole">CEO · online agora · responde em segundos</p>
+    </div>
+    <div class="chat-header-actions">
+      <button class="header-btn" onclick="enviarRapido('status')">📊 Status</button>
+      <button class="header-btn" onclick="enviarRapido('aprovações')">⚠️ Pendentes</button>
+      <button class="header-btn" onclick="enviarRapido('ajuda')">❓ Ajuda</button>
+    </div>
+  </div>
+
+  <!-- Agent bar -->
+  <div class="agent-bar">
+    <div class="agent-chip active" onclick="switchChip('lucas_mendes',this)">
+      <div class="chip-dot" style="background:#f59e0b"></div>🧠 Lucas CEO
+    </div>
+    <div class="agent-chip" onclick="switchChip('mariana_oliveira',this)">
+      <div class="chip-dot" style="background:#ec4899"></div>📣 Mariana CMO
+    </div>
+    <div class="agent-chip" onclick="switchChip('pedro_lima',this)">
+      <div class="chip-dot" style="background:#ef4444"></div>💰 Pedro CFO
+    </div>
+    <div class="agent-chip" onclick="switchChip('carla_santos',this)">
+      <div class="chip-dot" style="background:#10b981"></div>⚙️ Carla COO
+    </div>
+    <div class="agent-chip" onclick="switchChip('rafael_torres',this)">
+      <div class="chip-dot" style="background:#8b5cf6"></div>🚀 Rafael CPO
+    </div>
+    <div class="agent-chip" onclick="switchChip('ana_costa',this)">
+      <div class="chip-dot" style="background:#a855f7"></div>👥 Ana CHRO
+    </div>
+    <div class="agent-chip" onclick="switchChip('dani_ferreira',this)">
+      <div class="chip-dot" style="background:#06b6d4"></div>📊 Dani Dados
+    </div>
+    <div class="agent-chip" onclick="switchChip('ze_carvalho',this)">
+      <div class="chip-dot" style="background:#fbbf24"></div>🧘 Zé Coach
+    </div>
+    <div class="agent-chip" onclick="switchChip('beto_rocha',this)">
+      <div class="chip-dot" style="background:#f97316"></div>🔧 Beto Opt.
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="messages" id="msgs">
+    <!-- Mensagem inicial do CEO -->
+    <div class="msg agent" id="msg-welcome">
+      <div class="msg-avatar" style="background:rgba(245,158,11,0.12)">🧠</div>
+      <div class="msg-body">
+        <div class="msg-name">Lucas Mendes · CEO</div>
+        <div class="msg-bubble">
+          Bom dia! 👋 Estou aqui.<br><br>
+          Temos <strong>2 aprovações pendentes</strong> esperando sua decisão — vejo que você já está vendo na sidebar.<br><br>
+          A Mariana finalizou o planejamento da campanha Q1 e o Pedro fechou o relatório financeiro de fevereiro. Posso te dar um resumo executivo agora?
+        </div>
+        <div class="msg-ts">agora</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Typing -->
+  <div class="typing" id="typing">
+    <div class="msg-avatar" style="background:rgba(245,158,11,0.12);width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;border:1px solid rgba(255,255,255,0.06)">🧠</div>
+    <div>
+      <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+    <span class="typing-label" id="typing-label">Lucas está digitando...</span>
+  </div>
+
+  <!-- WhatsApp hint -->
+  <div class="wa-hint">
+    <span>📱</span>
+    <span>Esta conversa também acontece no <strong>WhatsApp</strong> — tudo sincronizado em tempo real.</span>
+  </div>
+
+  <!-- Quick replies -->
+  <div class="quick-replies" id="quickReplies">
+    <button class="qr-btn" onclick="enviarRapido('Como está indo a empresa?')">Como está a empresa?</button>
+    <button class="qr-btn" onclick="enviarRapido('Me dê um resumo das campanhas')">Resumo de marketing</button>
+    <button class="qr-btn" onclick="enviarRapido('Como estão as finanças?')">Situação financeira</button>
+    <button class="qr-btn" onclick="enviarRapido('O que os agentes fizeram hoje?')">Atividade de hoje</button>
+    <button class="qr-btn" onclick="enviarRapido('Quais são os próximos passos?')">Próximos passos</button>
+  </div>
+
+  <!-- Input -->
+  <div class="input-area">
+    <div class="input-wrap">
+      <textarea id="msg-input" placeholder="Fale com Lucas (CEO) ou @mariana, @pedro, @carla..." rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="attach-btn" title="Anexar">📎</button>
+    </div>
+    <button class="send-btn" id="sendBtn" onclick="enviar()">➤</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ── ESTADO ───────────────────────────────────────────────────
+const API = window.location.origin;
+let agenteAtual = 'lucas_mendes';
+let aguardandoResposta = false;
+
+const AGENTES = {
+  lucas_mendes:     {nome:'Lucas Mendes',  cargo:'CEO',      emoji:'🧠', cor:'#f59e0b'},
+  mariana_oliveira: {nome:'Mariana Oliveira',cargo:'CMO',   emoji:'📣', cor:'#ec4899'},
+  pedro_lima:       {nome:'Pedro Lima',    cargo:'CFO',      emoji:'💰', cor:'#ef4444'},
+  carla_santos:     {nome:'Carla Santos',  cargo:'COO',      emoji:'⚙️', cor:'#10b981'},
+  rafael_torres:    {nome:'Rafael Torres', cargo:'CPO',      emoji:'🚀', cor:'#8b5cf6'},
+  ana_costa:        {nome:'Ana Costa',     cargo:'CHRO',     emoji:'👥', cor:'#a855f7'},
+  dani_ferreira:    {nome:'Dani Ferreira', cargo:'Dados',    emoji:'📊', cor:'#06b6d4'},
+  ze_carvalho:      {nome:'Zé Carvalho',   cargo:'Coach',    emoji:'🧘', cor:'#fbbf24'},
+  beto_rocha:       {nome:'Beto Rocha',    cargo:'Otimizador',emoji:'🔧',cor:'#f97316'},
+};
+
+// ── ENVIAR MENSAGEM ───────────────────────────────────────────
+async function enviar() {
+  const input = document.getElementById('msg-input');
+  const texto = input.value.trim();
+  if (!texto || aguardandoResposta) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  aguardandoResposta = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  // Detectar menção
+  let agenteDest = agenteAtual;
+  const mencaoMatch = texto.match(/@(\w+)/);
+  if (mencaoMatch) {
+    const m = '@' + mencaoMatch[1].toLowerCase();
+    const map = {'@ceo':'lucas_mendes','@lucas':'lucas_mendes','@cmo':'mariana_oliveira','@mariana':'mariana_oliveira',
+                 '@cfo':'pedro_lima','@pedro':'pedro_lima','@coo':'carla_santos','@carla':'carla_santos',
+                 '@cpo':'rafael_torres','@rafael':'rafael_torres','@rh':'ana_costa','@ana':'ana_costa',
+                 '@dados':'dani_ferreira','@dani':'dani_ferreira','@coach':'ze_carvalho','@ze':'ze_carvalho',
+                 '@beto':'beto_rocha'};
+    if (map[m]) agenteDest = map[m];
+  }
+
+  addMsg('user', texto, 'Você', '👤');
+  esconderQuickReplies();
+  mostrarTyping(agenteDest);
+
+  try {
+    const res = await fetch(`${API}/api/v1/chat/mensagem`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({mensagem: texto, agente: agenteDest})
+    });
+    const data = await res.json();
+    esconderTyping();
+    addMsg('agent', formatarMarkdown(data.resposta || 'Recebido!'), AGENTES[agenteDest]?.nome, AGENTES[agenteDest]?.emoji);
+  } catch {
+    // Modo demo — respostas locais
+    await sleep(1200 + Math.random() * 800);
+    esconderTyping();
+    const resp = respostaDemo(texto, agenteDest);
+    addMsg('agent', formatarMarkdown(resp), AGENTES[agenteDest]?.nome, AGENTES[agenteDest]?.emoji);
+  }
+
+  aguardandoResposta = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function enviarRapido(txt) {
+  document.getElementById('msg-input').value = txt;
+  enviar();
+}
+
+// ── UI ────────────────────────────────────────────────────────
+function addMsg(tipo, texto, nome, emoji) {
+  const msgs = document.getElementById('msgs');
+  const ts = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const ag = tipo === 'agent' ? AGENTES[agenteAtual] : null;
+  const div = document.createElement('div');
+  div.className = `msg ${tipo}`;
+  div.innerHTML = `
+    <div class="msg-avatar" style="background:${tipo==='agent'?`rgba(${hexToRgb(ag?.cor||'#f59e0b')},0.12)`:'rgba(96,165,250,0.12)'}">${emoji}</div>
+    <div class="msg-body">
+      <div class="msg-name">${nome}</div>
+      <div class="msg-bubble">${texto}</div>
+      <div class="msg-ts">${ts}</div>
+    </div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function mostrarTyping(agId) {
+  const ag = AGENTES[agId] || AGENTES.lucas_mendes;
+  document.getElementById('typing-label').textContent = `${ag.nome} está digitando...`;
+  document.getElementById('typing').classList.add('show');
+  document.getElementById('msgs').scrollTop = 99999;
+}
+function esconderTyping() { document.getElementById('typing').classList.remove('show'); }
+function esconderQuickReplies() { document.getElementById('quickReplies').style.display = 'none'; }
+
+function mostrarToast(msg, tipo) {
+  const t = document.createElement('div');
+  t.className = `toast toast-${tipo}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ── APROVAÇÕES ────────────────────────────────────────────────
+function decidir(id, decisao) {
+  const card = document.getElementById(id);
+  const desc = card.querySelector('.apv-desc').textContent;
+  const valor = card.querySelector('.apv-valor').textContent;
+
+  if (decisao === 'sim') {
+    card.style.opacity = '0';
+    card.style.transform = 'translateX(20px)';
+    card.style.transition = 'all .3s';
+    setTimeout(() => card.remove(), 300);
+    mostrarToast(`✅ Aprovado: ${desc}`, 'ok');
+    addMsg('agent', formatarMarkdown(`✅ *Aprovado!*\n\n_${desc}_\n${valor}\n\nVou executar agora. — _Lucas_`), 'Lucas Mendes', '🧠');
+  } else if (decisao === 'nao') {
+    card.style.opacity = '0';
+    card.style.transition = 'opacity .3s';
+    setTimeout(() => card.remove(), 300);
+    mostrarToast(`❌ Rejeitado: ${desc}`, 'no');
+    addMsg('agent', formatarMarkdown(`❌ *Rejeitado.*\n\n_${desc}_\n\nEntendido. Vou avisar a equipe para buscar alternativas. — _Lucas_`), 'Lucas Mendes', '🧠');
+  } else {
+    card.querySelector('.apv-btns').innerHTML = '<span style="font-size:12px;color:var(--muted)">🔁 Adiado — ainda pendente</span>';
+    mostrarToast('🔁 Decisão adiada', 'ok');
+  }
+
+  // Atualizar contador
+  const remaining = document.querySelectorAll('.apv-card').length;
+  document.getElementById('apv-count').textContent = remaining;
+  if (remaining === 0) {
+    document.getElementById('apv-list').innerHTML = `
+      <div class="empty-state">
+        <div class="ei">✅</div>
+        <p>Nenhuma aprovação pendente.<br>Tudo em dia!</p>
+      </div>`;
+  }
+
+  // Chamar API real se disponível
+  fetch(`${API}/api/v1/aprovacoes/${id}`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({decisao: decisao==='sim'?'aprovar':'rejeitar'})
+  }).catch(()=>{});
+}
+
+// ── TROCA DE AGENTE ───────────────────────────────────────────
+function switchAgent(id, el) {
+  agenteAtual = id;
+  document.querySelectorAll('.agent-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  updateChatHeader(id);
+}
+
+function switchChip(id, el) {
+  agenteAtual = id;
+  document.querySelectorAll('.agent-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  updateChatHeader(id);
+  const ag = AGENTES[id];
+  addMsg('agent', `Olá! Sou ${ag.nome}, ${ag.cargo}. Como posso ajudar?`, ag.nome, ag.emoji);
+}
+
+function updateChatHeader(id) {
+  const ag = AGENTES[id];
+  if (!ag) return;
+  document.getElementById('agentName').textContent = ag.nome;
+  document.getElementById('agentRole').textContent = `${ag.cargo} · online agora`;
+  const av = document.getElementById('avatarEl');
+  av.style.background = `rgba(${hexToRgb(ag.cor)},0.12)`;
+  av.childNodes[0].textContent = ag.emoji;
+}
+
+// ── RESPOSTAS DEMO (sem backend) ─────────────────────────────
+const RESPOSTAS = {
+  lucas_mendes: [
+    "Estamos bem! Score médio da diretoria em 8.4, acima da meta. A Mariana está finalizando a campanha Q1 e o Pedro me deu boas notícias sobre o fluxo de caixa. Que aspecto você quer aprofundar? — _Lucas_",
+    "Boa pergunta. Deixa eu verificar os dados mais recentes com a Dani e te passo um panorama completo em instantes. — _Lucas_",
+    "Entendido. Vou colocar isso como prioridade para a próxima reunião de diretoria. Algum prazo específico em mente? — _Lucas_",
+    "A equipe está funcionando bem. Temos 2 aprovações pendentes que precisam da sua atenção quando puder. Posso te mandar o resumo agora? — _Lucas_",
+  ],
+  mariana_oliveira: [
+    "Oi! A campanha Q1 está linda 🎯 CTR de 3.2%, acima da meta de 2.5%. O criativo do Leonardo.AI converteu muito melhor que o anterior. Quer ver os números detalhados? — _Mariana_",
+    "Já tenho 3 variações de criativo prontas para teste A/B essa semana. Só precisando da sua aprovação no budget. — _Mariana_",
+  ],
+  pedro_lima: [
+    "Fevereiro fechou em R$127k, crescimento de 18% vs janeiro. Hotmart respondeu por 60% da receita. Projeção de março é conservadora em R$140k. — _Pedro_",
+    "Fluxo de caixa positivo. Reserva de 3 meses operacionais mantida. Recomendo aprovar o Supabase Pro — ROI de 6 meses confirmado. — _Pedro_",
+  ],
+  carla_santos: [
+    "Processos operacionais otimizados essa semana. Reduzimos o tempo médio de entrega em 2 dias com o novo parceiro logístico. — _Carla_",
+  ],
+  dani_ferreira: [
+    "Dados de fevereiro: 47.3k sessões (+22%), taxa de conversão 3.8%, LTV médio R$890. O canal orgânico cresceu 31% mês a mês. — _Dani_",
+  ],
+};
+
+function respostaDemo(texto, agId) {
+  const resps = RESPOSTAS[agId] || RESPOSTAS.lucas_mendes;
+  return resps[Math.floor(Math.random() * resps.length)];
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+function formatarMarkdown(txt) {
+  return txt
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/_(.*?)_/g,'<em style="color:var(--muted2)">$1</em>')
+    .replace(/→/g,'<span style="color:var(--amber)">→</span>')
+    .replace(/✅/g,'<span style="color:var(--green)">✅</span>')
+    .replace(/❌/g,'<span style="color:var(--red)">❌</span>')
+    .replace(/\n/g,'<br>');
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r,ms)); }
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); }
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+// Tentar conectar WebSocket para updates em tempo real
+try {
+  const ws = new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}/ws/dashboard`);
+  ws.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    if (data.tipo === 'aprovacao_resolvida') {
+      const card = document.getElementById(data.aprovacao_id);
+      if (card) card.remove();
+    }
+  };
+} catch(e) {}
+</script>
+</body>
+</html>
