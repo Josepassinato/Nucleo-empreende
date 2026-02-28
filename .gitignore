@@ -8,6 +8,9 @@ venv/
 .venv/
 nucleo/logs/audios/
 nucleo/logs/*.jsonl
+nucleo/logs/*.log
+nucleo/logs/resultado_*.md
+nucleo/logs/alma_state.json
 !nucleo/logs/.gitkeep
 .DS_Store
 .idea/
