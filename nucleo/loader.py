@@ -7,7 +7,7 @@ import yaml
 import logging
 from pathlib import Path
 from crewai import Agent, Task
-from crewai.tools import BaseTool
+from crewai_tools import Tool
 from nucleo.mecanismos.alma import alma, GerenciadorAlma
 
 logger = logging.getLogger("nucleo.loader")
