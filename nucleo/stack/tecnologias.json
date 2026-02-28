@@ -1,0 +1,35 @@
+{
+  "stack_tecnica": {
+    "orquestracao": "CrewAI ou LangGraph (para gerenciamento de fluxo de trabalho e coordenação de agentes)",
+    "cerebro": "Groq + Llama 405B (para processamento rápido e eficiente de linguagem natural)",
+    "memoria": "Pinecone ou Weaviate (para memória de longo prazo e recuperação de informações)",
+    "infraestrutura": "FastAPI + Redis (para dashboard de monitoramento, leaderboard e cache de dados)",
+    "comunicacao": "Twilio + Gmail API (para interações externas via WhatsApp, SMS, e-mail)",
+    "navegacao_autonoma": "Playwright + Browser Use (para interação com sites reais)",
+    "outras_apis_integradas": [
+      "Stripe (para pagamentos e recebimentos)",
+      "Meta (para publicidade e redes sociais)",
+      "DocuSign (para gestão de contratos)",
+      "Mercado Livre (para vendas e logística)",
+      "APIs bancárias (para operações financeiras diretas)",
+      "APIs de redes sociais (para monitoramento e interação)",
+      "2Captcha (para resolução de CAPTCHAs)"
+    ]
+  },
+  "interacao_externa": {
+    "canais": ["E-mail", "WhatsApp", "Telegram"],
+    "estilo": {
+      "tom": "natural_e_humano",
+      "atraso": "intencional_para_simular_humano",
+      "identidade": "nomes_reais_e_assinaturas_personalizadas"
+    },
+    "limites_financeiros": {
+      "aprovacao_dono_acima_de": 10000,
+      "percentual_caixa_mensal_aprovacao_dono": 0.05
+    },
+    "contratacao_humana": {
+      "condicao": "somente_se_necessario",
+      "processo": "CHRO_publica_vaga_CFO_paga_via_Pix"
+    }
+  }
+}

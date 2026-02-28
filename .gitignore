@@ -1,0 +1,14 @@
+.env
+*.env.local
+nucleo/logs/licencas.jsonl
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+nucleo/logs/audios/
+nucleo/logs/*.jsonl
+!nucleo/logs/.gitkeep
+.DS_Store
+.idea/
+.vscode/

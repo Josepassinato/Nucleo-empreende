@@ -1,0 +1,43 @@
+{
+  "mecanismos_alma": {
+    "estresse": {
+      "descricao": "Medido por atraso em tarefas críticas, orçamento baixo ou feedback negativo. Acima de 70% de estresse, o agente pede ajuda ao seu superior ou ao Coach.",
+      "gatilhos": ["atraso_tarefa_critica", "orcamento_baixo", "feedback_negativo"],
+      "limite_alerta": 0.7,
+      "acao_limite": "solicitar_ajuda_superior_ou_coach"
+    },
+    "proatividade": {
+      "descricao": "20% do tempo de processamento do agente é dedicado a tentar soluções fora da caixa, explorar novas ideias ou otimizar processos.",
+      "taxa_exploracao": 0.2,
+      "objetivo": "solucoes_inovadoras_e_otimizacao"
+    },
+    "sugestao": {
+      "descricao": "Canal aberto para agentes enviarem sugestões aos seus superiores. Boas ideias resultam em 'bônus de confiança' no Leaderboard.",
+      "canal": "aberto_para_superiores",
+      "recompensa_boa_ideia": "bonus_de_confianca_leaderboard"
+    },
+    "reuniao_semanal": {
+      "descricao": "Chat simulado onde todos os diretores 'se encontram' semanalmente. Lucas Mendes (CEO) lidera a pauta e as discussões.",
+      "formato": "chat_simulado",
+      "lideranca": "Lucas Mendes",
+      "participantes": "toda_diretoria"
+    },
+    "leaderboard": {
+      "descricao": "Sistema de pontuação de 0 a 10 para cada agente, baseado em KPIs, proatividade, pontualidade e cultura.",
+      "pesos": {
+        "kpi": 0.4,
+        "proatividade": 0.3,
+        "pontualidade": 0.2,
+        "cultura": 0.1
+      },
+      "recompensas_top3": {
+        "descricao": "Os 3 agentes com maior pontuação recebem mais 'crédito' (recursos de processamento) e 'folga' (redução temporária de carga de trabalho).",
+        "beneficios": ["mais_credito_processamento", "folga_carga_trabalho"]
+      },
+      "penalidades_bottom3": {
+        "descricao": "Os 3 agentes com menor pontuação recebem coaching extra com Zé Carvalho e um plano de melhoria de desempenho.",
+        "acoes": ["coaching_extra_ze_carvalho", "plano_melhoria_desempenho"]
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "seguranca_recuperacao": {
+    "supervisao_cruzada": {
+      "descricao": "Cada agente vigia outro; erro grave (ex: pagamento fantasma, envio de spam) bloqueia APIs críticas até a correção e aprovação humana.",
+      "validador": "sistema_de_auditoria_automatizado",
+      "acao_erro_grave": "bloqueio_api_e_alerta_humano"
+    },
+    "backup": {
+      "frequencia": "12h",
+      "tipo": "automatico_criptografado",
+      "localizacao": "nuvem_segura_geo_redundante"
+    },
+    "modo_recuperacao": {
+      "descricao": "Em caso de falha crítica, o sistema retorna automaticamente ao último estado operacional bom, minimizando perdas.",
+      "acao": "voltar_ultimo_estado_bom",
+      "gatilho": "falha_critica_detectada"
+    },
+    "advogado_virtual": {
+      "descricao": "Módulo de IA dedicado a checar conformidade legal (LGPD, CLT) e contratual em todas as operações e interações.",
+      "foco": ["LGPD", "CLT", "Contratos", "Termos_de_Servico_APIs"],
+      "acao_nao_conformidade": "alerta_e_bloqueio_operacao"
+    },
+    "kill_switch": {
+      "descricao": "O Dono possui veto absoluto e um botão de emergência no celular para parar todas as operações da diretoria imediatamente.",
+      "acesso": "Dono (Conselho)",
+      "dispositivo": "Celular",
+      "acao": "Veto_absoluto_e_parada_total_emergencial"
+    },
+    "navegacao_autonoma_seguranca": {
+      "descricao": "Protocolos de segurança específicos para a ferramenta de navegação autônoma.",
+      "uso_sandbox_vm": "O browser deve ser executado em ambiente isolado (sandbox/VM) para mitigar riscos.",
+      "credenciais_seguras": "Credenciais reais nunca devem ser expostas diretamente em prompts ou logs não criptografados.",
+      "log_acoes": "Todas as ações de navegação devem ser logadas para auditoria e rastreabilidade."
+    },
+    "auditoria": {
+      "descricao": "Todas as interações e decisões são logadas de forma criptografada e imutável para rastreabilidade e conformidade.",
+      "tipo_log": "criptografado_e_imutavel",
+      "finalidade": "rastreabilidade_e_conformidade"
+    }
+  }
+}

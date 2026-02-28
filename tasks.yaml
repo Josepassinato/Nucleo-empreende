@@ -1,0 +1,137 @@
+tasks:
+
+  # ─────────────────────────────────────────────
+  # CICLO 1 — INTELIGÊNCIA DE MERCADO
+  # ─────────────────────────────────────────────
+
+  pesquisa_tendencias:
+    description: |
+      Pesquise as últimas tendências de mercado relevantes para o negócio atual da Nucleo Empreende.
+      Identifique os 5 principais concorrentes diretos e analise suas estratégias de marketing digital,
+      posicionamento de preço e diferencial de produto.
+      Use a ferramenta de navegação para acessar sites reais, redes sociais e notícias recentes.
+      Prepare um resumo executivo com: tendências-chave, mapa de concorrentes e oportunidades não exploradas.
+    expected_output: |
+      Um resumo executivo detalhado em Markdown contendo:
+      1. Top 5 tendências de mercado (com fontes)
+      2. Tabela comparativa dos 5 concorrentes (nome, diferenciais, fraquezas, preço estimado)
+      3. 3 oportunidades concretas para a Nucleo Empreende explorar
+    agent: dani_ferreira
+
+  analise_custos_api:
+    description: |
+      Analise os custos atuais das APIs e serviços de IA que estamos utilizando.
+      Pesquise alternativas mais baratas ou gratuitas (OpenRouter, Groq, Together.ai, Ollama, etc.).
+      Verifique programas de crédito: Google Startup Program, AWS Activate, BNDES Inovação.
+      Prepare relatório comparativo com recomendações priorizadas por ROI de migração.
+    expected_output: |
+      Relatório em Markdown com:
+      1. Tabela de custos atuais vs alternativas (por API/serviço)
+      2. Estimativa de economia mensal se migrar top 3 alternativas
+      3. Guia passo a passo de migração da opção mais vantajosa
+      4. Links dos programas de crédito encontrados com requisitos
+    agent: beto_rocha
+
+  # ─────────────────────────────────────────────
+  # CICLO 2 — MARKETING E PRODUTO
+  # ─────────────────────────────────────────────
+
+  proposta_campanha:
+    description: |
+      Com base nos insights do relatório de pesquisa de tendências, crie uma proposta completa
+      de campanha de marketing digital para o próximo mês.
+      A campanha deve cobrir: Instagram, TikTok e E-mail Marketing.
+      Inclua: calendário editorial (4 semanas), 5 ideias de conteúdo viral, CTAs específicos,
+      KPIs de acompanhamento e orçamento estimado.
+    expected_output: |
+      Proposta de campanha em Markdown com:
+      1. Objetivo da campanha e KPIs (CTR meta, CPL meta, taxa de conversão)
+      2. Calendário editorial semana a semana (tabela)
+      3. 5 ideias de conteúdo viral com formato e script resumido
+      4. Budget estimado (orgânico vs pago)
+      5. Plano de contingência se KPIs não atingirem 50% em 2 semanas
+    agent: mariana_oliveira
+    depends_on:
+      - pesquisa_tendencias
+
+  plano_produto:
+    description: |
+      Com base nas tendências identificadas pela Dani e na proposta de campanha da Mariana,
+      defina o roadmap de produto para os próximos 60 dias.
+      Priorize funcionalidades usando o framework RICE (Reach, Impact, Confidence, Effort).
+      Identifique o MVP mínimo para o próximo lançamento e como validar em 2 semanas com custo < R$500.
+    expected_output: |
+      Roadmap em Markdown com:
+      1. Tabela RICE com top 5 funcionalidades/iniciativas priorizadas
+      2. Definição do MVP (mínimo 3 critérios de sucesso mensuráveis)
+      3. Plano de validação em 14 dias com orçamento detalhado
+      4. Riscos identificados e mitigações
+    agent: rafael_torres
+    depends_on:
+      - pesquisa_tendencias
+      - proposta_campanha
+
+  # ─────────────────────────────────────────────
+  # CICLO 3 — FINANCEIRO E OPERACIONAL
+  # ─────────────────────────────────────────────
+
+  relatorio_financeiro:
+    description: |
+      Consolide os dados financeiros do período, incluindo os custos identificados pelo Beto
+      e os investimentos propostos pela Mariana e Rafael.
+      Projete o fluxo de caixa para os próximos 30 dias considerando os cenários das propostas.
+      Identifique quais decisões requerem aprovação do Dono (>R$10k ou >5% caixa mensal).
+      Sinalize qualquer risco de compliance (LGPD, CLT, contratos).
+    expected_output: |
+      Relatório financeiro em Markdown com:
+      1. Resumo de receitas e despesas atuais
+      2. Impacto financeiro das propostas de marketing e produto (custo vs retorno esperado)
+      3. Projeção de fluxo de caixa 30 dias (tabela)
+      4. Lista de itens que necessitam aprovação do Dono (com justificativa)
+      5. Alertas de compliance identificados
+    agent: pedro_lima
+    depends_on:
+      - analise_custos_api
+      - proposta_campanha
+      - plano_produto
+
+  plano_operacional:
+    description: |
+      Com base em todas as propostas anteriores, crie o plano operacional da semana.
+      Defina quem faz o quê, até quando, e como será medido.
+      Identifique gargalos potenciais e estabeleça planos de contingência.
+      Garanta que o João Silva (humano) tenha tarefas claras e viáveis para ele.
+    expected_output: |
+      Plano operacional em Markdown com:
+      1. Matriz de responsabilidades (RACI) da semana
+      2. Cronograma de entregas com datas e responsáveis
+      3. Top 3 riscos operacionais e como mitigar
+      4. Tarefas específicas para o João Silva (simples, com instruções passo a passo)
+    agent: carla_santos
+    depends_on:
+      - relatorio_financeiro
+
+  # ─────────────────────────────────────────────
+  # CICLO 4 — SÍNTESE EXECUTIVA
+  # ─────────────────────────────────────────────
+
+  sintese_executiva:
+    description: |
+      Você é Lucas Mendes, CEO. Consolide todos os relatórios da semana em uma síntese executiva
+      para apresentar ao Dono da empresa.
+      Inclua: situação atual, decisões tomadas autonomamente, decisões que precisam de aprovação
+      do Dono, próximos 3 passos prioritários e o estado da equipe (estresse, leaderboard).
+      Seja direto, sem rodeios. O Dono tem 5 minutos para ler isso.
+    expected_output: |
+      Síntese executiva em Markdown (máximo 1 página) com:
+      1. 🟢/🟡/🔴 Status geral do negócio
+      2. Top 3 decisões tomadas essa semana (com resultado esperado)
+      3. ⚠️ Decisões que precisam do Dono (com prazo e valor em jogo)
+      4. 📈 Próximos 3 passos da semana (dono de cada um)
+      5. 👥 Pulso da equipe (quem está bem, quem precisa de atenção)
+    agent: lucas_mendes
+    depends_on:
+      - plano_operacional
+      - relatorio_financeiro
+      - proposta_campanha
+      - plano_produto

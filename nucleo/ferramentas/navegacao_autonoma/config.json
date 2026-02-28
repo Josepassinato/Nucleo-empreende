@@ -1,0 +1,19 @@
+{
+  "browser": "chromium",
+  "headless": true,
+  "stealth": true,
+  "timeout": 60000,
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "proxy": {
+    "enabled": false,
+    "url": "http://usuario:senha@proxy.exemplo.com:8080"
+  },
+  "captcha_solver": {
+    "enabled": true,
+    "servico": "2Captcha",
+    "api_key": "SUA_CHAVE_2CAPTCHA_AQUI"
+  }
+}

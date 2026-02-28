@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nucleo Empreende — Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --amber:#f59e0b;--amber2:#d97706;--green:#10b981;--red:#ef4444;
+  --bg:#07090f;--bg2:#0d1220;--surface:#111827;--surface2:#1a2438;
+  --border:rgba(255,255,255,0.07);--text:#e2e8f0;--muted:#64748b;
+  --syne:'Syne',sans-serif;--dm:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--dm);min-height:100vh;overflow-x:hidden}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{
+  background:var(--bg2);border-right:1px solid var(--border);
+  position:sticky;top:0;height:100vh;display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.sidebar-brand{padding:28px 24px 24px;border-bottom:1px solid var(--border)}
+.sidebar-brand h1{font-family:var(--syne);font-size:17px;font-weight:800;color:var(--amber);letter-spacing:-0.5px}
+.sidebar-brand p{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:4px}
+
+.nav-section{padding:20px 16px 0}
+.nav-section-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--muted);padding:0 8px;margin-bottom:8px;text-transform:uppercase}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;
+  border-radius:8px;cursor:pointer;transition:all 0.15s;margin-bottom:2px;
+  border:1px solid transparent;text-decoration:none;
+}
+.nav-item:hover{background:var(--surface)}
+.nav-item.active{background:var(--surface);border-color:rgba(245,158,11,0.2)}
+.nav-item.done .nav-num{background:var(--green)!important;color:#fff!important}
+.nav-num{
+  width:24px;height:24px;border-radius:6px;background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;font-weight:600;color:var(--muted);
+  flex-shrink:0;transition:all 0.2s;
+}
+.nav-item.active .nav-num{background:var(--amber);color:#000}
+.nav-text h4{font-size:12px;font-weight:600;color:var(--muted);transition:color 0.15s}
+.nav-text p{font-size:10px;color:#334155;margin-top:1px}
+.nav-item.active .nav-text h4{color:var(--text)}
+.nav-item.done .nav-text h4{color:var(--text)}
+
+.sidebar-progress{margin-top:auto;padding:20px 24px;border-top:1px solid var(--border)}
+.prog-label{display:flex;justify-content:space-between;margin-bottom:8px}
+.prog-label span{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.prog-label strong{font-family:var(--mono);font-size:9px;color:var(--amber)}
+.prog-bar{height:3px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--green));transition:width 0.5s ease}
+
+/* MAIN */
+.main{overflow-y:auto;height:100vh}
+.page{display:none;padding:48px;max-width:800px}
+.page.active{display:block}
+
+.page-hero{margin-bottom:40px}
+.page-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--amber);margin-bottom:12px;text-transform:uppercase}
+.page-title{font-family:var(--syne);font-size:36px;font-weight:800;letter-spacing:-1.5px;color:#fff;line-height:1.1;margin-bottom:12px}
+.page-sub{font-size:16px;color:var(--muted);line-height:1.7;max-width:560px}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px;transition:border-color 0.2s}
+.card:hover{border-color:rgba(245,158,11,0.2)}
+.card-title{font-family:var(--syne);font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.card-body{font-size:14px;color:var(--muted);line-height:1.7}
+
+/* CODE BLOCKS */
+.code-block{background:#050810;border:1px solid var(--border);border-radius:12px;padding:0;margin:16px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--bg2)}
+.code-lang{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px}
+.copy-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:all 0.15s;font-family:var(--mono)}
+.copy-btn:hover{border-color:var(--amber);color:var(--amber)}
+.copy-btn.copied{border-color:var(--green);color:var(--green)}
+pre{padding:20px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:#94a3b8}
+pre .c{color:var(--muted)}
+pre .k{color:var(--amber)}
+pre .s{color:var(--green)}
+pre .h{color:#60a5fa}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:0}
+.step-item{display:flex;gap:20px;padding-bottom:32px;position:relative}
+.step-item:not(:last-child)::before{content:'';position:absolute;left:19px;top:44px;bottom:0;width:1px;background:var(--border)}
+.step-dot{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid var(--border);background:var(--surface);position:relative;z-index:1}
+.step-content{flex:1;padding-top:8px}
+.step-content h3{font-family:var(--syne);font-size:16px;font-weight:700;margin-bottom:8px}
+.step-content p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px}
+
+/* CHECKLIST */
+.checklist{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.check-item{display:flex;align-items:flex-start;gap:14px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all 0.15s;-webkit-user-select:none;user-select:none}
+.check-item:hover{border-color:rgba(245,158,11,0.2)}
+.check-item.checked{border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.04)}
+.check-box{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;margin-top:1px}
+.check-item.checked .check-box{background:var(--green);border-color:var(--green);color:#fff}
+.check-text h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.check-text p{font-size:12px;color:var(--muted)}
+.check-item.checked .check-text h4{color:var(--green)}
+
+/* API TABLE */
+.api-table{width:100%;border-collapse:collapse;margin-top:20px}
+.api-table th{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--muted);padding:10px 16px;text-align:left;border-bottom:1px solid var(--border);text-transform:uppercase}
+.api-table td{padding:14px 16px;font-size:13px;border-bottom:1px solid var(--border)}
+.api-table tr:last-child td{border-bottom:none}
+.api-table tr:hover td{background:var(--surface2)}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;font-family:var(--mono)}
+.badge-req{background:rgba(239,68,68,0.15);color:#fca5a5}
+.badge-opt{background:var(--surface2);color:var(--muted)}
+.badge-ok{background:rgba(16,185,129,0.15);color:#6ee7b7}
+
+/* ALERT BOXES */
+.alert{padding:16px 20px;border-radius:12px;margin:16px 0;font-size:14px;line-height:1.6;display:flex;gap:12px}
+.alert-amber{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25)}
+.alert-green{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25)}
+.alert-blue{background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2)}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+
+/* TEST RUNNER */
+.test-runner{background:#050810;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:20px}
+.test-runner-header{padding:16px 24px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.test-runner-header span{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.run-btn{background:var(--amber);color:#000;border:none;padding:8px 20px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--syne)}
+.run-btn:hover{background:var(--amber2)}
+.run-btn:disabled{opacity:0.5;cursor:not-allowed}
+.test-output{padding:20px 24px;font-family:var(--mono);font-size:12px;line-height:1.9;min-height:200px;max-height:360px;overflow-y:auto}
+.test-line{opacity:0;transform:translateY(4px);transition:all 0.2s}
+.test-line.show{opacity:1;transform:translateY(0)}
+.ok-line{color:var(--green)}
+.warn-line{color:var(--amber)}
+.err-line{color:var(--red)}
+.dim-line{color:var(--muted)}
+.done-line{color:#fff;font-weight:700}
+
+/* NEXT STEP BTN */
+.next-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--amber);color:#000;border:none;
+  padding:14px 32px;border-radius:12px;font-size:15px;font-weight:800;
+  cursor:pointer;font-family:var(--syne);margin-top:32px;
+  transition:all 0.2s;
+}
+.next-btn:hover{background:var(--amber2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(245,158,11,0.25)}
+.back-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:14px 24px;border-radius:12px;font-size:14px;font-weight:600;
+  cursor:pointer;font-family:var(--dm);margin-top:32px;margin-right:12px;
+  transition:all 0.2s;
+}
+.back-btn:hover{border-color:var(--muted);color:var(--text)}
+
+/* SUCCESS PAGE */
+.success-card{background:linear-gradient(135deg,#070d1a,#0d1a2e);border:1px solid rgba(245,158,11,0.2);border-radius:24px;padding:56px;text-align:center}
+.success-icon{font-size:72px;margin-bottom:24px;display:block}
+.success-card h2{font-family:var(--syne);font-size:36px;font-weight:800;color:var(--amber);letter-spacing:-1px;margin-bottom:12px}
+.success-card p{font-size:16px;color:var(--muted);max-width:480px;margin:0 auto 36px;line-height:1.7}
+.cmd-pill{background:#050810;border:1px solid var(--border);border-radius:10px;padding:14px 24px;font-family:var(--mono);font-size:13px;color:var(--green);display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;cursor:pointer;transition:border-color 0.15s}
+.cmd-pill:hover{border-color:var(--amber)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main{height:auto}
+  .page{padding:28px 20px}
+}
+
+/* ANIMATIONS */
+@keyframes fade-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.page.active{animation:fade-in 0.3s ease}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <h1>Nucleo Empreende</h1>
+    <p>GUIA DE ONBOARDING</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Início</div>
+    <a class="nav-item active" data-page="0" onclick="ir(0)">
+      <div class="nav-num">👋</div>
+      <div class="nav-text"><h4>Bem-vindo</h4><p>Introdução ao framework</p></div>
+    </a>
+  </div>
+
+  <div class="nav-section" style="margin-top:8px">
+    <div class="nav-section-label">Instalação</div>
+    <a class="nav-item" data-page="1" onclick="ir(1)">
+      <div class="nav-num">1</div>
+      <div class="nav-text"><h4>Seu servidor</h4><p>VPS ou máquina local</p></div>
+    </a>
+    <a class="nav-item" data-page="2" onclick="ir(2)">
+      <div class="nav-num">2</div>
+      <div class="nav-text"><h4>Instalar</h4><p>1 comando no terminal</p></div>
+    </a>
+    <a class="nav-item" data-page="3" onclick="ir(3)">
+      <div class="nav-num">3</div>
+      <div class="nav-text"><h4>API Keys</h4><p>Configurar integrações</p></div>
+    </a>
+  </div>
+
+  <div class="nav-section" style="margin-top:8px">
+    <div class="nav-section-label">Configuração</div>
+    <a class="nav-item" data-page="4" onclick="ir(4)">
+      <div class="nav-num">4</div>
+      <div class="nav-text"><h4>Testar tudo</h4><p>Validar conexões</p></div>
+    </a>
+    <a class="nav-item" data-page="5" onclick="ir(5)">
+      <div class="nav-num">5</div>
+      <div class="nav-text"><h4>Primeiro ciclo</h4><p>Iniciar os agentes</p></div>
+    </a>
+    <a class="nav-item" data-page="6" onclick="ir(6)">
+      <div class="nav-num">6</div>
+      <div class="nav-text"><h4>Dashboard</h4><p>Painel de controle</p></div>
+    </a>
+  </div>
+
+  <div class="nav-section" style="margin-top:8px;margin-bottom:20px">
+    <div class="nav-section-label">Pronto</div>
+    <a class="nav-item" data-page="7" onclick="ir(7)">
+      <div class="nav-num">🚀</div>
+      <div class="nav-text"><h4>Em operação</h4><p>Próximos passos</p></div>
+    </a>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="prog-label">
+      <span>Progresso</span>
+      <strong id="pct-text">0%</strong>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- PAGE 0: BEM-VINDO -->
+  <div class="page active" id="page-0">
+    <div class="page-hero">
+      <div class="page-label">bem-vindo ao núcleo</div>
+      <h1 class="page-title">Você está a 20 minutos<br>de ter sua diretoria de IA.</h1>
+      <p class="page-sub">Este guia vai te levar passo a passo da instalação até os agentes operando. Siga na ordem e não pule etapas.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🗺️ O que vamos fazer</div>
+      <div class="card-body">
+        <div class="steps">
+          <div class="step-item"><div class="step-dot">🖥️</div><div class="step-content"><h3>Preparar o servidor</h3><p>VPS ou máquina local com Linux/macOS. Se você já tem uma VPS, já está pronto para o próximo passo.</p></div></div>
+          <div class="step-item"><div class="step-dot">⚡</div><div class="step-content"><h3>Instalar com 1 comando</h3><p>Um único <code style="font-family:var(--mono);font-size:12px;background:var(--surface2);padding:2px 8px;border-radius:4px;color:var(--amber)">curl | bash</code> instala tudo: Python, dependências, o framework completo.</p></div></div>
+          <div class="step-item"><div class="step-dot">🔑</div><div class="step-content"><h3>Configurar API Keys</h3><p>O Setup Wizard guia você para configurar cada integração com links diretos e dicas de formato.</p></div></div>
+          <div class="step-item"><div class="step-dot">✅</div><div class="step-content"><h3>Testar e iniciar</h3><p>Validamos todas as conexões antes de ligar. Você vê exatamente o que está funcionando.</p></div></div>
+          <div class="step-item" style="padding-bottom:0"><div class="step-dot">🧠</div><div class="step-content"><h3>Agentes em operação</h3><p>9 diretores de IA trabalhando pela sua empresa. A primeira reunião semanal acontece em 24h.</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-amber">
+      <div class="alert-icon">⏱️</div>
+      <div><strong style="color:var(--amber)">Tempo total estimado:</strong> 15–25 minutos dependendo da velocidade da sua internet e da quantidade de API keys que configurar agora.</div>
+    </div>
+
+    <button class="next-btn" onclick="ir(1)">Começar → Preparar servidor</button>
+  </div>
+
+  <!-- PAGE 1: SERVIDOR -->
+  <div class="page" id="page-1">
+    <div class="page-hero">
+      <div class="page-label">passo 1 de 6</div>
+      <h1 class="page-title">Onde você vai instalar?</h1>
+      <p class="page-sub">O framework roda em qualquer Linux ou macOS. Escolha sua situação:</p>
+    </div>
+
+    <div class="checklist" id="server-choice">
+      <div class="check-item" onclick="escolherServidor(this, 'vps')">
+        <div class="check-box">✓</div>
+        <div class="check-text"><h4>🖥️ Tenho uma VPS / servidor</h4><p>DigitalOcean, Hetzner, AWS, Contabo ou qualquer Linux. Já tenho acesso SSH.</p></div>
+      </div>
+      <div class="check-item" onclick="escolherServidor(this, 'local')">
+        <div class="check-box">✓</div>
+        <div class="check-text"><h4>💻 Quero instalar no meu Mac</h4><p>macOS 12 ou superior. Instala direto no terminal.</p></div>
+      </div>
+      <div class="check-item" onclick="escolherServidor(this, 'windows')">
+        <div class="check-box">✓</div>
+        <div class="check-text"><h4>🪟 Tenho Windows</h4><p>Funciona via WSL2 (Ubuntu no Windows). Mostro como ativar.</p></div>
+      </div>
+      <div class="check-item" onclick="escolherServidor(this, 'novo')">
+        <div class="check-box">✓</div>
+        <div class="check-text"><h4>🌐 Preciso criar uma VPS agora</h4><p>Vou te indicar as melhores opções com custo e tempo de setup.</p></div>
+      </div>
+    </div>
+
+    <div id="server-detail" style="display:none;margin-top:16px"></div>
+
+    <button class="back-btn" onclick="ir(0)">← Voltar</button>
+    <button class="next-btn" onclick="ir(2)">Próximo → Instalar</button>
+  </div>
+
+  <!-- PAGE 2: INSTALAR -->
+  <div class="page" id="page-2">
+    <div class="page-hero">
+      <div class="page-label">passo 2 de 6</div>
+      <h1 class="page-title">Instalar o framework</h1>
+      <p class="page-sub">Cole o comando abaixo no terminal do seu servidor. O instalador faz todo o resto automaticamente.</p>
+    </div>
+
+    <div class="alert alert-blue">
+      <div class="alert-icon">💡</div>
+      <div>Se você está em uma VPS, primeiro conecte via SSH:<br><code style="font-family:var(--mono);font-size:12px;color:#93c5fd">ssh ubuntu@IP_DO_SEU_SERVIDOR</code></div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TERMINAL</span>
+        <button class="copy-btn" onclick="copiar(this,'curl -fsSL https://install.nucleoempreende.com.br | bash -s SUA_CHAVE_AQUI')">copiar</button>
+      </div>
+      <pre><span class="c"># Cole no terminal e pressione Enter</span>
+<span class="k">curl</span> -fsSL https://install.nucleoempreende.com.br | <span class="k">bash</span> -s <span class="s">SUA_CHAVE_AQUI</span></pre>
+    </div>
+
+    <div class="alert alert-amber">
+      <div class="alert-icon">🔑</div>
+      <div><strong style="color:var(--amber)">Substitua SUA_CHAVE_AQUI</strong> pela chave de licença que você recebeu no e-mail de compra.<br>Formato: <code style="font-family:var(--mono);font-size:12px;color:var(--amber)">NF-XXXX-XXXX-XXXX-XXXX</code></div>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <div class="card-title">📋 O que o instalador faz</div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="color:var(--green)">✓</span> Verifica Python 3.10+</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="color:var(--green)">✓</span> Valida sua licença</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="color:var(--green)">✓</span> Instala 25+ dependências</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="color:var(--green)">✓</span> Configura Redis</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="color:var(--green)">✓</span> Cria o comando <code style="font-family:var(--mono);font-size:11px;background:var(--surface2);padding:1px 6px;border-radius:3px;color:var(--amber)">nucleo</code></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="color:var(--green)">✓</span> Cria serviço systemd</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="color:var(--green)">✓</span> Abre o Setup Wizard</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="color:var(--green)">✓</span> Testa conexões</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⏳ Quanto tempo demora?</div>
+      <div class="card-body">
+        <table style="width:100%;font-size:13px;border-collapse:collapse">
+          <tr><td style="padding:6px 0;color:var(--muted)">Download do framework</td><td style="text-align:right;color:var(--text)">~30 segundos</td></tr>
+          <tr><td style="padding:6px 0;color:var(--muted)">Instalação das dependências Python</td><td style="text-align:right;color:var(--text)">~3–5 minutos</td></tr>
+          <tr><td style="padding:6px 0;color:var(--muted)">Playwright (Chromium)</td><td style="text-align:right;color:var(--text)">~2 minutos</td></tr>
+          <tr style="border-top:1px solid var(--border)"><td style="padding:10px 0 0;font-weight:600">Total</td><td style="text-align:right;padding-top:10px;color:var(--amber);font-weight:700">~5–8 minutos</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <button class="back-btn" onclick="ir(1)">← Voltar</button>
+    <button class="next-btn" onclick="ir(3)">Instalado → Configurar API Keys</button>
+  </div>
+
+  <!-- PAGE 3: API KEYS -->
+  <div class="page" id="page-3">
+    <div class="page-hero">
+      <div class="page-label">passo 3 de 6</div>
+      <h1 class="page-title">Configurar as API Keys</h1>
+      <p class="page-sub">Após a instalação, o Setup Wizard abre automaticamente. Aqui está um guia visual das chaves mais importantes.</p>
+    </div>
+
+    <div class="alert alert-green">
+      <div class="alert-icon">✅</div>
+      <div><strong style="color:var(--green)">Dica:</strong> Comece só com as chaves <strong>OBRIGATÓRIAS</strong>. Os outros conectores funcionam em modo simulação enquanto você não configura. Você pode adicionar depois editando o <code style="font-family:var(--mono);font-size:12px">.env</code>.</div>
+    </div>
+
+    <table class="api-table">
+      <thead>
+        <tr>
+          <th>Serviço</th>
+          <th>Variável</th>
+          <th>Status</th>
+          <th>Link</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>🧠 Google Gemini</strong><br><span style="font-size:11px;color:var(--muted)">LLM principal — gratuito</span></td>
+          <td><code style="font-family:var(--mono);font-size:11px;color:var(--amber)">GOOGLE_API_KEY</code></td>
+          <td><span class="badge badge-req">OBRIG.</span></td>
+          <td><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--amber);font-size:12px">↗ Criar</a></td>
+        </tr>
+        <tr>
+          <td><strong>⚡ Groq API</strong><br><span style="font-size:11px;color:var(--muted)">LLM rápido — gratuito</span></td>
+          <td><code style="font-family:var(--mono);font-size:11px;color:var(--amber)">GROQ_API_KEY</code></td>
+          <td><span class="badge badge-req">OBRIG.</span></td>
+          <td><a href="https://console.groq.com" target="_blank" style="color:var(--amber);font-size:12px">↗ Criar</a></td>
+        </tr>
+        <tr>
+          <td><strong>📱 Twilio WhatsApp</strong><br><span style="font-size:11px;color:var(--muted)">~R$0,005/mensagem</span></td>
+          <td><code style="font-family:var(--mono);font-size:11px;color:var(--amber)">TWILIO_*</code></td>
+          <td><span class="badge badge-req">OBRIG.</span></td>
+          <td><a href="https://console.twilio.com" target="_blank" style="color:var(--amber);font-size:12px">↗ Criar</a></td>
+        </tr>
+        <tr>
+          <td><strong>💳 Mercado Pago</strong><br><span style="font-size:11px;color:var(--muted)">Pix grátis · 3.99% cartão</span></td>
+          <td><code style="font-family:var(--mono);font-size:11px;color:var(--amber)">MERCADOPAGO_*</code></td>
+          <td><span class="badge badge-req">OBRIG.</span></td>
+          <td><a href="https://www.mercadopago.com.br/developers" target="_blank" style="color:var(--amber);font-size:12px">↗ Criar</a></td>
+        </tr>
+        <tr>
+          <td><strong>🧬 Pinecone</strong><br><span style="font-size:11px;color:var(--muted)">Memória vetorial — gratuito</span></td>
+          <td><code style="font-family:var(--mono);font-size:11px;color:var(--muted)">PINECONE_API_KEY</code></td>
+          <td><span class="badge badge-opt">opcional</span></td>
+          <td><a href="https://app.pinecone.io" target="_blank" style="color:var(--amber);font-size:12px">↗ Criar</a></td>
+        </tr>
+        <tr>
+          <td><strong>📊 Meta Ads</strong><br><span style="font-size:11px;color:var(--muted)">Campanhas automáticas</span></td>
+          <td><code style="font-family:var(--mono);font-size:11px;color:var(--muted)">META_ACCESS_TOKEN</code></td>
+          <td><span class="badge badge-opt">opcional</span></td>
+          <td><a href="https://developers.facebook.com" target="_blank" style="color:var(--amber);font-size:12px">↗ Criar</a></td>
+        </tr>
+        <tr>
+          <td><strong>🛒 Hotmart</strong><br><span style="font-size:11px;color:var(--muted)">Vendas digitais</span></td>
+          <td><code style="font-family:var(--mono);font-size:11px;color:var(--muted)">HOTMART_*</code></td>
+          <td><span class="badge badge-opt">opcional</span></td>
+          <td><a href="https://app.hotmart.com" target="_blank" style="color:var(--amber);font-size:12px">↗ Criar</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="card" style="margin-top:24px">
+      <div class="card-title">✏️ Editar o .env manualmente</div>
+      <div class="card-body">
+        Se precisar adicionar ou alterar chaves depois:
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-header"><span class="code-lang">TERMINAL</span><button class="copy-btn" onclick="copiar(this,'nano ~/nucleo-empreende/.env')">copiar</button></div>
+          <pre><span class="k">nano</span> ~/nucleo-empreende/.env</pre>
+        </div>
+        Salve com <code style="font-family:var(--mono);font-size:12px;background:var(--surface2);padding:2px 6px;border-radius:4px">Ctrl+X → Y → Enter</code>. As mudanças têm efeito no próximo restart.
+      </div>
+    </div>
+
+    <button class="back-btn" onclick="ir(2)">← Voltar</button>
+    <button class="next-btn" onclick="ir(4)">Próximo → Testar conexões</button>
+  </div>
+
+  <!-- PAGE 4: TESTAR -->
+  <div class="page" id="page-4">
+    <div class="page-hero">
+      <div class="page-label">passo 4 de 6</div>
+      <h1 class="page-title">Testar os conectores</h1>
+      <p class="page-sub">Antes de iniciar em produção, vamos verificar que tudo está funcionando. Rode o comando abaixo no terminal do servidor.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TERMINAL</span>
+        <button class="copy-btn" onclick="copiar(this,'cd ~/nucleo-empreende && python3 testar_tudo.py')">copiar</button>
+      </div>
+      <pre><span class="k">cd</span> ~/nucleo-empreende
+<span class="k">python3</span> testar_tudo.py</pre>
+    </div>
+
+    <div class="test-runner">
+      <div class="test-runner-header">
+        <span>Simulação da saída esperada</span>
+        <button class="run-btn" id="run-btn" onclick="simularTeste()">▶ Simular</button>
+      </div>
+      <div class="test-output" id="test-output">
+        <span style="color:var(--muted);font-size:12px">Clique em "Simular" para ver como deve aparecer no seu terminal →</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <div class="card-title">🔍 Interpretando o resultado</div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:13px;color:var(--green);width:80px">✅ produção</span><span style="font-size:13px;color:var(--muted)">API key configurada e conexão OK</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:13px;color:var(--amber);width:80px">⚠️ simulação</span><span style="font-size:13px;color:var(--muted)">Sem API key — funciona mas não faz chamadas reais</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:13px;color:var(--red);width:80px">❌ erro</span><span style="font-size:13px;color:var(--muted)">Chave configurada mas inválida — verifique o formato</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-amber">
+      <div class="alert-icon">⚠️</div>
+      <div>Para continuar, você precisa de pelo menos <strong style="color:var(--amber)">Gemini, Groq e Twilio</strong> em modo produção. Os demais podem ficar em simulação.</div>
+    </div>
+
+    <button class="back-btn" onclick="ir(3)">← Voltar</button>
+    <button class="next-btn" onclick="ir(5)">Tudo OK → Primeiro ciclo</button>
+  </div>
+
+  <!-- PAGE 5: PRIMEIRO CICLO -->
+  <div class="page" id="page-5">
+    <div class="page-hero">
+      <div class="page-label">passo 5 de 6</div>
+      <h1 class="page-title">Iniciar os agentes</h1>
+      <p class="page-sub">Tudo validado. É hora de ligar a diretoria.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TERMINAL</span>
+        <button class="copy-btn" onclick="copiar(this,'nucleo start')">copiar</button>
+      </div>
+      <pre><span class="k">nucleo</span> start</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🧠 O que acontece agora</div>
+      <div class="card-body">
+        <div class="steps">
+          <div class="step-item"><div class="step-dot" style="font-size:14px">01</div><div class="step-content"><h3>Agentes inicializam</h3><p>Cada agente carrega sua personalidade, memória e lista de tarefas. Leva ~30 segundos.</p></div></div>
+          <div class="step-item"><div class="step-dot" style="font-size:14px">02</div><div class="step-content"><h3>Lucas faz um briefing</h3><p>O CEO lê o estado da empresa (configurações, dados disponíveis) e distribui as primeiras tarefas para a equipe.</p></div></div>
+          <div class="step-item"><div class="step-dot" style="font-size:14px">03</div><div class="step-content"><h3>Você recebe uma mensagem no WhatsApp</h3><p>A Ana Costa (CHRO) envia uma mensagem te apresentando a equipe e confirmando que todos estão operando.</p></div></div>
+          <div class="step-item" style="padding-bottom:0"><div class="step-dot" style="font-size:14px">04</div><div class="step-content"><h3>Primeira reunião em 24h</h3><p>O sistema agenda a primeira reunião semanal. Você recebe a ata por e-mail e WhatsApp.</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Outros comandos úteis</div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+          <div style="display:flex;gap:16px;align-items:center"><code style="font-family:var(--mono);font-size:12px;color:var(--amber);width:200px">nucleo stop</code><span style="font-size:13px;color:var(--muted)">Para todos os agentes</span></div>
+          <div style="display:flex;gap:16px;align-items:center"><code style="font-family:var(--mono);font-size:12px;color:var(--amber);width:200px">nucleo status</code><span style="font-size:13px;color:var(--muted)">Status de cada agente</span></div>
+          <div style="display:flex;gap:16px;align-items:center"><code style="font-family:var(--mono);font-size:12px;color:var(--amber);width:200px">nucleo logs</code><span style="font-size:13px;color:var(--muted)">Ver atividade em tempo real</span></div>
+          <div style="display:flex;gap:16px;align-items:center"><code style="font-family:var(--mono);font-size:12px;color:var(--amber);width:200px">nucleo setup</code><span style="font-size:13px;color:var(--muted)">Reconfigurar API keys</span></div>
+          <div style="display:flex;gap:16px;align-items:center"><code style="font-family:var(--mono);font-size:12px;color:var(--amber);width:200px">bash kill_switch.sh</code><span style="font-size:13px;color:var(--muted)">Parar tudo imediatamente</span></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="back-btn" onclick="ir(4)">← Voltar</button>
+    <button class="next-btn" onclick="ir(6)">Próximo → Dashboard</button>
+  </div>
+
+  <!-- PAGE 6: DASHBOARD -->
+  <div class="page" id="page-6">
+    <div class="page-hero">
+      <div class="page-label">passo 6 de 6</div>
+      <h1 class="page-title">Acessar o dashboard</h1>
+      <p class="page-sub">O painel de controle mostra o estado de todos os agentes, aprovações pendentes e atividade em tempo real.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TERMINAL</span>
+        <button class="copy-btn" onclick="copiar(this,'nucleo dashboard')">copiar</button>
+      </div>
+      <pre><span class="k">nucleo</span> dashboard
+
+<span class="c"># Dashboard disponível em:</span>
+<span class="h">http://localhost:8000</span>   <span class="c"># local</span>
+<span class="h">http://IP_DO_SERVIDOR:8000</span>   <span class="c"># VPS</span></pre>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 O que você vê no dashboard</div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
+          <div style="padding:14px;background:var(--surface2);border-radius:10px"><div style="font-weight:600;font-size:13px;margin-bottom:4px">🧠 Estado dos agentes</div><div style="font-size:12px;color:var(--muted)">Score, estresse, energia e tarefa atual de cada agente em tempo real via WebSocket</div></div>
+          <div style="padding:14px;background:var(--surface2);border-radius:10px"><div style="font-weight:600;font-size:13px;margin-bottom:4px">💰 Aprovações pendentes</div><div style="font-size:12px;color:var(--muted)">Gastos acima do limite aguardando sua aprovação com 1 clique</div></div>
+          <div style="padding:14px;background:var(--surface2);border-radius:10px"><div style="font-weight:600;font-size:13px;margin-bottom:4px">📋 Feed de atividade</div><div style="font-size:12px;color:var(--muted)">Tudo que os agentes fizeram nas últimas horas</div></div>
+          <div style="padding:14px;background:var(--surface2);border-radius:10px"><div style="font-weight:600;font-size:13px;margin-bottom:4px">⚙️ Status das APIs</div><div style="font-size:12px;color:var(--muted)">Latência, chamadas e custo de cada integração no dia</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-blue">
+      <div class="alert-icon">🔒</div>
+      <div>Se a sua VPS for acessível publicamente, adicione um proxy reverso com HTTPS antes de expor o dashboard. Veja <a href="docs/instalacao.md" style="color:#93c5fd">docs/instalacao.md</a> para o exemplo Nginx.</div>
+    </div>
+
+    <button class="back-btn" onclick="ir(5)">← Voltar</button>
+    <button class="next-btn" onclick="ir(7)">Concluir onboarding 🎉</button>
+  </div>
+
+  <!-- PAGE 7: PRONTO -->
+  <div class="page" id="page-7">
+    <div class="success-card">
+      <span class="success-icon">🚀</span>
+      <h2>Sua diretoria está operando!</h2>
+      <p>Os 9 agentes estão ativos, conectados e trabalhando. Aqui estão os próximos passos para extrair o máximo do Nucleo Empreende.</p>
+
+      <div style="text-align:left;max-width:480px;margin:0 auto">
+        <p style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;text-align:center">COMANDOS ESSENCIAIS</p>
+        <div class="cmd-pill" onclick="copiar(null,'nucleo dashboard')">
+          <span>$ nucleo dashboard</span>
+          <span style="font-size:11px;color:var(--muted)">painel de controle</span>
+        </div>
+        <div class="cmd-pill" onclick="copiar(null,'nucleo logs')">
+          <span>$ nucleo logs</span>
+          <span style="font-size:11px;color:var(--muted)">ver atividade</span>
+        </div>
+        <div class="cmd-pill" onclick="copiar(null,'nucleo status')">
+          <span>$ nucleo status</span>
+          <span style="font-size:11px;color:var(--muted)">estado dos agentes</span>
+        </div>
+        <div class="cmd-pill" onclick="copiar(null,'nucleo setup')">
+          <span>$ nucleo setup</span>
+          <span style="font-size:11px;color:var(--muted)">adicionar mais APIs</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:24px">
+      <a href="docs/agentes.md" style="text-decoration:none">
+        <div class="card" style="text-align:center;cursor:pointer">
+          <div style="font-size:28px;margin-bottom:8px">👥</div>
+          <div style="font-family:var(--syne);font-weight:700;font-size:14px;margin-bottom:4px">Personalizar agentes</div>
+          <div style="font-size:12px;color:var(--muted)">Mudar nome, cargo e personalidade</div>
+        </div>
+      </a>
+      <a href="docs/api-keys.md" style="text-decoration:none">
+        <div class="card" style="text-align:center;cursor:pointer">
+          <div style="font-size:28px;margin-bottom:8px">🔑</div>
+          <div style="font-family:var(--syne);font-weight:700;font-size:14px;margin-bottom:4px">Mais integrações</div>
+          <div style="font-size:12px;color:var(--muted)">Ativar Meta Ads, Hotmart, ClickSign</div>
+        </div>
+      </a>
+      <a href="https://wa.me/5511XXXXXXXXX" style="text-decoration:none">
+        <div class="card" style="text-align:center;cursor:pointer">
+          <div style="font-size:28px;margin-bottom:8px">💬</div>
+          <div style="font-family:var(--syne);font-weight:700;font-size:14px;margin-bottom:4px">Suporte</div>
+          <div style="font-size:12px;color:var(--muted)">WhatsApp · resposta em até 4h</div>
+        </div>
+      </a>
+    </div>
+
+    <button class="back-btn" onclick="ir(6)">← Voltar</button>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+let paginaAtual = 0;
+const TOTAL = 8;
+
+function ir(n) {
+  // Marca página atual como done
+  document.querySelectorAll('.nav-item').forEach(el => {
+    const p = parseInt(el.dataset.page);
+    el.classList.remove('active');
+    if (p < n) el.classList.add('done');
+    if (p === n) el.classList.add('active');
+  });
+
+  document.querySelectorAll('.page').forEach((p, i) => {
+    p.classList.toggle('active', i === n);
+  });
+
+  paginaAtual = n;
+  atualizarProgresso();
+  document.querySelector('.main').scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function atualizarProgresso() {
+  const pct = Math.round((paginaAtual / (TOTAL - 1)) * 100);
+  document.getElementById('pct-text').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+}
+
+function copiar(btn, texto) {
+  navigator.clipboard.writeText(texto).then(() => {
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = '✓ copiado';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+    }
+  });
+}
+
+function escolherServidor(el, tipo) {
+  document.querySelectorAll('#server-choice .check-item').forEach(i => i.classList.remove('checked'));
+  el.classList.add('checked');
+  el.querySelector('.check-box').textContent = '✓';
+
+  const detail = document.getElementById('server-detail');
+  const conteudos = {
+    vps: `<div class="alert alert-green"><div class="alert-icon">✅</div><div><strong style="color:var(--green)">Ótimo!</strong> Você já tem uma VPS. Conecte via SSH e pule direto para o próximo passo.<br><code style="font-family:var(--mono);font-size:12px">ssh ubuntu@IP_DO_SERVIDOR</code></div></div>`,
+    local: `<div class="alert alert-blue"><div class="alert-icon">🍎</div><div><strong style="color:#93c5fd">macOS detectado.</strong> Certifique-se de ter o Homebrew instalado:<br><code style="font-family:var(--mono);font-size:12px;color:#93c5fd">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code><br>Depois, o instalador funciona normalmente no Terminal.</div></div>`,
+    windows: `<div class="alert alert-amber"><div class="alert-icon">🪟</div><div><strong style="color:var(--amber)">WSL2 necessário.</strong> Abra o PowerShell como administrador e execute:<br><code style="font-family:var(--mono);font-size:12px;color:var(--amber)">wsl --install</code><br>Reinicie o computador. Depois abra o Ubuntu pelo menu Iniciar e prossiga normalmente.</div></div>`,
+    novo: `<div class="card"><div class="card-title">🌐 Criar uma VPS agora</div><div class="card-body"><table style="width:100%;font-size:13px;border-collapse:collapse"><tr><td style="padding:8px 0;font-weight:600">Hetzner CX21</td><td style="color:var(--muted)">2 vCPU / 4GB</td><td style="text-align:right;color:var(--amber)">~R$50/mês</td><td style="padding-left:16px"><a href="https://hetzner.com" target="_blank" style="color:var(--amber);font-size:12px">↗ Abrir</a></td></tr><tr><td style="padding:8px 0;font-weight:600">DigitalOcean</td><td style="color:var(--muted)">2 vCPU / 4GB</td><td style="text-align:right;color:var(--amber)">~R$60/mês</td><td style="padding-left:16px"><a href="https://digitalocean.com" target="_blank" style="color:var(--amber);font-size:12px">↗ Abrir</a></td></tr><tr><td style="padding:8px 0;font-weight:600">Contabo VPS S</td><td style="color:var(--muted)">4 vCPU / 8GB</td><td style="text-align:right;color:var(--amber)">~R$40/mês</td><td style="padding-left:16px"><a href="https://contabo.com" target="_blank" style="color:var(--amber);font-size:12px">↗ Abrir</a></td></tr></table><p style="margin-top:12px;font-size:13px;color:var(--muted)">Crie a VPS com Ubuntu 22.04 LTS. Após criar, você terá o IP e a senha root para conectar via SSH.</p></div></div>`
+  };
+  detail.innerHTML = conteudos[tipo] || '';
+  detail.style.display = 'block';
+}
+
+// Simulação do teste
+const TEST_LINES = [
+  {t:300,  c:'dim',  tx:'══════════════════════════════════════════════'},
+  {t:400,  c:'dim',  tx:'  🧪  NÚCLEO VENTURES — Teste de Conectores'},
+  {t:500,  c:'dim',  tx:'  11 integrações · hoje'},
+  {t:600,  c:'dim',  tx:'══════════════════════════════════════════════'},
+  {t:900,  c:'dim',  tx:''},
+  {t:1000, c:'dim',  tx:'──── 📱 WHATSAPP ────────────────────────────'},
+  {t:1400, c:'ok',   tx:'  ✓ Delay de digitação calculado: 3.2s'},
+  {t:1700, c:'ok',   tx:'  ✓ Envio simulado OK — 1 mensagem(ns)'},
+  {t:2000, c:'dim',  tx:'  ℹ Twilio configurado: SIM'},
+  {t:2200, c:'dim',  tx:''},
+  {t:2300, c:'dim',  tx:'──── 📧 GMAIL ───────────────────────────────'},
+  {t:2600, c:'ok',   tx:'  ✓ Assinatura HTML gerada: 412 chars'},
+  {t:2900, c:'ok',   tx:'  ✓ Envio simulado OK: Relatório Financeiro'},
+  {t:3100, c:'dim',  tx:'  ℹ Gmail configurado: NÃO — usando simulação'},
+  {t:3300, c:'dim',  tx:''},
+  {t:3400, c:'dim',  tx:'──── 💳 PAGAMENTOS ──────────────────────────'},
+  {t:3700, c:'ok',   tx:'  ✓ PIX: aguardando_pagamento | ID: SIM_a1b2'},
+  {t:4000, c:'ok',   tx:'  ✓ Boleto: pendente | ID: SIM_c3d4'},
+  {t:4300, c:'ok',   tx:'  ✓ Bloqueio R$15k → aprovação do Dono ✓'},
+  {t:4500, c:'dim',  tx:''},
+  {t:4600, c:'dim',  tx:'──── 📊 META ADS ────────────────────────────'},
+  {t:4900, c:'ok',   tx:'  ✓ Campanha criada: SIM_3f4g | PAUSED'},
+  {t:5200, c:'ok',   tx:'  ✓ Métricas: 45,200 impressões | CTR 3.0%'},
+  {t:5400, c:'warn', tx:'  ⚠ Meta Ads configurado: NÃO — simulação'},
+  {t:5600, c:'dim',  tx:''},
+  {t:5700, c:'dim',  tx:'──── 🛒 HOTMART ─────────────────────────────'},
+  {t:6000, c:'ok',   tx:'  ✓ Vendas (30 dias): 27 encontradas'},
+  {t:6300, c:'ok',   tx:'  ✓ Aprovadas: 22 | Faturamento: R$ 18,934'},
+  {t:6500, c:'dim',  tx:''},
+  {t:6600, c:'dim',  tx:'──── 🎙️ ELEVENLABS ──────────────────────────'},
+  {t:6900, c:'ok',   tx:'  ✓ Lucas: simulado → \'Bom dia equipe...\''},
+  {t:7100, c:'ok',   tx:'  ✓ Mariana: simulado → \'Campanha aprovada!\''},
+  {t:7300, c:'dim',  tx:''},
+  {t:7500, c:'dim',  tx:'══════════════════════════════════════════════'},
+  {t:7700, c:'done', tx:''},
+  {t:7800, c:'done', tx:'  RESULTADO FINAL'},
+  {t:7900, c:'done', tx:''},
+  {t:8100, c:'ok',   tx:'  ✅  whatsapp              produção'},
+  {t:8200, c:'warn', tx:'  ⚠️  gmail                 simulação'},
+  {t:8300, c:'ok',   tx:'  ✅  pagamentos             produção'},
+  {t:8400, c:'warn', tx:'  ⚠️  meta_ads               simulação'},
+  {t:8500, c:'ok',   tx:'  ✅  hotmart                produção'},
+  {t:8600, c:'warn', tx:'  ⚠️  elevenlabs             simulação'},
+  {t:8700, c:'ok',   tx:'  ✅  memoria                produção'},
+  {t:9000, c:'done', tx:''},
+  {t:9100, c:'ok',   tx:'  7/11 conectores em produção'},
+  {t:9300, c:'dim',  tx:'  Configure as APIs faltantes no .env'},
+  {t:9400, c:'dim',  tx:''},
+];
+
+function simularTeste() {
+  const out = document.getElementById('test-output');
+  const btn = document.getElementById('run-btn');
+  out.innerHTML = '';
+  btn.disabled = true;
+  btn.textContent = '⏳ Rodando...';
+
+  TEST_LINES.forEach(({t, c, tx}) => {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = `test-line show ${c === 'ok' ? 'ok-line' : c === 'warn' ? 'warn-line' : c === 'err' ? 'err-line' : c === 'done' ? 'done-line' : 'dim-line'}`;
+      el.textContent = tx;
+      out.appendChild(el);
+      out.scrollTop = out.scrollHeight;
+    }, t);
+  });
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = '▶ Simular novamente';
+  }, 9600);
+}
+</script>
+</body>
+</html>
