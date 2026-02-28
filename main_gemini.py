@@ -56,11 +56,18 @@ if not GOOGLE_API_KEY:
 # ──────────────────────────────────────────────────────────────────
 
 from crewai import Crew, Process
-from crewai_tools import Tool
+from crewai.tools import BaseTool
+from typing import Any
 
 from nucleo.config_loader import config          # ← inicializa TODA a stack
-from nucleo.ferramentas.navegacao_autonoma.tool import NavegacaoAutonomaTool
 from nucleo.loader import criar_agentes, criar_tarefas
+
+try:
+    from nucleo.ferramentas.navegacao_autonoma.tool import NavegacaoAutonomaTool
+    _NAV_DISPONIVEL = True
+except ImportError as e:
+    logger.warning(f"NavegacaoAutonomaTool indisponível (API browser_use mudou): {e}")
+    _NAV_DISPONIVEL = False
 from nucleo.mecanismos.alma import alma
 from nucleo.mecanismos.reuniao_semanal import gerar_reuniao_semanal, imprimir_ata
 
@@ -77,19 +84,25 @@ if not gemini_llm:
 # Ferramentas disponíveis
 # ──────────────────────────────────────────────────────────────────
 
-navegacao_instance = NavegacaoAutonomaTool()
+TOOLS_MAP: dict[str, BaseTool] = {}
 
-TOOLS_MAP: dict[str, Tool] = {
-    "Navegar Site": Tool(
-        name="Navegar Site",
-        func=navegacao_instance.navegar_site,
-        description=(
+if _NAV_DISPONIVEL:
+    navegacao_instance = NavegacaoAutonomaTool()
+
+    class NavegarSiteTool(BaseTool):
+        name: str = "Navegar Site"
+        description: str = (
             "Navega em sites reais como um humano. Recebe instrução natural e executa. "
             "Ex: 'pesquise concorrentes no Google, abra o primeiro resultado, tire screenshot'. "
             "Retorna texto extraído + screenshot em base64."
-        ),
-    ),
-}
+        )
+
+        def _run(self, instrucao: str, **kwargs) -> Any:
+            return navegacao_instance.navegar_site(instrucao, **kwargs)
+
+    TOOLS_MAP["Navegar Site"] = NavegarSiteTool()
+else:
+    logger.info("⚪ Ferramenta 'Navegar Site' desativada — browser_use incompatível.")
 
 # ──────────────────────────────────────────────────────────────────
 # Banner de inicialização
@@ -184,7 +197,7 @@ def modo_tarefas():
     crew = Crew(
         agents=list(agentes.values()),
         tasks=tarefas,
-        verbose=2,
+        verbose=True,
         process=Process.sequential,  # executa na ordem do YAML respeitando depends_on
     )
 
