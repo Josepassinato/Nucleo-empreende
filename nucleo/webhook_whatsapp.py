@@ -29,6 +29,20 @@ logger = logging.getLogger("nucleo.webhook.whatsapp")
 
 router = APIRouter()
 
+# Import memória longa
+try:
+    from nucleo.memoria import (
+        salvar_mensagem, montar_contexto_completo,
+        extrair_e_memorizar, resumir_se_necessario
+    )
+    MEMORIA_ATIVA = True
+except ImportError:
+    MEMORIA_ATIVA = False
+    def salvar_mensagem(*a, **k): pass
+    def montar_contexto_completo(): return ""
+    def extrair_e_memorizar(t): pass
+    async def resumir_se_necessario(): pass
+
 # Import executor e admin
 try:
     from nucleo.executor import processar_execucao
@@ -179,10 +193,14 @@ async def conversar_com_ceo(mensagem: str, numero_remetente: str) -> str:
     DONO = os.getenv("DONO_NOME", "Dono")
 
     # Montar histórico (últimas 10 mensagens)
-    historico_formatado = ""
-    for h in HISTORICO_CEO[-10:]:
-        role = "Dono" if h["role"] == "user" else "Lucas"
-        historico_formatado += f"{role}: {h['content']}\n"
+    if MEMORIA_ATIVA:
+        historico_formatado = montar_contexto_completo()
+    else:
+        historico_formatado = ""
+        for h in HISTORICO_CEO[-10:]:
+            role = "José" if h["role"] == "user" else "Lucas"
+            historico_formatado += f"{role}: {h['content']}
+" 
 
     # Contexto do estado dos agentes
     estado_resumo = _resumo_estado_sistema()
@@ -226,6 +244,8 @@ HISTÓRICO RECENTE:
     if not GOOGLE_API_KEY:
         resposta = _ceo_simulado(mensagem, EMPRESA, DONO)
         HISTORICO_CEO.append({"role": "assistant", "content": resposta, "ts": datetime.now().isoformat()})
+        if MEMORIA_ATIVA:
+            salvar_mensagem("assistant", resposta, "lucas")
         return resposta
 
     try:
@@ -390,6 +410,11 @@ async def receber_whatsapp(
             content='<?xml version="1.0"?><Response></Response>',
             media_type="application/xml"
         )
+
+    # 0. Memória — extrair fatos e salvar mensagem
+    if MEMORIA_ATIVA:
+        extrair_e_memorizar(Body)
+        salvar_mensagem("user", Body)
 
     # 1. Verificar se é execução de ação real (comprar, criar campanha, etc)
     if EXECUTOR_ATIVO:
