@@ -31,6 +31,12 @@ app = FastAPI(title="Nucleo Empreende", version="1.0.0")
 from nucleo.webhook_whatsapp import router as whatsapp_router
 app.include_router(whatsapp_router)
 
+# Remote Control — acesso direto para Claude
+try:
+    from nucleo.remote_control import router as rc_router
+    app.include_router(rc_router)
+except: pass
+
 # Static files (site/)
 if SITE_DIR.exists():
     app.mount("/site", StaticFiles(directory=str(SITE_DIR), html=True), name="site")
