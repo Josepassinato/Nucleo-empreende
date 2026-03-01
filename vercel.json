@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "nucleo-empreende",
+  "builds": [
+    {
+      "src": "site/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/site/onboarding.html" },
+    { "src": "/onboarding", "dest": "/site/onboarding.html" },
+    { "src": "/chat", "dest": "/site/chat_dashboard.html" },
+    { "src": "/(.*)", "dest": "/site/$1" }
+  ]
+}
