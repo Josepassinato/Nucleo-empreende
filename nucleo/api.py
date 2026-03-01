@@ -424,6 +424,46 @@ async def salvar_integracoes(request: Request):
 
 
 # ── WebSocket ────────────────────────────────────────────────────
+
+# ── Chat direto (dashboard e testes) ─────────────────────────
+@app.post("/api/v1/chat")
+async def chat_direto(request: Request):
+    """Chat direto com qualquer agente."""
+    data = await request.json()
+    mensagem = data.get("mensagem","")
+    agente   = data.get("agente","lucas")
+    try:
+        from nucleo.webhook_whatsapp import resposta_lucas, resposta_agente, mem_add
+        if agente != "lucas":
+            resp = await resposta_agente(agente, mensagem)
+        else:
+            resp = await resposta_lucas(mensagem)
+        mem_add("user", mensagem)
+        mem_add("assistant", resp, agente)
+        return {"resposta": resp, "agente": agente}
+    except Exception as e:
+        return {"resposta": f"Erro: {e}", "agente": agente}
+
+@app.post("/api/v1/reset")
+async def reset_empresa():
+    """Reset para sistema virgem."""
+    import json
+    from pathlib import Path
+    mem_file = Path("/root/Nucleo-empreende/nucleo/data/memoria.json")
+    mem_file.parent.mkdir(parents=True, exist_ok=True)
+    mem_file.write_text(json.dumps({"empresa": {}, "historico": [], "onboarding_completo": False}))
+    return {"ok": True, "msg": "Sistema resetado — virgem para novo usuário"}
+
+@app.get("/api/v1/memoria")
+async def ver_memoria():
+    """Ver memória atual do sistema."""
+    import json
+    from pathlib import Path
+    mem_file = Path("/root/Nucleo-empreende/nucleo/data/memoria.json")
+    if mem_file.exists():
+        return json.loads(mem_file.read_text())
+    return {"empresa": {}, "historico": []}
+
 @app.websocket("/ws/dashboard")
 async def ws_dashboard(websocket: WebSocket):
     await websocket.accept()
