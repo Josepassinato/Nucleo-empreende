@@ -29,6 +29,14 @@ logger = logging.getLogger("nucleo.webhook.whatsapp")
 
 router = APIRouter()
 
+# Import admin module
+try:
+    from nucleo.admin_whatsapp import verificar_e_processar_admin
+    ADMIN_ATIVO = True
+except ImportError:
+    ADMIN_ATIVO = False
+    async def verificar_e_processar_admin(txt): return None
+
 # ──────────────────────────────────────────────────────────────
 # ESTADO DE APROVAÇÕES PENDENTES (compartilhado com api.py)
 # ──────────────────────────────────────────────────────────────
@@ -361,6 +369,18 @@ async def receber_whatsapp(
             content='<?xml version="1.0"?><Response></Response>',
             media_type="application/xml"
         )
+
+    # Verificar se é comando admin primeiro
+    if ADMIN_ATIVO:
+        resp_admin = await verificar_e_processar_admin(Body)
+        if resp_admin:
+            twiml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Message to="{From}" from="{os.getenv('TWILIO_WHATSAPP_NUMBER', '')}">
+        <Body>{resp_admin}</Body>
+    </Message>
+</Response>'''
+            return Response(content=twiml, media_type="application/xml")
 
     # Rotear mensagem
     rota = rotear_mensagem(Body, From)
