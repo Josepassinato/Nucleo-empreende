@@ -1,26 +1,32 @@
 #!/usr/bin/env bash
-# Corrige o Nginx com o IP real da VPS
+# Fix Nginx — detecta IP automaticamente, sem input interativo
 set -e
 
 GREEN='\033[38;5;82m'; AMBER='\033[38;5;214m'; CYAN='\033[38;5;51m'; GRAY='\033[38;5;244m'; BOLD='\033[1m'; R='\033[0m'
 ok()   { echo -e "  ${GREEN}${BOLD}✓${R}  $1"; }
 info() { echo -e "  ${GRAY}→${R}  $1"; }
 
+echo ""
+echo -e "  ${AMBER}${BOLD}Nucleo Empreende — Fix Nginx${R}"
+echo ""
+
 # Detectar IP público real
-IP=$(curl -s https://api.ipify.org 2>/dev/null || curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
+IP=$(curl -s https://api.ipify.org 2>/dev/null \
+  || curl -s https://ifconfig.me 2>/dev/null \
+  || curl -s https://icanhazip.com 2>/dev/null \
+  || hostname -I | awk '{print $1}')
 
-echo ""
-echo -e "  ${AMBER}${BOLD}Corrigindo configuração do Nginx${R}"
-echo ""
-echo -e "  IP detectado: ${CYAN}$IP${R}"
-echo ""
-echo -e "  ${AMBER}►${R} Tem domínio configurado? (ex: api.nucleoempreende.com.br)"
-echo -e "  ${GRAY}  Enter para usar o IP: $IP${R}"
-read -r DOMINIO
-DOMINIO="${DOMINIO:-$IP}"
+echo -e "  IP público detectado: ${CYAN}$IP${R}"
 
-# Reescrever config do Nginx com IP/domínio correto
-cat > /etc/nginx/sites-available/nucleo-empreende << NGINX
+# Verificar se foi passado domínio como argumento
+DOMINIO="${1:-$IP}"
+echo -e "  Usando: ${CYAN}$DOMINIO${R}"
+echo ""
+
+# Criar config Nginx com IP/domínio real
+CONFIG_FILE="/etc/nginx/sites-available/nucleo-empreende"
+
+cat > "$CONFIG_FILE" << NGINX
 server {
     listen 80;
     server_name $DOMINIO;
@@ -53,24 +59,28 @@ server {
 }
 NGINX
 
+ln -sf "$CONFIG_FILE" /etc/nginx/sites-enabled/nucleo-empreende
+rm -f /etc/nginx/sites-enabled/default
+
 nginx -t && systemctl reload nginx
-ok "Nginx corrigido para: $DOMINIO"
+ok "Nginx configurado para: $DOMINIO"
 
 # Reiniciar backend
-systemctl restart nucleo-empreende
+systemctl restart nucleo-empreende 2>/dev/null || true
 sleep 3
 
 # Testar
-if curl -s http://localhost:8000 | grep -qi "nucleo\|online\|sistema" 2>/dev/null; then
-  ok "Backend respondendo na porta 8000"
+HTTP=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000 2>/dev/null || echo "000")
+if [ "$HTTP" = "200" ] || [ "$HTTP" = "404" ]; then
+  ok "Backend respondendo (HTTP $HTTP)"
 else
-  info "Backend iniciando... teste em 10s: curl http://localhost:8000"
+  info "Backend ainda iniciando... teste: curl http://localhost:8000"
 fi
 
 echo ""
-echo -e "  ${GREEN}${BOLD}✅  SISTEMA CORRIGIDO!${R}"
+echo -e "  ${GREEN}${BOLD}✅  NGINX CORRIGIDO!${R}"
 echo ""
-echo -e "  ${AMBER}Teste agora:${R}"
+echo -e "  ${AMBER}Testar API:${R}"
 echo -e "  ${CYAN}  curl http://$DOMINIO/api/v1/status${R}"
 echo ""
 echo -e "  ${AMBER}Webhook WhatsApp → cole no Twilio:${R}"
@@ -79,6 +89,8 @@ echo ""
 echo -e "  ${AMBER}Webhook Hotmart → cole no painel:${R}"
 echo -e "  ${CYAN}  http://$DOMINIO/webhook/hotmart${R}"
 echo ""
-echo -e "  ${AMBER}Logs em tempo real:${R}"
-echo -e "  ${CYAN}  journalctl -u nucleo-empreende -f${R}"
+echo -e "  ${AMBER}Vercel → Settings → Environment Variables:${R}"
+echo -e "  ${CYAN}  NEXT_PUBLIC_API_URL = http://$DOMINIO${R}"
+echo ""
+echo -e "  ${GRAY}Logs: journalctl -u nucleo-empreende -f${R}"
 echo ""
