@@ -29,6 +29,14 @@ logger = logging.getLogger("nucleo.webhook.whatsapp")
 
 router = APIRouter()
 
+# Import executor e admin
+try:
+    from nucleo.executor import processar_execucao
+    EXECUTOR_ATIVO = True
+except ImportError:
+    EXECUTOR_ATIVO = False
+    async def processar_execucao(txt, ag=None): return None
+
 # Import admin module
 try:
     from nucleo.admin_whatsapp import verificar_e_processar_admin
@@ -383,7 +391,19 @@ async def receber_whatsapp(
             media_type="application/xml"
         )
 
-    # Verificar se é comando admin primeiro
+    # 1. Verificar se é execução de ação real (comprar, criar campanha, etc)
+    if EXECUTOR_ATIVO:
+        resp_exec = await processar_execucao(Body)
+        if resp_exec:
+            twiml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Message to="{From}" from="{os.getenv('TWILIO_WHATSAPP_NUMBER', '')}">
+        <Body>{resp_exec}</Body>
+    </Message>
+</Response>'''
+            return Response(content=twiml, media_type="application/xml")
+
+    # 2. Verificar se é comando admin
     if ADMIN_ATIVO:
         resp_admin = await verificar_e_processar_admin(Body)
         if resp_admin:
