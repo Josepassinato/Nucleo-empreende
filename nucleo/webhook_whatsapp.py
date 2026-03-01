@@ -29,19 +29,19 @@ logger = logging.getLogger("nucleo.webhook.whatsapp")
 
 router = APIRouter()
 
-# Import memória longa
+# Import banco de dados central
 try:
-    from nucleo.memoria import (
-        salvar_mensagem, montar_contexto_completo,
-        extrair_e_memorizar, resumir_se_necessario
+    from nucleo.database import (
+        conv_salvar, mem_contexto_agente, extrair_fatos,
+        empresa_getall
     )
-    MEMORIA_ATIVA = True
+    DB_ATIVO = True
 except ImportError:
-    MEMORIA_ATIVA = False
-    def salvar_mensagem(*a, **k): pass
-    def montar_contexto_completo(): return ""
-    def extrair_e_memorizar(t): pass
-    async def resumir_se_necessario(): pass
+    DB_ATIVO = False
+    def conv_salvar(*a, **k): pass
+    def mem_contexto_agente(ag): return ""
+    def extrair_fatos(t): pass
+    def empresa_getall(): return {}
 
 # Import executor e admin
 try:
@@ -193,8 +193,8 @@ async def conversar_com_ceo(mensagem: str, numero_remetente: str) -> str:
     DONO = os.getenv("DONO_NOME", "Dono")
 
     # Montar histórico (últimas 10 mensagens)
-    if MEMORIA_ATIVA:
-        historico_formatado = montar_contexto_completo()
+    if DB_ATIVO:
+        historico_formatado = mem_contexto_agente('lucas_mendes')
     else:
         historico_formatado = ""
         for h in HISTORICO_CEO[-10:]:
@@ -244,8 +244,8 @@ HISTÓRICO RECENTE:
     if not GOOGLE_API_KEY:
         resposta = _ceo_simulado(mensagem, EMPRESA, DONO)
         HISTORICO_CEO.append({"role": "assistant", "content": resposta, "ts": datetime.now().isoformat()})
-        if MEMORIA_ATIVA:
-            salvar_mensagem("assistant", resposta, "lucas")
+        if DB_ATIVO:
+            conv_salvar('lucas_mendes', 'assistant', resposta)
         return resposta
 
     try:
@@ -412,9 +412,9 @@ async def receber_whatsapp(
         )
 
     # 0. Memória — extrair fatos e salvar mensagem
-    if MEMORIA_ATIVA:
-        extrair_e_memorizar(Body)
-        salvar_mensagem("user", Body)
+    if DB_ATIVO:
+        extrair_fatos(Body)
+        conv_salvar('lucas_mendes', 'user', Body, From)
 
     # 1. Verificar se é execução de ação real (comprar, criar campanha, etc)
     if EXECUTOR_ATIVO:
