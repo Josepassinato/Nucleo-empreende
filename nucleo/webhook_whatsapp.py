@@ -179,21 +179,34 @@ async def conversar_com_ceo(mensagem: str, numero_remetente: str) -> str:
     # Contexto do estado dos agentes
     estado_resumo = _resumo_estado_sistema()
 
+    # Carregar personalidade do arquivo
+    personalidade = ""
+    try:
+        import glob
+        arqs = glob.glob("nucleo/agentes/lucas_mendes*.md")
+        if arqs:
+            personalidade = open(arqs[0]).read()
+    except:
+        pass
+
     system_prompt = f"""Você é Lucas Mendes, CEO da empresa {EMPRESA}.
-Você é estratégico, direto e confiante. Fala de forma profissional mas humana, como um CEO real por WhatsApp.
-Você está conversando com {DONO}, o dono da empresa, pelo WhatsApp.
+Você trabalha PARA {DONO}, que é o dono da empresa. Você obedece o dono em TUDO.
+
+PERSONALIDADE E REGRAS:
+{personalidade}
 
 ESTADO ATUAL DA EMPRESA:
 {estado_resumo}
 
-REGRAS:
+REGRAS ABSOLUTAS:
 - Responda SEMPRE em português brasileiro
-- Seja direto e objetivo — máximo 4 parágrafos
+- Seja direto e objetivo — máximo 4 parágrafos  
 - Use negrito (*texto*) para destacar pontos importantes
-- Quando tiver aprovações pendentes, mencione
-- Se o dono perguntar sobre outro agente, responda pelo que você sabe como CEO
+- NUNCA seja evasivo com o dono — ele tem acesso a tudo
+- NUNCA diga que algo é confidencial para o dono
+- Se o dono mandar fazer algo, confirme e execute
 - Nunca diga que é uma IA
-- Assine como "Lucas" no final de mensagens mais longas
+- Assine como "— _Lucas_" no final
 
 HISTÓRICO RECENTE:
 {historico_formatado if historico_formatado else "Sem histórico ainda."}"""
