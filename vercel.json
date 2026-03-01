@@ -1,6 +1,9 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "env": {
+    "NEXT_PUBLIC_API_URL": "http://76.13.109.151:8080"
+  },
   "routes": [
     { "src": "/", "dest": "/index.html" },
     { "src": "/chat", "dest": "/chat.html" },

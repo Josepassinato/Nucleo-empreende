@@ -311,7 +311,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--d
 
 <script>
 // ── ESTADO ───────────────────────────────────────────────────
-const API = window.location.origin;
+const API = window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'http://76.13.109.151:8080';
 let agenteAtual = 'lucas_mendes';
 let aguardandoResposta = false;
 
