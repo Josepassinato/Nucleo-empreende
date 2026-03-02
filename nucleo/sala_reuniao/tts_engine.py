@@ -100,6 +100,9 @@ async def tts_elevenlabs(texto: str, agente: str) -> bytes | None:
             if r.status_code == 200:
                 logger.info(f"✅ ElevenLabs TTS ok — {agente}")
                 return r.content
+            elif r.status_code in (401, 429):
+                logger.warning(f"ElevenLabs quota/auth {r.status_code} — caindo para Gemini")
+                return None
             else:
                 logger.warning(f"ElevenLabs erro {r.status_code}: {r.text[:100]}")
                 return None
