@@ -12,17 +12,18 @@ logger = logging.getLogger("nucleo.tts")
 
 # ElevenLabs — vozes nativas garantidas em todas as contas
 # Fonte: https://elevenlabs.io/docs/voices/premade-voices
+# Vozes ElevenLabs — multilingual, sotaque neutro para português
 VOZES_ELEVENLABS = {
-    "lucas":   "onwK4e9ZLuTAKqWW03F9",  # Daniel — masculino profissional BR
-    "pedro":   "N2lVS1w4EtoT3dr4eOWO",  # Callum — masculino sério
-    "rafael":  "CwhRBWXzGAHq8TQ4Fs17",  # Roger — masculino jovem energético
-    "ze":      "IKne3meq5aSn9XLyUdCD",  # Charlie — masculino motivador
-    "beto":    "JBFqnCBsd6RMkjVDRZzb",  # George — masculino direto
-    "diana":   "EXAVITQu4vr4xnSDxMaL",  # Sarah — feminina articulada
-    "mariana": "FGY2WhTYpPnrIDTdsKH5",  # Laura — feminina jovem expressiva
+    "lucas":   "TX3LPaxmHKxFdv7VOQHJ",  # Liam — masculino neutro, multilingual
+    "pedro":   "bIHbv24MWmeRgasZH58o",  # Will — masculino sério, neutro
+    "rafael":  "nPczCjzI2devNBz1zQrb",  # Brian — masculino jovem, natural
+    "ze":      "iP95p4xoKVk53GoZ742B",  # Chris — masculino direto, motivador
+    "beto":    "t0jbNlBVZ17f02VDIeMI",  # Clyde — masculino objetivo
+    "diana":   "9BWtsMINqrJLrRacOk9x",  # Aria — feminina natural, multilingual
+    "mariana": "SAz9YHcvj6GT2YYXdXww",  # River — feminina jovem, expressiva
     "carla":   "XB0fDUnXU5powFXDhCwa",  # Charlotte — feminina executiva
-    "ana":     "Xb7hH8MSUJpSbSDYk0k2",  # Alice — feminina empática
-    "dani":    "cgSgspJ2msm6clMCkdW9",  # Jessica — feminina analítica
+    "ana":     "pFZP5JQG7iQjIQuC4Bku",  # Lily — feminina empática, suave
+    "dani":    "z9fAnlkpzviPz146aGWa",  # Glinda — feminina analítica
 }
 
 # Gemini TTS — vozes disponíveis no preview

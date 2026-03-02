@@ -416,7 +416,8 @@ body::after {{
   overflow-y:auto;
   padding:8px 16px;
   flex:1;
-  max-height:140px;
+  min-height:80px;
+  max-height:200px;
 }}
 .hist-container::-webkit-scrollbar{{width:2px}}
 .hist-container::-webkit-scrollbar-thumb{{background:rgba(0,229,255,0.2);border-radius:1px}}
@@ -462,11 +463,11 @@ body::after {{
 
 /* ── CHAT INPUT ── */
 .chat-bar {{
-  position:relative; z-index:10;
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
   display:flex; gap:8px; padding:10px 16px;
-  background:rgba(6,8,16,0.95);
-  border-top:1px solid rgba(0,229,255,0.08);
-  backdrop-filter:blur(10px);
+  background:rgba(6,8,16,0.97);
+  border-top:1px solid rgba(0,229,255,0.15);
+  backdrop-filter:blur(20px);
 }}
 .chat-input {{
   flex:1; background:rgba(13,17,23,0.8);
@@ -489,7 +490,7 @@ body::after {{
 .chat-send:hover{{background:rgba(0,229,255,0.2);border-color:var(--neon)}}
 
 /* Layout flex vertical */
-.page {{ display:flex; flex-direction:column; height:100vh; }}
+.page {{ display:flex; flex-direction:column; height:100vh; padding-bottom:60px; }}
 .arena-wrap {{ flex:0 0 auto; display:flex; justify-content:center; align-items:center; padding:12px 0; }}
 </style>
 </head>
@@ -633,24 +634,23 @@ function desenharBeam(agenteId) {{
 function ativarAgente(id, nome, cargo, genero, texto, audio, ts) {{
   // Desativar todos
   AGENTES.forEach(a => {{
-    const av = document.getElementById(`av-${{a.id}}`);
-    if (av) av.className = `avatar-node aguardando ${{a.genero}}`;
+    const el = document.getElementById(`av-${{a.id}}`);
+    if (el) el.className = `avatar-node aguardando ${{a.genero}}`;
   }});
-  // Ativar este
+  // Ativar este — usar o ID exato do agente
   const av = document.getElementById(`av-${{id}}`);
-  if (av) av.className = `avatar-node falando ${{genero}}`;
-
+  if (av) {{
+    av.className = `avatar-node falando ${{genero}}`;
+    // Garantir que o nome correto aparece no painel
+    document.querySelector(`#av-${{id}} .avatar-nome`).style.color = genero === 'F' ? 'var(--female-color)' : 'var(--neon)';
+  }}
   desenharBeam(id);
 
   // Fala panel
   const panel = document.getElementById('fala-panel');
   panel.className = `fala-panel ${{genero}}`;
   document.getElementById('fala-speaker').textContent = `${{nome.toUpperCase()}} — ${{cargo}}`;
-  document.getElementById('fala-texto').innerHTML = texto + '<span class="cursor" id="cursor"></span>';
-  setTimeout(() => {{
-    const c = document.getElementById('cursor');
-    if (c) c.remove();
-  }}, 4000);
+  document.getElementById('fala-texto').innerHTML = texto;
 
   adicionarHistorico({{agente:id, nome, cargo, genero, fala:texto, ts}});
 
