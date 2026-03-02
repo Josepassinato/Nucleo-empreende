@@ -375,9 +375,30 @@ async def scheduler():
             except Exception as e:
                 logger.error(f"Conhecimento erro: {e}")
 
+        # Autodesenvolvimento — todo sábado às 10:00
+        if dia_semana == 5 and hora == 10 and minuto == 0 and ultimo.get("autodev") != agora.date():
+            try:
+                await ciclo_autodev_todos()
+                ultimo["autodev"] = agora.date()
+            except Exception as e:
+                logger.error(f"Autodev erro: {e}")
+
         # Aguarda 1 minuto antes do próximo check
         await asyncio.sleep(60)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     asyncio.run(scheduler())
+
+# ── Ciclos de Autodesenvolvimento (importado do colegiado) ───────
+async def ciclo_autodev_todos():
+    """Todo sábado cada agente faz seu ciclo de autodesenvolvimento."""
+    from nucleo.colegiado import ciclo_autodesenvolvimento
+    agentes = ["diana", "pedro", "mariana", "carla", "rafael", "ana", "dani", "beto"]
+    for agente in agentes:
+        try:
+            await ciclo_autodesenvolvimento(agente)
+            await asyncio.sleep(5)  # respira entre agentes
+        except Exception as e:
+            logger.error(f"Autodev {agente} erro: {e}")
+    logger.info("✅ Ciclo de autodesenvolvimento completo para toda diretoria")
