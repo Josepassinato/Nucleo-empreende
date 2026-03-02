@@ -457,7 +457,8 @@ agentes.forEach(a => {{
 }});
 
 // WebSocket
-const ws = new WebSocket(`wss://${{location.host}}/ws/sala/${{SALA_ID}}`);
+const wsProto = location.protocol === 'https:' ? 'wss' : 'ws';
+const ws = new WebSocket(`${{wsProto}}://${{location.host}}/ws/sala/${{SALA_ID}}`);
 
 ws.onopen = () => {{
   document.getElementById('status-bar').textContent = 'Conectado. Aguardando início...';
