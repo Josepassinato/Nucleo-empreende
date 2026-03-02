@@ -130,78 +130,86 @@ class SalaReuniao:
         await self.broadcast({"tipo": "inicio", "tema": self.tema, "agentes": self.agentes})
         await asyncio.sleep(1)
 
-        # Fase 1: Lucas abre a reunião
-        lucas_abertura = await self._fala_agente(
-            "lucas",
-            f"Você está abrindo uma reunião de diretoria sobre: {self.tema}\n"
-            f"Presentes: {', '.join([VOZES[a]['nome'] for a in self.agentes if a in VOZES])}\n"
-            f"Empresa: {empresa_str}\n\n"
-            "Faça uma abertura de 2-3 frases: apresente o tema, a urgência e passe a palavra para o primeiro diretor.",
-            historico_str
-        )
-        historico_str += f"\nLucas: {lucas_abertura}"
-        await asyncio.sleep(2)
-
-        # Fase 2: Cada agente fala na sua vez (2 rodadas)
-        agentes_sem_lucas = [a for a in self.agentes if a != "lucas"]
-        
-        for rodada in range(2):
-            # Injetar mensagem do cliente se houver
-            if self.mensagens_externas:
-                msg_cliente = self.mensagens_externas.pop(0)
-                await self.broadcast({
-                    "tipo": "mensagem_cliente",
-                    "texto": f"💬 Direção do proprietário: {msg_cliente}"
-                })
-                historico_str += f"\n[PROPRIETÁRIO]: {msg_cliente}"
-
-            for agente in agentes_sem_lucas:
-                prompt_agente = (
-                    f"Reunião sobre: {self.tema}\n"
-                    f"Empresa: {empresa_str}\n"
-                    f"Histórico da reunião até agora:\n{historico_str}\n\n"
-                    f"É sua vez de falar. Contribua com sua perspectiva da área de "
-                    f"{VOZES[agente]['cargo']}. "
-                    f"{'Primeira rodada: apresente sua análise.' if rodada == 0 else 'Segunda rodada: reaja ao que foi dito e proponha algo concreto.'}"
-                    f"\nSeja direto, natural, máximo 3 frases."
-                )
-                fala = await self._fala_agente(agente, prompt_agente, historico_str)
-                historico_str += f"\n{VOZES[agente]['nome']}: {fala}"
-                await asyncio.sleep(1.5)
-
-        # Fase 3: Lucas fecha com decisão
-        decisao_prompt = (
-            f"Reunião sobre: {self.tema}\n"
-            f"Empresa: {empresa_str}\n"
-            f"Debate completo:\n{historico_str}\n\n"
-            "Como CEO, encerre a reunião com:\n"
-            "1. Uma síntese do debate (1 frase)\n"
-            "2. A decisão final clara\n"
-            "3. O próximo passo concreto\n"
-            "Seja decisivo e motivador. Máximo 4 frases."
-        )
-        decisao = await self._fala_agente("lucas", decisao_prompt, historico_str, encerramento=True)
-        self.decisao_final = decisao
-        self.status = "encerrada"
-
-        await self.broadcast({
-            "tipo": "encerramento",
-            "decisao": decisao,
-            "historico_completo": self.historico
-        })
-
-        # Salvar sala em disco
-        self._salvar()
-        
-        # Salvar ata digital no Supabase
         try:
-            from nucleo.sala_reuniao.ata import salvar_ata
-            import asyncio
-            asyncio.create_task(salvar_ata(self))
-            logger.info(f"📋 Ata sendo salva no Supabase — sala {self.id}")
+            # Fase 1: Lucas abre a reunião
+            lucas_abertura = await self._fala_agente(
+                "lucas",
+                f"Você está abrindo uma reunião de diretoria sobre: {self.tema}\n"
+                f"Presentes: {', '.join([VOZES[a]['nome'] for a in self.agentes if a in VOZES])}\n"
+                f"Empresa: {empresa_str}\n\n"
+                "Faça uma abertura de 2-3 frases: apresente o tema, a urgência e passe a palavra para o primeiro diretor.",
+                historico_str
+            )
+            historico_str += f"\nLucas: {lucas_abertura}"
+            await asyncio.sleep(2)
+
+            # Fase 2: Cada agente fala na sua vez (2 rodadas)
+            agentes_sem_lucas = [a for a in self.agentes if a != "lucas"]
+            
+            for rodada in range(2):
+                if self.mensagens_externas:
+                    msg_cliente = self.mensagens_externas.pop(0)
+                    await self.broadcast({
+                        "tipo": "mensagem_cliente",
+                        "texto": f"💬 Direção do proprietário: {msg_cliente}"
+                    })
+                    historico_str += f"\n[PROPRIETÁRIO]: {msg_cliente}"
+
+                for agente in agentes_sem_lucas:
+                    prompt_agente = (
+                        f"Reunião sobre: {self.tema}\n"
+                        f"Empresa: {empresa_str}\n"
+                        f"Histórico da reunião até agora:\n{historico_str}\n\n"
+                        f"É sua vez de falar. Contribua com sua perspectiva da área de "
+                        f"{VOZES[agente]['cargo']}. "
+                        f"{'Primeira rodada: apresente sua análise.' if rodada == 0 else 'Segunda rodada: reaja ao que foi dito e proponha algo concreto.'}"
+                        f"\nSeja direto, natural, máximo 3 frases."
+                    )
+                    fala = await self._fala_agente(agente, prompt_agente, historico_str)
+                    historico_str += f"\n{VOZES[agente]['nome']}: {fala}"
+                    await asyncio.sleep(1.5)
+
+            # Fase 3: Lucas fecha com decisão
+            decisao_prompt = (
+                f"Reunião sobre: {self.tema}\n"
+                f"Empresa: {empresa_str}\n"
+                f"Debate completo:\n{historico_str}\n\n"
+                "Como CEO, encerre a reunião com:\n"
+                "1. Uma síntese do debate (1 frase)\n"
+                "2. A decisão final clara\n"
+                "3. O próximo passo concreto\n"
+                "Seja decisivo e motivador. Máximo 4 frases."
+            )
+            decisao = await self._fala_agente("lucas", decisao_prompt, historico_str, encerramento=True)
+            self.decisao_final = decisao
+            self.status = "encerrada"
+
+            await self.broadcast({
+                "tipo": "encerramento",
+                "decisao": decisao,
+                "historico_completo": self.historico
+            })
+
+            self._salvar()
+
+            # Salvar ata no Supabase (não bloqueia)
+            try:
+                from nucleo.sala_reuniao.ata import salvar_ata
+                asyncio.create_task(salvar_ata(self))
+                logger.info(f"📋 Ata sendo salva — sala {self.id}")
+            except Exception as ata_err:
+                logger.warning(f"Ata não salva: {ata_err}")
+
+            logger.info(f"✅ Sala {self.id} encerrada")
+
         except Exception as e:
-            logger.warning(f"Ata não salva: {e}")
-        logger.info(f"✅ Sala {self.id} encerrada")
+            logger.error(f"❌ Erro na reunião {self.id}: {e}", exc_info=True)
+            self.status = "erro"
+            await self.broadcast({
+                "tipo": "erro",
+                "mensagem": str(e),
+                "detalhe": "Verifique as API keys no .env do servidor"
+            })
 
     async def _fala_agente(self, agente: str, prompt: str, historico: str, encerramento: bool = False) -> str:
         """Gera fala de um agente com áudio e transmite via WebSocket."""

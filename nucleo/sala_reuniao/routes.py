@@ -491,8 +491,8 @@ body::after {{
 .chat-send:hover{{background:rgba(0,229,255,0.2);border-color:var(--neon)}}
 
 /* Layout flex vertical */
-.page {{ display:flex; flex-direction:column; height:100vh; padding-bottom:60px; }}
-.arena-wrap {{ flex:1; display:flex; justify-content:center; align-items:center; padding:8px 0; min-height:280px; }}
+.page {{ display:flex; flex-direction:column; height:100vh; padding-bottom:60px; overflow:hidden; }}
+.arena-wrap {{ flex:1; display:flex; justify-content:center; align-items:center; width:100%; padding:8px 0; min-height:260px; }}
 </style>
 </head>
 <body>
@@ -725,6 +725,7 @@ const ws = new WebSocket(`${{wsProto}}://${{location.host}}/ws/sala/${{SALA_ID}}
 
 ws.onopen = () => {{
   document.getElementById('status-line').textContent = '⬡ CONECTADO — TOQUE EM "ATIVAR" PARA INICIAR';
+  document.getElementById('dot-live').className = 'dot pulse';
 }};
 
 ws.onmessage = (e) => {{
@@ -733,6 +734,7 @@ ws.onmessage = (e) => {{
     document.getElementById('badge-txt').textContent = 'AO VIVO';
     document.getElementById('dot-live').className = 'dot pulse';
     document.getElementById('status-line').textContent = `▶ REUNIÃO INICIADA — ${{ev.agentes?.length||''}} PARTICIPANTES`;
+    document.getElementById('fala-texto').innerHTML = 'Aguardando primeira fala...<span class="cursor"></span>';
   }}
   if (ev.tipo === 'fala') {{
     ativarAgente(ev.agente, ev.nome, ev.cargo, ev.genero||'M', ev.texto, ev.audio, ev.ts);
@@ -742,6 +744,12 @@ ws.onmessage = (e) => {{
   }}
   if (ev.tipo === 'mensagem_cliente') {{
     document.getElementById('status-line').textContent = `💬 ${{ev.texto}}`;
+  }}
+  if (ev.tipo === 'erro') {{
+    document.getElementById('badge-txt').textContent = 'ERRO';
+    document.getElementById('dot-live').className = 'dot';
+    document.getElementById('status-line').textContent = `⚠ ERRO: ${{ev.mensagem}}`;
+    document.getElementById('fala-texto').innerHTML = `<span style="color:#ff5252">⚠ ${{ev.detalhe||ev.mensagem}}</span>`;
   }}
   if (ev.tipo === 'encerramento') {{
     document.getElementById('badge-txt').textContent = 'ENCERRADO';
