@@ -96,20 +96,6 @@ def detectar_agente_convocado(texto: str) -> str | None:
                 return agente
     return None
 
-def _extrair_agentes_da_mensagem(texto: str) -> list[str]:
-    """Extrai todos os agentes mencionados na mensagem usando MENCOES."""
-    txt = texto.lower()
-    encontrados = []
-    # Lucas/CEO não está em MENCOES, tratar à parte
-    if any(w in txt for w in ["lucas", "ceo"]):
-        encontrados.append("lucas")
-    for agente, mencoes in MENCOES.items():
-        for m in mencoes:
-            if m in txt:
-                encontrados.append(agente)
-                break
-    return encontrados or ["lucas"]
-
 # ── Montar contexto completo ─────────────────────────────────
 def montar_contexto(n_hist: int = 15) -> str:
     mem = mem_carregar()
@@ -130,7 +116,7 @@ def montar_contexto(n_hist: int = 15) -> str:
     if hist:
         ctx.append("\nHISTÓRICO RECENTE:")
         for h in hist:
-            nome = "Sr Passinato" if h["role"] == "user" else h.get("agente","lucas").title()
+            nome = "José" if h["role"] == "user" else h.get("agente","lucas").title()
             ctx.append(f"  [{h['ts']}] {nome}: {h['conteudo']}")
 
     return "\n".join(ctx)
@@ -167,7 +153,6 @@ async def resposta_lucas(mensagem: str) -> str:
     dono_nome = emp.get("dono_nome", "Sr Passinato")
 
     system = f"""Você é Lucas Mendes, CEO.
-IMPORTANTE: O dono se chama Sr Passinato. NUNCA use outro nome.
 
 {pers}
 
@@ -185,17 +170,16 @@ REGRAS DE COMPORTAMENTO:
 
     # Detectar convocação de sala de reunião
     msg_lower = mensagem.lower()
-    if any(w in msg_lower for w in ["convocar sala", "sala de reunião", "reunião com", "convoca reunião", "marca uma reunião", "marcar reunião", "cria uma reunião", "reuniao com", "marca uma reuniao", "marcar reuniao"]):
+    if any(w in msg_lower for w in ["convocar sala", "sala de reunião", "reunião com", "convoca reunião", "marca uma reunião", "marcar reunião", "cria uma reunião"]):
         try:
             from nucleo.sala_reuniao.backend import criar_sala, VOZES
+            from nucleo.webhook_whatsapp import _extrair_agentes_da_mensagem
             agentes = _extrair_agentes_da_mensagem(mensagem)
             tema = mensagem
             sala = criar_sala(tema, agentes)
-            host = os.getenv("HOST_URL", "http://76.13.109.151:8000")
+            host = os.getenv("HOST_URL", "http://145.79.4.68:8000")
             return f"Sala convocada! Acesse ao vivo:\n{host}/reuniao/{sala.id}\n\nParticipantes: {', '.join([VOZES[a]['nome'] for a in agentes if a in VOZES])}"
-        except Exception as e:
-            print(f"ERRO SALA: {e}")
-            return f"Erro ao criar sala: {e}"
+        except Exception as h            pass
 
     resp = await chamar_gemini(system, mensagem)
     
@@ -295,7 +279,6 @@ async def webhook(request: Request):
 
     # Detectar se convocou agente específico
     agente_convocado = detectar_agente_convocado(Body)
-    print(f"AGENTE: {agente_convocado}")
 
     if agente_convocado:
         # Resposta do agente convocado

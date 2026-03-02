@@ -1,0 +1,88 @@
+{
+  "id": "03a54147",
+  "tema": "Estrategia VibeSchool",
+  "agentes": [
+    "lucas",
+    "diana",
+    "pedro",
+    "mariana"
+  ],
+  "status": "encerrada",
+  "historico": [
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Bom dia, time! Bora focar na VibeSchool hoje.\n\nPrecisamos destravar o go-to-market disso ainda este mês. Diana, qual a sua visão inicial?",
+      "ts": "04:37:13",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Lucas, bom dia! Tem um gap aqui enorme em conteúdo personalizado pra GenZ, a concorrência ainda não viu. Dá pra testar parcerias com creators e influenciadores pra viralizar a VibeSchool e criar um distribution channel massivo.",
+      "ts": "04:37:16",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Diana, legal essa visão de creators. Mas e as unit economics? O CAC tá aceitável pra GenZ? Precisamos ver o LTV:CAC e o payback period antes de gastar com influenciador.",
+      "ts": "04:37:19",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Pedro, total razão em olhar as unit economics. Diana, antes de creators, vamos refinar o ICP da VibeSchool e validar se o canal de influenciador tem um \"channel fit\" bom. A/B test isso com campanhas menores, focando em orgânico vs pago pra ver onde a conversion escala melhor, antes de investir pesado.",
+      "ts": "04:37:23",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Mariana, boa! Concordo em testar orgânico vs pago. Pedro, dá pra começar com micro-influenciadores comissão por lead qualificado (CPL) pra mitigar o risco e validar o LTV rapidinho. Oportunidade de posicionamento forte se acertarmos o tom de voz da VibeSchool com a GenZ.",
+      "ts": "04:37:26",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Diana, comissão por lead qualificado (CPL) nos micro-influenciadores é interessante pra testar. Mas, Pedro Lima aqui, quero ver esse CAC bem de perto. Valida rápido o LTV pra gente não torrar o runway à toa.",
+      "ts": "04:37:29",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Curti o teste com micro-influenciadores CPL, Diana. Pedro, além do LTV, A/B test isso com diferentes landing pages e calls-to-action pra otimizar a conversion do funil. Foco em entender se o problema está no CAC ou na retenção, e aí escalamos.",
+      "ts": "04:37:33",
+      "encerramento": false
+    },
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Boa, time! Sintetizando: vamos validar rápido micro-influenciadores CPL pra GenZ, mirando um canal de aquisição escalável.\n\nDiana, toca esse MVP de testes com micro-influenciadores, com foco em CPL e otimização de landing pages. Pedro e Mariana, vocês dois juntos vão monitorar de perto o CAC, LTV e funil de conversão.\n\nShip rápido e me tragam os resultados na próxima semana. Quero ver esse \"needle\" se movendo!",
+      "ts": "04:37:37",
+      "encerramento": true
+    }
+  ],
+  "decisao_final": "Boa, time! Sintetizando: vamos validar rápido micro-influenciadores CPL pra GenZ, mirando um canal de aquisição escalável.\n\nDiana, toca esse MVP de testes com micro-influenciadores, com foco em CPL e otimização de landing pages. Pedro e Mariana, vocês dois juntos vão monitorar de perto o CAC, LTV e funil de conversão.\n\nShip rápido e me tragam os resultados na próxima semana. Quero ver esse \"needle\" se movendo!",
+  "criado_em": "2026-03-02T04:36:20.906008",
+  "empresa": {}
+}

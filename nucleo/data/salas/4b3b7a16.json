@@ -1,0 +1,88 @@
+{
+  "id": "4b3b7a16",
+  "tema": "Estrategia VibeSchool",
+  "agentes": [
+    "lucas",
+    "diana",
+    "pedro",
+    "mariana"
+  ],
+  "status": "encerrada",
+  "historico": [
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Bom dia, time! Bora focar na VibeSchool hoje.\n\nPrecisamos definir a estratégia e ver como ela move o needle. Diana, começa com a sua visão?",
+      "ts": "04:21:11",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Lucas, bom dia! VibeSchool tem um gap gigante no mercado de edtech. A concorrência ainda não escalou a personalização como a gente pode, e tem uma baita oportunidade de posicionamento aí.",
+      "ts": "04:21:26",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Diana, concordo com o potencial, mas vamos olhar os números. O CAC tá alto e precisamos urgentemente endereçar o LTV:CAC para pelo menos 3x pra essa vertical fazer sentido. Sem unit economics saudáveis, o runway não aguenta.",
+      "ts": "04:21:40",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Bom dia, time! Diana, adorei a visão de personalização, mas Pedro tem razão. Precisamos urgentemente otimizar o funil da VibeSchool. Vamos A/B test isso: landing pages, precificação, o que for preciso para melhorar conversion e CAC.",
+      "ts": "04:21:51",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Mariana, total! E Pedro, bora atacar esses unit economics com parcerias estratégicas? A gente pode usar distribution channels já existentes pra baixar o CAC e testar rápido novas ofertas.",
+      "ts": "04:21:59",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Parcerias, Diana, é uma via. Mas foco no payback period: tem que ser menor que X meses. E Mariana, quero ver esse funil sangrar menos dinheiro já na próxima semana. O burn rate da VibeSchool não pode comprometer o resto.",
+      "ts": "04:22:09",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Mariana, Pedro e Diana, valeu! Concordo em otimizar o funil e testar canais alternativos. Mas, antes de escalar qualquer parceria, vamos cravar nosso ICP na VibeSchool e garantir o channel fit. A/B test isso antes de gastar mais.",
+      "ts": "04:22:21",
+      "encerramento": false
+    },
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Boa, time!\n\nEntendi que o unlock da VibeSchool é equilibrar a personalização com unit economics que escalem.\n\nDecisão: Mariana foca em otimizar o funil com A/B tests agressivos e Diana explora parcerias, mas validando o ICP antes.\n\nMariana e Diana, quero um plano de ação até amanhã pra gente ship rápido!",
+      "ts": "04:22:33",
+      "encerramento": true
+    }
+  ],
+  "decisao_final": "Boa, time!\n\nEntendi que o unlock da VibeSchool é equilibrar a personalização com unit economics que escalem.\n\nDecisão: Mariana foca em otimizar o funil com A/B tests agressivos e Diana explora parcerias, mas validando o ICP antes.\n\nMariana e Diana, quero um plano de ação até amanhã pra gente ship rápido!",
+  "criado_em": "2026-03-02T04:20:28.486088",
+  "empresa": {}
+}

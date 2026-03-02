@@ -1,0 +1,1 @@
+Você fala           →  Sistema extrai fatos automaticamente "Nosso ramo é X"    →  Salva em contexto_dono.json (permanente) "Meta R$50k"        →  Salva em contexto_dono.json (permanente) Cada mensagem       →  Salva no Redis + arquivo diário  A cada 10 mensagens →  Gemini resume e consolida os fatos Na próxima conversa

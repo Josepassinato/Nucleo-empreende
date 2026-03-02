@@ -1,0 +1,88 @@
+{
+  "id": "a1abfcfd",
+  "tema": "Estrategia VibeSchool",
+  "agentes": [
+    "lucas",
+    "diana",
+    "pedro",
+    "mariana"
+  ],
+  "status": "encerrada",
+  "historico": [
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Bom dia time! Bora focar em VibeSchool hoje.\n\nPrecisamos destravar o roadmap disso ainda essa semana. Diana, manda bala com a sua visão?",
+      "ts": "04:24:03",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Lucas, bom dia! VibeSchool tem um gap de go-to-market gigante. A concorrência ainda não percebeu a oportunidade de posicionamento em nichos específicos.",
+      "ts": "04:24:13",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Diana, concordo. O go-to-market é chave. Mas sem unit economics que fechem, o CAC vai explodir e o LTV:CAC não paga a conta. Precisamos de um plano com payback period realista.",
+      "ts": "04:24:23",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Pedro, total razão. Sem unit economics, queimamos caixa à toa. Diana, nichar é ótimo, mas vamos testar um MVP de aquisição antes de cravar o ICP. A/B test isso no funil!",
+      "ts": "04:24:34",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Mariana e Pedro, dados na mesa! Mas e se a gente fizesse um freemium agressivo via parcerias com outras edtechs? Distribution channel já existente, custo de aquisição lá embaixo.",
+      "ts": "04:24:43",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Diana, freemium agressivo soa bem, mas dilui o LTV. O burn vai nas alturas e o runway encurta.\n\nSugiro testar o freemium em um nicho específico primeiro, com um CAC bem controlado. Assim vemos se o LTV:CAC justifica a estratégia.",
+      "ts": "04:24:53",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Concordo com o Pedro, Diana. Freemium sem controle é sangria.\n\nMas, e se a gente fizesse um freemium focado em um subnicho MUITO específico e com alta intenção, tipo \"VibeSchool para designers de produto\"? Valida o channel fit e o conversion antes de expandir. A/B test isso com tráfego orgânico e pago pra ver qual performa melhor.",
+      "ts": "04:25:06",
+      "encerramento": false
+    },
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Boa, time! Show de bola a discussão, destrinchamos bem os riscos e oportunidades do VibeSchool.\n\nDecidido: Mariana e Pedro, bora focar no freemium \"VibeSchool para designers de produto\". Validem rápido o channel fit e conversion com A/B tests de tráfego orgânico e pago.\n\nShip rápido esse MVP, quero ver dados concretos na próxima reunião! Move o needle!",
+      "ts": "04:25:20",
+      "encerramento": true
+    }
+  ],
+  "decisao_final": "Boa, time! Show de bola a discussão, destrinchamos bem os riscos e oportunidades do VibeSchool.\n\nDecidido: Mariana e Pedro, bora focar no freemium \"VibeSchool para designers de produto\". Validem rápido o channel fit e conversion com A/B tests de tráfego orgânico e pago.\n\nShip rápido esse MVP, quero ver dados concretos na próxima reunião! Move o needle!",
+  "criado_em": "2026-03-02T04:23:27.446714",
+  "empresa": {}
+}

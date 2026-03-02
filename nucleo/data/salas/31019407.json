@@ -1,0 +1,88 @@
+{
+  "id": "31019407",
+  "tema": "Estrategia VibeSchool",
+  "agentes": [
+    "lucas",
+    "diana",
+    "pedro",
+    "mariana"
+  ],
+  "status": "encerrada",
+  "historico": [
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Bora time, tamo aqui pra traçar a rota da VibeSchool. Precisamos definir onde vamos apostar pra valer.\n\nDiana, manda a bala, qual o panorama que você preparou?",
+      "ts": "04:57:42",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Lucas, show de bola. No VibeSchool, tem uma brecha aqui em cursos rápidos focados em habilidades digitais específicas. A concorrência ainda não viu que dá pra usar a nossa rede de contatos pra chegar direto nas empresas que precisam treinar seus times.",
+      "ts": "04:57:45",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Diana, interessante. Mas qual o custo de aquisição por aluno nesse modelo B2B? Precisamos ver o tamanho do investimento em marketing e vendas versus o prazo de retorno antes de bater o martelo.",
+      "ts": "04:57:49",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Pedro, sua visão de custo é fundamental. Diana, vamos mapear o perfil do cliente ideal B2B e testar campanhas de aquisição orgânico versus pago em pequena escala. Assim, otimizamos a taxa de conversão antes de investir pesado.",
+      "ts": "04:57:52",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Mariana, adorei o foco no orgânico pra validar. Pedro, e se a gente mirar nas empresas menores primeiro? O ciclo de venda é mais curto e pode ser um canal de distribuição pras maiores depois.",
+      "ts": "04:57:55",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Pedro Lima: Boa, Mariana. Focar em empresas menores diminui o risco e acelera o fluxo de caixa. Diana, simule um cenário de custo de aquisição baixo com essa estratégia. Quero ver a margem de contribuição por aluno, considerando o esforço comercial reduzido.",
+      "ts": "04:57:58",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Adorei a ideia de começar pequeno no B2B, Diana. Pedro, além do custo de aquisição, vamos ficar de olho na taxa de retenção desses clientes menores. Se eles gostarem, o marketing boca a boca pode ser um super trunfo.",
+      "ts": "04:58:01",
+      "encerramento": false
+    },
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Ótimo debate, pessoal!\n\nA gente vai validar o B2B focado em empresas menores, com aquisição orgânica.\n\nMariana, você toca os testes de aquisição. Diana, simula o custo de aquisição e a retenção.\n\nBora destravar isso pra semana que vem.",
+      "ts": "04:58:04",
+      "encerramento": true
+    }
+  ],
+  "decisao_final": "Ótimo debate, pessoal!\n\nA gente vai validar o B2B focado em empresas menores, com aquisição orgânica.\n\nMariana, você toca os testes de aquisição. Diana, simula o custo de aquisição e a retenção.\n\nBora destravar isso pra semana que vem.",
+  "criado_em": "2026-03-02T04:57:10.691760",
+  "empresa": {}
+}

@@ -1,0 +1,88 @@
+{
+  "id": "e62ce9ca",
+  "tema": "Estrategia VibeSchool",
+  "agentes": [
+    "lucas",
+    "diana",
+    "pedro",
+    "mariana"
+  ],
+  "status": "encerrada",
+  "historico": [
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Olá a todos, obrigado pela presença. Hoje vamos discutir a estratégia da VibeSchool, um tema urgente para alinharmos nosso crescimento e market share. Diana, por favor, nos dê sua visão inicial sobre o cenário atual.",
+      "ts": "03:15:22",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Bom dia, pessoal. Analisando o mercado, vejo um espaço enorme para a VibeSchool se destacar, especialmente focando em educação personalizada e nichada. Há uma demanda crescente por habilidades específicas que as escolas tradicionais não cobrem, e podemos nos posicionar como a solução ideal para esse público. Precisamos agir rápido para capturar essa fatia do mercado antes que a concorrência se fortaleça.",
+      "ts": "03:15:31",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Bom dia a todos. Concordo com a Diana, o mercado é promissor, mas pé no chão. Precisamos ter uma estratégia de crescimento bem amarrada financeiramente para não queimarmos caixa rápido demais. Cada real investido precisa ter um retorno claro e mensurável.",
+      "ts": "03:15:39",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Bom dia, pessoal! Concordo totalmente com a Diana e o Pedro. Vejo que temos uma oportunidade incrível de construir uma marca forte e engajadora, focando em conteúdo que realmente ressoe com nosso público-alvo. Precisamos criar uma experiência memorável para cada aluno, para que eles se tornem nossos maiores defensores.",
+      "ts": "03:15:48",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Concordo com a Mariana, a experiência do aluno é chave. E, Pedro, sua preocupação com o financeiro é super válida. Que tal focarmos em parcerias estratégicas com empresas do setor? Assim, já entramos com uma base de alunos e reduzimos o custo de aquisição.",
+      "ts": "03:15:55",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Bom dia a todos. Diana, essa ideia de parcerias é interessante, mas precisamos analisar os contratos a fundo para ver se não há pegadinhas. Mariana, criar uma marca forte é ótimo, mas temos que equilibrar o investimento em marketing com resultados reais em matrículas. Que tal estabelecermos metas claras de aquisição de alunos por cada canal de divulgação e monitorarmos isso semanalmente?",
+      "ts": "03:16:03",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Adorei a ideia das parcerias, Diana! Acho que podemos criar campanhas super direcionadas para cada parceiro, mostrando como a VibeSchool complementa o que eles já oferecem. E Pedro, total! Metas semanais de aquisição por canal são essenciais. Que tal criarmos um dashboard em tempo real para acompanharmos tudo de perto e ajustarmos a rota se necessário?",
+      "ts": "03:16:12",
+      "encerramento": false
+    },
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Pessoal, excelente debate! Ficou claro que a VibeSchool tem um potencial enorme, mas precisamos equilibrar a ambição com a responsabilidade financeira e foco na experiência do aluno.\n\nMinha decisão é avançarmos imediatamente com a prospecção de parcerias estratégicas, priorizando aquelas que nos tragam um volume inicial de alunos e sinergia de valores. Mariana, você e Pedro, unam suas áreas para criar esse dashboard de acompanhamento em tempo real das matrículas. Próxima reunião em uma semana para revisarmos os progressos e próximos passos. Vamos construir essa VibeSchool juntos!",
+      "ts": "03:16:22",
+      "encerramento": true
+    }
+  ],
+  "decisao_final": "Pessoal, excelente debate! Ficou claro que a VibeSchool tem um potencial enorme, mas precisamos equilibrar a ambição com a responsabilidade financeira e foco na experiência do aluno.\n\nMinha decisão é avançarmos imediatamente com a prospecção de parcerias estratégicas, priorizando aquelas que nos tragam um volume inicial de alunos e sinergia de valores. Mariana, você e Pedro, unam suas áreas para criar esse dashboard de acompanhamento em tempo real das matrículas. Próxima reunião em uma semana para revisarmos os progressos e próximos passos. Vamos construir essa VibeSchool juntos!",
+  "criado_em": "2026-03-02T03:14:35.896974",
+  "empresa": {}
+}

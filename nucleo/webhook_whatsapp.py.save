@@ -83,7 +83,7 @@ MENCOES = {
     "rafael": ["rafael", "@rafael", "cpo", "produto"],
     "ana": ["ana", "@ana", "rh", "chro", "pessoas"],
     "dani": ["dani", "@dani", "dados", "analytics"],
-    "ze": ["@ze", "coach"],
+    "ze": ["zé", "ze", "@ze", "coach"],
     "beto": ["beto", "@beto", "otimizador"],
 }
 
@@ -95,20 +95,6 @@ def detectar_agente_convocado(texto: str) -> str | None:
             if txt.startswith(m) or f" {m}," in txt or f" {m} " in txt[:30]:
                 return agente
     return None
-
-def _extrair_agentes_da_mensagem(texto: str) -> list[str]:
-    """Extrai todos os agentes mencionados na mensagem usando MENCOES."""
-    txt = texto.lower()
-    encontrados = []
-    # Lucas/CEO não está em MENCOES, tratar à parte
-    if any(w in txt for w in ["lucas", "ceo"]):
-        encontrados.append("lucas")
-    for agente, mencoes in MENCOES.items():
-        for m in mencoes:
-            if m in txt:
-                encontrados.append(agente)
-                break
-    return encontrados or ["lucas"]
 
 # ── Montar contexto completo ─────────────────────────────────
 def montar_contexto(n_hist: int = 15) -> str:
@@ -130,7 +116,7 @@ def montar_contexto(n_hist: int = 15) -> str:
     if hist:
         ctx.append("\nHISTÓRICO RECENTE:")
         for h in hist:
-            nome = "Sr Passinato" if h["role"] == "user" else h.get("agente","lucas").title()
+            nome = "José" if h["role"] == "user" else h.get("agente","lucas").title()
             ctx.append(f"  [{h['ts']}] {nome}: {h['conteudo']}")
 
     return "\n".join(ctx)
@@ -164,10 +150,9 @@ async def resposta_lucas(mensagem: str) -> str:
     mem  = mem_carregar()
     emp  = mem.get("empresa", {})
 
-    dono_nome = emp.get("dono_nome", "Sr Passinato")
+    dono_nome = emp.get("dono_nome", "")
 
     system = f"""Você é Lucas Mendes, CEO.
-IMPORTANTE: O dono se chama Sr Passinato. NUNCA use outro nome.
 
 {pers}
 
@@ -185,17 +170,17 @@ REGRAS DE COMPORTAMENTO:
 
     # Detectar convocação de sala de reunião
     msg_lower = mensagem.lower()
-    if any(w in msg_lower for w in ["convocar sala", "sala de reunião", "reunião com", "convoca reunião", "marca uma reunião", "marcar reunião", "cria uma reunião", "reuniao com", "marca uma reuniao", "marcar reuniao"]):
+    if any(w in msg_lower for w in ["convocar sala", "sala de reunião", "reunião com", "convoca reunião"]):
         try:
             from nucleo.sala_reuniao.backend import criar_sala, VOZES
+            from nucleo.webhook_whatsapp import _extrair_agentes_da_mensagem
             agentes = _extrair_agentes_da_mensagem(mensagem)
             tema = mensagem
             sala = criar_sala(tema, agentes)
-            host = os.getenv("HOST_URL", "http://76.13.109.151:8000")
+            host = os.getenv("HOST_URL", "http://145.79.4.68:8000")
             return f"Sala convocada! Acesse ao vivo:\n{host}/reuniao/{sala.id}\n\nParticipantes: {', '.join([VOZES[a]['nome'] for a in agentes if a in VOZES])}"
         except Exception as e:
-            print(f"ERRO SALA: {e}")
-            return f"Erro ao criar sala: {e}"
+            pass
 
     resp = await chamar_gemini(system, mensagem)
     
@@ -205,9 +190,11 @@ REGRAS DE COMPORTAMENTO:
         dest, assunto, corpo = email_match.group(1), email_match.group(2), email_match.group(3)
         resultado_email = enviar_email_zoho(dest, assunto, corpo)
         resp = re.sub(r'\[ENVIAR_EMAIL:[^\]]+\]', f'\n{resultado_email}', resp)
+
         telegram_enviar(f"📧 Lucas enviou email para {dest}\nAssunto: {assunto}")
     
     return resp
+
 
 # ── Resposta de agente específico ───────────────────────────
 async def resposta_agente(agente: str, mensagem: str) -> str:
@@ -273,10 +260,10 @@ REGRAS:
 async def webhook(request: Request):
     form = await request.form()
     Body = form.get("Body", "").strip()
-    From = form.get("From", "").replace(" ", "+")
+    From = form.get("From", "")
 
     if not Body:
-        return Response(content=_twiml("", From), media_type="application/xml")
+        return Response(content=_twiml(""), media_type="application/xml")
 
     logger.info(f"📱 [{From}] {Body[:80]}")
 
@@ -290,12 +277,11 @@ async def webhook(request: Request):
         resultado = await processar_execucao(Body)
         if resultado:
             mem_add("assistant", resultado, "sistema")
-            return Response(content=_twiml(resultado, From), media_type="application/xml")
+            return Response(content=_twiml(resultado), media_type="application/xml")
     except: pass
 
     # Detectar se convocou agente específico
     agente_convocado = detectar_agente_convocado(Body)
-    print(f"AGENTE: {agente_convocado}")
 
     if agente_convocado:
         # Resposta do agente convocado
@@ -306,12 +292,12 @@ async def webhook(request: Request):
         resposta = await resposta_lucas(Body)
         mem_add("assistant", resposta, "lucas")
 
-    return Response(content=_twiml(resposta, From), media_type="application/xml")
+    return Response(content=_twiml(resposta), media_type="application/xml")
 
-def _twiml(texto: str, para: str = "") -> str:
+def _twiml(texto: str) -> str:
     safe = texto.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
     return f'''<?xml version="1.0" encoding="UTF-8"?>
-<Response><Message to="{para}" from="{TWILIO_WPP}"><Body>{safe}</Body></Message></Response>'''
+<Response><Message to="" from="{TWILIO_WPP}"><Body>{safe}</Body></Message></Response>'''
 
 # ── Endpoints de suporte ─────────────────────────────────────
 @router.get("/api/v1/historico")
@@ -336,3 +322,12 @@ async def chat_dashboard(request: Request):
     mem_add("user", mensagem)
     mem_add("assistant", resp, agente)
     return {"resposta": resp}
+
+pm2 restart nucleo-dashboard
+
+x^X
+
+exit
+
+
+

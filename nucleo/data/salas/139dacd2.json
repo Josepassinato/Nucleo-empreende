@@ -1,0 +1,88 @@
+{
+  "id": "139dacd2",
+  "tema": "Estrategia VibeSchool",
+  "agentes": [
+    "lucas",
+    "diana",
+    "pedro",
+    "mariana"
+  ],
+  "status": "encerrada",
+  "historico": [
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Bom dia a todos. Sou Lucas Mendes, o novo CEO. Estamos aqui hoje para discutir a estratégia da VibeSchool. Precisamos alinhar nossas visões e definir um caminho claro para o sucesso.\n\nDiana, por favor, comece compartilhando suas perspectivas.",
+      "ts": "03:17:53",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Bom dia, Lucas, time! Vejo um oceano de oportunidades inexploradas na VibeSchool. Analisando o mercado e as tendências, podemos criar um posicionamento único, aproveitando nichos emergentes e movimentos de concorrentes. Com os dados certos, podemos construir uma estratégia matadora.",
+      "ts": "03:18:01",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Bom dia, pessoal. Diana, essa visão estratégica é fundamental. Do meu lado, foco total em garantir que cada real investido impulsione o crescimento sustentável da VibeSchool, otimizando custos e buscando o melhor retorno em cada ação. Precisamos ser cirúrgicos nos investimentos para maximizar o impacto.",
+      "ts": "03:18:09",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Bom dia, Lucas, Diana, Pedro! Concordo totalmente com a visão de vocês. Vejo que, com a análise da Diana e o olhar do Pedro, podemos construir uma marca que não só atrai, mas também cria conexões genuínas com o público, transformando alunos em verdadeiros fãs da VibeSchool. Vamos focar em criar campanhas que engajem e viralizem, para que a VibeSchool se torne referência no mercado.",
+      "ts": "03:18:17",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Excelente, time! Com essa visão integrada, podemos transformar a VibeSchool em um case de sucesso. Que tal explorarmos a criação de cursos personalizados para empresas, aproveitando a crescente demanda por treinamentos corporativos?",
+      "ts": "03:18:25",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Achei interessante essa ideia de cursos personalizados para empresas, Diana. Mas antes de nos aventurarmos, precisamos analisar a fundo os custos envolvidos e o potencial de receita. Precisamos de uma projeção detalhada para garantir que essa iniciativa seja financeiramente viável e traga um retorno interessante para a VibeSchool. Sugiro que façamos um estudo de caso rápido com algumas empresas parceiras para validar essa hipótese.",
+      "ts": "03:18:36",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Acho que a ideia de cursos personalizados é super válida, Diana! E o olhar do Pedro sobre os custos é essencial. Para dar um gás nisso, que tal criarmos um \"curso piloto\" para uma empresa parceira e usarmos os resultados como base para uma campanha de marketing matadora? Assim, já testamos o produto e criamos conteúdo para atrair mais clientes.",
+      "ts": "03:18:46",
+      "encerramento": false
+    },
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Excelente, time! Ficou claro que a sinergia entre visão estratégica, otimização financeira e marketing de impacto é o caminho para o sucesso da VibeSchool.\n\nDecidimos avançar com a criação de um curso piloto personalizado para uma empresa parceira, com análise rigorosa de custos e resultados para embasar nossa estratégia de marketing.\n\nMariana e Pedro, unam forças para colocar esse curso piloto de pé em duas semanas. Na próxima reunião, vamos analisar os resultados e definir os próximos passos para escalar essa iniciativa. Vamos juntos construir uma VibeSchool de sucesso!",
+      "ts": "03:18:55",
+      "encerramento": true
+    }
+  ],
+  "decisao_final": "Excelente, time! Ficou claro que a sinergia entre visão estratégica, otimização financeira e marketing de impacto é o caminho para o sucesso da VibeSchool.\n\nDecidimos avançar com a criação de um curso piloto personalizado para uma empresa parceira, com análise rigorosa de custos e resultados para embasar nossa estratégia de marketing.\n\nMariana e Pedro, unam forças para colocar esse curso piloto de pé em duas semanas. Na próxima reunião, vamos analisar os resultados e definir os próximos passos para escalar essa iniciativa. Vamos juntos construir uma VibeSchool de sucesso!",
+  "criado_em": "2026-03-02T03:17:17.873698",
+  "empresa": {}
+}

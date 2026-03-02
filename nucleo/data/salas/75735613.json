@@ -1,0 +1,88 @@
+{
+  "id": "75735613",
+  "tema": "Estrategia VibeSchool",
+  "agentes": [
+    "lucas",
+    "diana",
+    "pedro",
+    "mariana"
+  ],
+  "status": "encerrada",
+  "historico": [
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Bora começar, pessoal! Hoje a pauta é VibeSchool e como vamos bombar essa estratégia.\n\nDiana, manda bala! Qual o panorama que você preparou pra gente?",
+      "ts": "05:05:05",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Lucas, acho que VibeSchool tem uma brecha enorme no mercado de educação online. A concorrência ainda não viu o potencial de criar uma comunidade engajada em torno do aprendizado.",
+      "ts": "05:05:08",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Diana, a ideia é boa, mas comunidade não paga boleto. Precisamos urgentemente calcular o custo de aquisição por aluno e o potencial de receita a longo prazo para ver se essa \"brecha\" fecha as contas. Sem números claros, o risco de queimar caixa é altíssimo.",
+      "ts": "05:05:11",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Pedro tem razão, Diana. Antes de sonhar com comunidade, vamos mapear o perfil do cliente ideal e entender qual o funil de vendas mais eficiente para ele. Precisamos equilibrar orgânico versus pago, e testar canais menores antes de investir pesado.",
+      "ts": "05:05:15",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Pedro e Mariana, vocês dois têm razão, o negócio precisa fechar. Mas e se a gente fizesse uma parceria com influenciadores de educação? Eles já têm um público engajado, seria um baita canal de distribuição.",
+      "ts": "05:05:18",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Diana, influenciador é bom pra hype, mas caro. Precisamos de um plano com prazo de retorno definido.\n\nMariana, concordo 100% com o funil. Quero ver a margem de contribuição por aluno antes de aprovar qualquer parceria.",
+      "ts": "05:05:21",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "A parceria com influenciadores pode ser interessante, mas o custo precisa ser justificado pela taxa de conversão que eles trazem para o funil. Antes de fechar qualquer coisa, vamos testar diferentes tipos de conteúdo com microinfluenciadores e ver o que ressoa melhor com o perfil do nosso cliente ideal. Assim, usamos dados para otimizar o investimento e garantir que a estratégia seja escalável.",
+      "ts": "05:05:24",
+      "encerramento": false
+    },
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Boa, gente! VibeSchool tem potencial, mas pé no chão e foco nos números.\n\nMariana, valida primeiro o funil com microinfluenciadores. Próximo passo: uma apresentação concisa com os resultados desses testes em 2 semanas. Bora destravar!",
+      "ts": "05:05:28",
+      "encerramento": true
+    }
+  ],
+  "decisao_final": "Boa, gente! VibeSchool tem potencial, mas pé no chão e foco nos números.\n\nMariana, valida primeiro o funil com microinfluenciadores. Próximo passo: uma apresentação concisa com os resultados desses testes em 2 semanas. Bora destravar!",
+  "criado_em": "2026-03-02T05:04:35.466418",
+  "empresa": {}
+}

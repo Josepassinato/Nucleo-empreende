@@ -1,0 +1,88 @@
+{
+  "id": "85d1124b",
+  "tema": "Estrategia VibeSchool",
+  "agentes": [
+    "lucas",
+    "diana",
+    "pedro",
+    "mariana"
+  ],
+  "status": "encerrada",
+  "historico": [
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Bom dia time! Bora focar em VibeSchool hoje.\n\nPrecisamos definir a estratégia, qual o roadmap disso. Diana, começa com a visão geral?",
+      "ts": "03:49:44",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Lucas, bom dia! Tem um gap grande no mercado de edtech focado em soft skills e a VibeSchool pode liderar. A gente precisa testar rápido diferentes distribution channels e focar em parcerias estratégicas com outras plataformas.",
+      "ts": "03:49:55",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Diana, o mercado é grande, mas o CAC tá nas alturas. Valida rápido canais com menor custo e acompanha de perto o LTV:CAC antes de escalar. Precisamos alongar o runway.",
+      "ts": "03:50:04",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Bom dia, time! Concordo com o Pedro, precisamos otimizar o CAC. Diana, vamos mapear o funil completo e priorizar canais com melhor channel fit para nosso ICP. A/B test isso!",
+      "ts": "03:50:15",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Mariana, perfeito o foco no funil e ICP. A concorrência ainda não viu a oportunidade de posicionamento em nichos específicos dentro de soft skills. Que tal a gente criar um programa de referral agressivo, testando micro-influenciadores?",
+      "ts": "03:50:25",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Diana, referral com micro-influenciadores pode ser interessante, mas controla o burn. Valida o payback period dessa ação e acompanha as unit economics de perto. O LTV precisa justificar o investimento.",
+      "ts": "03:50:34",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Diana, micro-influenciador parece promissor, mas vamos comparar orgânico vs pago SEMPRE. A/B test isso em landing pages diferentes para otimizar a conversion e provar qual escala.",
+      "ts": "03:50:42",
+      "encerramento": false
+    },
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Show, time! A gente vai validar rápido micro-influenciadores e canais orgânicos pra VibeSchool.\n\nDiana, foca em A/B testar landing pages e um programa de referral agressivo. Pedro, acompanha o payback e unit economics. Mariana, funil e ICP são prioridade. Próxima reunião, resultados disso!",
+      "ts": "03:50:55",
+      "encerramento": true
+    }
+  ],
+  "decisao_final": "Show, time! A gente vai validar rápido micro-influenciadores e canais orgânicos pra VibeSchool.\n\nDiana, foca em A/B testar landing pages e um programa de referral agressivo. Pedro, acompanha o payback e unit economics. Mariana, funil e ICP são prioridade. Próxima reunião, resultados disso!",
+  "criado_em": "2026-03-02T03:49:05.346632",
+  "empresa": {}
+}

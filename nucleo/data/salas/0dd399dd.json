@@ -1,0 +1,88 @@
+{
+  "id": "0dd399dd",
+  "tema": "Estrategia de lancamento VibeSchool",
+  "agentes": [
+    "lucas",
+    "diana",
+    "pedro",
+    "mariana"
+  ],
+  "status": "encerrada",
+  "historico": [
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "E aí, time. Bora focar no lançamento da VibeSchool.\n\nPrecisamos *shipar* isso rápido, e validar se a gente move o *needle* mesmo. Diana, qual a visão geral?",
+      "ts": "03:32:17",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Lucas, *shipar* rápido é essencial. Vejo uma baita oportunidade de posicionamento, a concorrência ainda não viu o gap de personalização. A gente pode testar parcerias com edtechs menores pra ganhar distribution channel.",
+      "ts": "03:32:23",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Diana, parcerias são ok, mas o CAC tá alto. Precisamos focar nas unit economics desde o início pra garantir um LTV:CAC saudável.",
+      "ts": "03:32:29",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Pedro, concordo 100% com o CAC. Diana, antes de edtechs, vamos refinar o ICP e testar *channel fit* com campanhas de aquisição menores e muito A/B test. Validado o funil, pensamos em parcerias.",
+      "ts": "03:32:35",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Mariana, total acordo. O LTV precisa fechar. Mas antes de aquisição, vamos focar no onboarding, tem um gap gigante ali pra aumentar a retenção e o referral.",
+      "ts": "03:32:41",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Concordo com a Mariana, o CAC precisa estar sob controle. Diana, o onboarding é importante, mas sem grana pra aquisição, não rola. Vamos colocar um teto de gasto por aluno no primeiro mês pra não estourar o burn.",
+      "ts": "03:32:47",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Pedro, teu teto é importante, mas sem testar canais antes, queimamos grana à toa. Diana, A/B test isso no onboarding *versus* aquisição. Olhando o funil completo, onde o *conversion* dói mais?",
+      "ts": "03:32:52",
+      "encerramento": false
+    },
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Boa, time! Estamos alinhados em validar o *channel fit* e otimizar o funil antes de escalar.\n\nMariana, toca esses A/B testes agressivos no funil *versus* aquisição. Diana, dá o suporte analítico e vamos ver onde focamos primeiro pra *mover o needle* de verdade. *Ship rápido*!",
+      "ts": "03:32:58",
+      "encerramento": true
+    }
+  ],
+  "decisao_final": "Boa, time! Estamos alinhados em validar o *channel fit* e otimizar o funil antes de escalar.\n\nMariana, toca esses A/B testes agressivos no funil *versus* aquisição. Diana, dá o suporte analítico e vamos ver onde focamos primeiro pra *mover o needle* de verdade. *Ship rápido*!",
+  "criado_em": "2026-03-02T03:31:10.585749",
+  "empresa": {}
+}

@@ -1,0 +1,88 @@
+{
+  "id": "b8cfb592",
+  "tema": "Estrategia de lancamento da VibeSchool",
+  "agentes": [
+    "lucas",
+    "diana",
+    "pedro",
+    "mariana"
+  ],
+  "status": "encerrada",
+  "historico": [
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Olá a todos, obrigado pela presença. Hoje vamos discutir a estratégia de lançamento da VibeSchool. Precisamos alinhar os próximos passos para garantir que a gente entre no mercado com força total. Diana, pode nos dar um panorama geral, por favor?",
+      "ts": "03:10:37",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Bom dia, pessoal. Vejo um potencial enorme na VibeSchool, especialmente com a crescente demanda por educação flexível e online. Antes de detalharmos a estratégia, queria compartilhar alguns dados cruciais sobre o mercado e oportunidades que identifiquei.",
+      "ts": "03:10:47",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Bom dia a todos. Diana, obrigado pelo panorama inicial. Da minha perspectiva, antes de mergulharmos de cabeça, precisamos ter um olhar bem crítico sobre as projeções financeiras e o custo de aquisição de clientes. Afinal, um lançamento de sucesso tem que ser financeiramente sustentável a longo prazo.",
+      "ts": "03:10:57",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Bom dia, pessoal! Concordo plenamente com o Lucas e a Diana, o potencial é enorme. Pedro, sua preocupação com a sustentabilidade financeira é fundamental, e é aí que entra a minha área: precisamos criar uma campanha de lançamento viral, que gere buzz e reduza o custo de aquisição de clientes. Meu foco agora é entender como criar essa faísca inicial.",
+      "ts": "03:11:07",
+      "encerramento": false
+    },
+    {
+      "agente": "diana",
+      "nome": "Diana Vaz",
+      "cargo": "CNO",
+      "genero": "F",
+      "fala": "Adorei os pontos de vocês. Pedro, essencial olharmos para o custo de aquisição, e Mariana, genial pensarmos em viralização desde o início. Minha sugestão é: focarmos em parcerias estratégicas com influenciadores e empresas de tecnologia para um lançamento que já atinja um público engajado e relevante.",
+      "ts": "03:11:16",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Bom, gente, eu acho que as ideias estão ótimas, mas pé no chão, né? Essas parcerias com influenciadores e empresas de tecnologia podem ser caras. Que tal a gente começar com um piloto menor, focando em um nicho específico, para testar o mercado e ajustar a estratégia antes de gastar muito?",
+      "ts": "03:11:24",
+      "encerramento": false
+    },
+    {
+      "agente": "mariana",
+      "nome": "Mariana Oliveira",
+      "cargo": "CMO",
+      "genero": "F",
+      "fala": "Concordo com a cautela do Pedro, mas também acho que não podemos ter medo de ousar! Que tal pensarmos em um lançamento com duas fases? Primeiro, um piloto menor, super direcionado, e depois, com os aprendizados, uma campanha maior, com mais investimento em influenciadores e parcerias. Assim, equilibramos risco e potencial de viralização.",
+      "ts": "03:11:33",
+      "encerramento": false
+    },
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Olá a todos, obrigado pela presença e pelas ideias.\n\nResumidamente, tivemos um debate rico sobre como equilibrar o potencial de crescimento da VibeSchool com a necessidade de sustentabilidade financeira em nosso lançamento.\n\nDecidimos seguir com uma estratégia de lançamento em duas fases: começaremos com um piloto focado em um nicho específico para validar nossas hipóteses e, em seguida, expandiremos com uma campanha mais ampla, incorporando parcerias estratégicas e influenciadores.\n\nDiana e Mariana, quero que vocês liderem a formação de um plano detalhado para o piloto, com metas claras e métricas de sucesso definidas. Apresentem esse plano na próxima semana para darmos o próximo passo. Conto com vocês!",
+      "ts": "03:11:44",
+      "encerramento": true
+    }
+  ],
+  "decisao_final": "Olá a todos, obrigado pela presença e pelas ideias.\n\nResumidamente, tivemos um debate rico sobre como equilibrar o potencial de crescimento da VibeSchool com a necessidade de sustentabilidade financeira em nosso lançamento.\n\nDecidimos seguir com uma estratégia de lançamento em duas fases: começaremos com um piloto focado em um nicho específico para validar nossas hipóteses e, em seguida, expandiremos com uma campanha mais ampla, incorporando parcerias estratégicas e influenciadores.\n\nDiana e Mariana, quero que vocês liderem a formação de um plano detalhado para o piloto, com metas claras e métricas de sucesso definidas. Apresentem esse plano na próxima semana para darmos o próximo passo. Conto com vocês!",
+  "criado_em": "2026-03-02T03:09:46.711293",
+  "empresa": {}
+}

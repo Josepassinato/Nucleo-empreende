@@ -1,0 +1,50 @@
+{
+  "id": "a20d5641",
+  "tema": "Teste audio",
+  "agentes": [
+    "lucas",
+    "pedro"
+  ],
+  "status": "encerrada",
+  "historico": [
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Bom dia, Pedro. Obrigado por estar aqui.\n\nHoje vamos discutir os testes de áudio. Precisamos garantir a qualidade do som nos nossos produtos, então vamos mergulhar nisso.\n\nPedro, pode começar compartilhando suas perspectivas?",
+      "ts": "03:25:33",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Bom dia, Lucas. Áudio bom é essencial, mas áudio caro, não dá. Precisamos de testes eficientes, que garantam a qualidade sem estourar o orçamento. Quero entender os custos envolvidos em cada etapa, para ver onde podemos economizar.",
+      "ts": "03:25:40",
+      "encerramento": false
+    },
+    {
+      "agente": "pedro",
+      "nome": "Pedro Lima",
+      "cargo": "CFO",
+      "genero": "M",
+      "fala": "Beleza, Lucas. Entendo a importância do áudio, mas cada centavo conta. Precisamos de dados: quanto gastamos com testes atualmente e qual o custo de um áudio ruim para o cliente? Com esses números, podemos ver onde vale a pena investir e onde dá para apertar o cinto.",
+      "ts": "03:25:46",
+      "encerramento": false
+    },
+    {
+      "agente": "lucas",
+      "nome": "Lucas Mendes",
+      "cargo": "CEO",
+      "genero": "M",
+      "fala": "Pedro, valeu pelas ideias. Priorizar a qualidade do áudio sem onerar o orçamento é o nosso desafio. Decidimos levantar os custos atuais dos testes e o impacto financeiro da má qualidade. Com esses dados, vamos otimizar nossos testes e garantir a melhor experiência sonora para o cliente, sem comprometer a saúde financeira da empresa.\n\nAos times de financeiro e qualidade: tragam esses números na nossa próxima reunião, ok?",
+      "ts": "03:25:59",
+      "encerramento": true
+    }
+  ],
+  "decisao_final": "Pedro, valeu pelas ideias. Priorizar a qualidade do áudio sem onerar o orçamento é o nosso desafio. Decidimos levantar os custos atuais dos testes e o impacto financeiro da má qualidade. Com esses dados, vamos otimizar nossos testes e garantir a melhor experiência sonora para o cliente, sem comprometer a saúde financeira da empresa.\n\nAos times de financeiro e qualidade: tragam esses números na nossa próxima reunião, ok?",
+  "criado_em": "2026-03-02T03:24:55.929730",
+  "empresa": {}
+}
