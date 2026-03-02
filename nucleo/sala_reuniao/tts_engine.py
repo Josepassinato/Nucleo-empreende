@@ -88,11 +88,11 @@ async def tts_elevenlabs(texto: str, agente: str) -> bytes | None:
                 },
                 json={
                     "text": texto[:500],
-                    "model_id": "eleven_multilingual_v2",  # melhor qualidade em português
+                    "model_id": "eleven_turbo_v2_5",  # mais rápido + alta qualidade — conta paga
                     "voice_settings": {
-                        "stability": 0.5,
-                        "similarity_boost": 0.8,
-                        "style": 0.3,
+                        "stability": 0.4,
+                        "similarity_boost": 0.85,
+                        "style": 0.5,
                         "use_speaker_boost": True
                     }
                 }
