@@ -560,7 +560,7 @@ body::after {{
 
 <script>
 const SALA_ID = "{sala_id}";
-const AGENTES = AGENTES_PLACEHOLDER;
+const AGENTES = {agentes_json};
 
 let audioDesbloqueado = false;
 let audioCtx = null;
