@@ -565,7 +565,7 @@ const AGENTES = {agentes_json};
 
 let audioDesbloqueado = false;
 let audioCtx = null;
-let audioQueue = [];
+let audioQueue = []; // cada item: {audio, id, nome, cargo, genero, texto, ts}
 let tocandoAudio = false;
 
 // ── Posicionar avatares em círculo ──────────────────────────────
@@ -632,32 +632,36 @@ function desenharBeam(agenteId) {{
 
 // ── Ativar agente falando ────────────────────────────────────────
 function ativarAgente(id, nome, cargo, genero, texto, audio, ts) {{
+  // Adiciona ao histórico imediatamente
+  adicionarHistorico({{agente:id, nome, cargo, genero, fala:texto, ts}});
+
+  // Enfileira áudio COM metadata visual — avatar só acende quando áudio tocar
+  if (audio) {{
+    audioQueue.push({{audio, id, nome, cargo, genero, texto, ts}});
+    if (audioDesbloqueado && !tocandoAudio) tocarProximo();
+  }} else {{
+    // Sem áudio: ativa visual imediatamente
+    ativarVisual(id, nome, cargo, genero, texto);
+  }}
+}}
+
+function ativarVisual(id, nome, cargo, genero, texto) {{
   // Desativar todos
   AGENTES.forEach(a => {{
     const el = document.getElementById(`av-${{a.id}}`);
     if (el) el.className = `avatar-node aguardando ${{a.genero}}`;
   }});
-  // Ativar este — usar o ID exato do agente
+  // Ativar quem está falando
   const av = document.getElementById(`av-${{id}}`);
-  if (av) {{
-    av.className = `avatar-node falando ${{genero}}`;
-    // Garantir que o nome correto aparece no painel
-    document.querySelector(`#av-${{id}} .avatar-nome`).style.color = genero === 'F' ? 'var(--female-color)' : 'var(--neon)';
-  }}
+  if (av) av.className = `avatar-node falando ${{genero}}`;
   desenharBeam(id);
 
-  // Fala panel
+  // Atualizar painel de fala
   const panel = document.getElementById('fala-panel');
   panel.className = `fala-panel ${{genero}}`;
   document.getElementById('fala-speaker').textContent = `${{nome.toUpperCase()}} — ${{cargo}}`;
   document.getElementById('fala-texto').innerHTML = texto;
-
-  adicionarHistorico({{agente:id, nome, cargo, genero, fala:texto, ts}});
-
-  if (audio) {{
-    audioQueue.push(audio);
-    if (audioDesbloqueado && !tocandoAudio) tocarProximo();
-  }}
+  document.getElementById('status-line').textContent = `▶ ${{nome.toUpperCase()}} — ${{cargo.toUpperCase()}}`;
 }}
 
 // ── Histórico ────────────────────────────────────────────────────
@@ -691,10 +695,23 @@ function ativarAudio() {{
 }}
 
 function tocarProximo() {{
-  if (!audioDesbloqueado || audioQueue.length === 0) {{ tocandoAudio = false; return; }}
+  if (!audioDesbloqueado || audioQueue.length === 0) {{
+    tocandoAudio = false;
+    // Desativar todos quando fila vazia
+    AGENTES.forEach(a => {{
+      const el = document.getElementById(`av-${{a.id}}`);
+      if (el) el.className = `avatar-node aguardando ${{a.genero}}`;
+    }});
+    document.getElementById('conn-svg').innerHTML = '';
+    return;
+  }}
   tocandoAudio = true;
-  const b64 = audioQueue.shift();
-  const audio = new Audio('data:audio/mpeg;base64,' + b64);
+  const item = audioQueue.shift();
+  
+  // Ativar visual SINCRONIZADO com início do áudio
+  ativarVisual(item.id, item.nome, item.cargo, item.genero, item.texto);
+  
+  const audio = new Audio('data:audio/mpeg;base64,' + item.audio);
   audio.onended = tocarProximo;
   audio.onerror = tocarProximo;
   audio.play().catch(tocarProximo);
@@ -717,7 +734,6 @@ ws.onmessage = (e) => {{
   }}
   if (ev.tipo === 'fala') {{
     ativarAgente(ev.agente, ev.nome, ev.cargo, ev.genero||'M', ev.texto, ev.audio, ev.ts);
-    document.getElementById('status-line').textContent = `▶ ${{ev.nome.toUpperCase()}} — ${{ev.cargo.toUpperCase()}}`;
   }}
   if (ev.tipo === 'historico') {{
     ev.historico.forEach(h => adicionarHistorico(h));
