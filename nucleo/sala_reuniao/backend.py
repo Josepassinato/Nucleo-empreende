@@ -131,13 +131,17 @@ class SalaReuniao:
         await asyncio.sleep(1)
 
         try:
-            # Fase 1: Lucas abre a reunião
+            # Fase 1: Lucas abre a reunião anunciando o 5W2H
             lucas_abertura = await self._fala_agente(
                 "lucas",
                 f"Você está abrindo uma reunião de diretoria sobre: {self.tema}\n"
                 f"Presentes: {', '.join([VOZES[a]['nome'] for a in self.agentes if a in VOZES])}\n"
                 f"Empresa: {empresa_str}\n\n"
-                "Faça uma abertura de 2-3 frases: apresente o tema, a urgência e passe a palavra para o primeiro diretor.",
+                "Faça a abertura em 2-3 frases:\n"
+                "1. Apresente o tema e a urgência\n"
+                "2. Deixe claro que a reunião SÓ termina com o 5W2H definido (O quê, Por quê, Quem, Onde, Quando, Como, Quanto)\n"
+                "3. Passe a palavra para o primeiro diretor\n"
+                "Seja direto. Português brasileiro.",
                 historico_str
             )
             historico_str += f"\nLucas: {lucas_abertura}"
@@ -169,16 +173,25 @@ class SalaReuniao:
                     historico_str += f"\n{VOZES[agente]['nome']}: {fala}"
                     await asyncio.sleep(1.5)
 
-            # Fase 3: Lucas fecha com decisão
+            # Fase 3: Lucas fecha com 5W2H obrigatório
             decisao_prompt = (
                 f"Reunião sobre: {self.tema}\n"
                 f"Empresa: {empresa_str}\n"
                 f"Debate completo:\n{historico_str}\n\n"
-                "Como CEO, encerre a reunião com:\n"
-                "1. Uma síntese do debate (1 frase)\n"
-                "2. A decisão final clara\n"
-                "3. O próximo passo concreto\n"
-                "Seja decisivo e motivador. Máximo 4 frases."
+                "Como CEO, encerre a reunião aplicando o 5W2H obrigatório.\n"
+                "A reunião SÓ termina com todos os 7 campos definidos.\n\n"
+                "Primeiro faça uma síntese do debate em 1 frase.\n"
+                "Depois apresente o 5W2H completo neste formato exato:\n\n"
+                "✅ O QUÊ: [ação concreta e específica decidida]\n"
+                "✅ POR QUÊ: [razão de negócio + qual métrica isso move]\n"
+                "✅ QUEM: [nome do responsável único pela execução]\n"
+                "✅ ONDE: [sistema, canal ou ambiente de execução]\n"
+                "✅ QUANDO: [data específica de entrega]\n"
+                "✅ COMO: [método, abordagem ou ferramentas]\n"
+                "✅ QUANTO: [custo estimado em R$ e horas]\n\n"
+                "Finalize confirmando o compromisso com o responsável: '[Nome], você confirma?'\n"
+                "Se algum campo não foi definido no debate, você mesmo define com base no contexto.\n"
+                "Seja direto e decisivo. Português brasileiro."
             )
             decisao = await self._fala_agente("lucas", decisao_prompt, historico_str, encerramento=True)
             self.decisao_final = decisao

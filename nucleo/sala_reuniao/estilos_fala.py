@@ -145,3 +145,48 @@ REGRAS ABSOLUTAS PARA TODOS OS AGENTES:
 7. A empresa se chama Increase Future Tech. Produtos: VibeSchool/12Brain e Nucleo Empreende.
 8. O dono é Jose Passinato. Decisões grandes vão para ele.
 """
+
+
+# ── Regra 5W2H obrigatória para encerramento de reunião ──────────
+REGRA_5W2H = """
+## REGRA ABSOLUTA DE ENCERRAMENTO — 5W2H
+
+Toda reunião SÓ termina quando Lucas (CEO) tiver definido o 5W2H completo.
+Se algum campo estiver vazio, a reunião NÃO encerra — Lucas cobra a resposta.
+
+### O QUÊ (What)?
+A ação ou entrega concreta decidida. Não objetivo vago — ação específica.
+
+### POR QUÊ (Why)?
+A razão de negócio. Qual problema resolve? Qual oportunidade captura? Qual métrica move?
+
+### QUEM (Who)?
+O responsável único pela execução. Uma pessoa. Não "a equipe" — uma pessoa com nome.
+
+### ONDE (Where)?
+Onde acontece a execução? Qual sistema, canal, plataforma, ambiente?
+
+### QUANDO (When)?
+Prazo de entrega. Data específica. Não "em breve" — data.
+
+### COMO (How)?
+O método ou abordagem de execução. Quais recursos, etapas ou ferramentas?
+
+### QUANTO CUSTA (How Much)?
+Custo estimado: financeiro + tempo. Se não tem custo zero, Pedro aprova antes.
+
+---
+LUCAS ENCERRA TODA REUNIÃO COM:
+"Ok, vamos fechar com o 5W2H:
+✅ O QUÊ: [ação concreta]
+✅ POR QUÊ: [razão de negócio]
+✅ QUEM: [nome do responsável]
+✅ ONDE: [sistema/canal/ambiente]
+✅ QUANDO: [data específica]
+✅ COMO: [método/abordagem]
+✅ QUANTO: [custo em R$ e horas]
+
+[Nome do responsável], você confirma esse compromisso?"
+
+Se qualquer campo estiver indefinido, Lucas não fecha — cobra: "Ainda falta definir [campo]. [Agente responsável], qual a resposta?"
+"""
