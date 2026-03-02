@@ -226,67 +226,191 @@ class SalaReuniao:
     async def conduzir_reuniao(self):
         """Orquestra a reunião completa."""
         self.status = "em_andamento"
-        empresa_str = json.dumps(self.empresa, ensure_ascii=False) if self.empresa else "em configuração"
+        empresa_str = json.dumps(self.empresa, ensure_ascii=False) if self.empresa else ""
         historico_str = ""
 
         await self.broadcast({"tipo": "inicio", "tema": self.tema, "agentes": self.agentes})
         await asyncio.sleep(1)
 
         try:
-            # Fase 1: Lucas abre a reunião anunciando o 5W2H
+            # ── PRÉ-FASE: Diagnóstico de contexto ────────────────────────
+            # Verifica o que a empresa tem definido antes de qualquer debate
+            contexto_empresa = self.contexto_persistente
+            
+            CAMPOS_CRITICOS = {
+                "produto":      ["produto", "curso", "vibeschool", "12brain", "nucleo", "serviço"],
+                "preco":        ["preço", "price", "ticket", "valor", "r$", "mensalidade"],
+                "publico_alvo": ["público", "persona", "cliente", "aluno", "empreendedor"],
+                "concorrentes": ["concorrent", "competidor", "mercado", "competitor"],
+                "canais":       ["canal", "meta ads", "instagram", "whatsapp", "funil"],
+                "diferenciais": ["diferencial", "vantagem", "único", "proposta de valor"],
+            }
+
+            campos_ausentes = []
+            contexto_lower = contexto_empresa.lower() + empresa_str.lower()
+            for campo, palavras in CAMPOS_CRITICOS.items():
+                if not any(p in contexto_lower for p in palavras):
+                    campos_ausentes.append(campo)
+
+            tem_contexto_suficiente = len(campos_ausentes) <= 2
+
+            # ── FASE 0: Lucas faz o diagnóstico antes de começar ─────────
+            if not tem_contexto_suficiente:
+                # Executivo real para antes de deliberar sem informação
+                diagnostico_prompt = (
+                    f"Você é o CEO e acabou de entrar numa reunião sobre: {self.tema}\n"
+                    f"Presentes: {', '.join([VOZES[a]['nome'] for a in self.agentes if a in VOZES])}\n\n"
+                    f"CONTEXTO DISPONÍVEL:\n{contexto_empresa[:500] if contexto_empresa else 'NENHUM'}\n\n"
+                    f"CAMPOS QUE ESTÃO FALTANDO: {', '.join(campos_ausentes)}\n\n"
+                    "IMPORTANTE: Você é um executivo sério. Não vai fingir que sabe o que não sabe.\n"
+                    "Antes de qualquer debate, você precisa parar a reunião e declarar:\n"
+                    "1. O que você NÃO sabe sobre a empresa/produto que é crítico para decidir\n"
+                    "2. Quais perguntas específicas precisam ser respondidas antes de deliberar\n"
+                    "3. Que você vai consultar o dono para obter essas informações\n"
+                    "4. Que a reunião só avança quando essas respostas chegarem\n\n"
+                    "Seja direto e firme. Um CEO que toma decisão sem informação é irresponsável.\n"
+                    "Português brasileiro. Máximo 4 frases."
+                )
+                diagnostico = await self._fala_agente("lucas", diagnostico_prompt, "")
+                historico_str += f"\nLucas: {diagnostico}"
+                await asyncio.sleep(2)
+
+                # Cada agente também levanta o que precisa saber da sua área
+                for agente in [a for a in self.agentes if a != "lucas"]:
+                    info = VOZES.get(agente, {})
+                    gap_prompt = (
+                        f"Reunião sobre: {self.tema}\n"
+                        f"O CEO acabou de parar a reunião porque faltam informações críticas: {', '.join(campos_ausentes)}\n\n"
+                        f"Você é {info.get('nome','?')}, {info.get('cargo','?')}.\n"
+                        f"Da sua área específica, quais informações você também não tem e precisa antes de opinar?\n"
+                        f"Seja específico: 'Não tenho dados de [X]. Preciso saber [Y] antes de recomendar [Z].'\n"
+                        f"Se não faltar nada da sua área, confirme o que você já sabe.\n"
+                        f"Máximo 2 frases. Português brasileiro."
+                    )
+                    fala_gap = await self._fala_agente(agente, gap_prompt, historico_str)
+                    historico_str += f"\n{info.get('nome','?')}: {fala_gap}"
+                    await asyncio.sleep(1.5)
+
+                # Lucas consolida e consulta o dono
+                consulta_prompt = (
+                    f"Você é o CEO. A diretoria levantou os seguintes gaps de informação:\n{historico_str[-800:]}\n\n"
+                    "Consolide todas as lacunas em perguntas objetivas para o dono.\n"
+                    "Formato: liste as perguntas numeradas e informe que a reunião está pausada até as respostas.\n"
+                    "Diga que o dono pode responder aqui no chat ou você vai buscar no site/documentação do produto.\n"
+                    "Máximo 5 perguntas. Português brasileiro."
+                )
+                consulta = await self._fala_agente("lucas", consulta_prompt, historico_str, encerramento=False)
+                historico_str += f"\nLucas: {consulta}"
+
+                # Notificar que reunião aguarda input do dono
+                await self.broadcast({
+                    "tipo": "aguarda_dono",
+                    "mensagem": "⏸ Reunião pausada — aguardando informações do proprietário",
+                    "gaps": campos_ausentes,
+                    "perguntas": consulta
+                })
+
+                # Aguarda resposta do dono (via mensagens_externas) por até 5 minutos
+                logger.info(f"⏸ Sala {self.id} aguardando input do dono — gaps: {campos_ausentes}")
+                for _ in range(60):  # 60 × 5s = 5 minutos
+                    await asyncio.sleep(5)
+                    if self.mensagens_externas:
+                        break
+
+                # Incorporar resposta do dono se chegou
+                if self.mensagens_externas:
+                    resposta_dono = self.mensagens_externas.pop(0)
+                    historico_str += f"\n[PROPRIETÁRIO — informações da empresa]: {resposta_dono}"
+                    empresa_str = resposta_dono  # atualizar contexto
+                    await self.broadcast({
+                        "tipo": "mensagem_cliente",
+                        "texto": f"✅ Proprietário respondeu: {resposta_dono[:100]}..."
+                    })
+                    # Lucas confirma recebimento e reabre
+                    reabertura = await self._fala_agente(
+                        "lucas",
+                        f"O proprietário acabou de fornecer as informações solicitadas:\n{resposta_dono}\n\n"
+                        "Confirme que recebeu, agradeça brevemente e reabra a reunião com o tema original.\n"
+                        "Máximo 2 frases.",
+                        historico_str
+                    )
+                    historico_str += f"\nLucas: {reabertura}"
+                    await asyncio.sleep(1)
+                else:
+                    # Sem resposta — avança com o que tem mas registra limitação
+                    sem_resposta = await self._fala_agente(
+                        "lucas",
+                        "O proprietário não respondeu em tempo hábil. Declare que a reunião vai avançar "
+                        "com as informações disponíveis, mas que TODAS as decisões terão caráter PROVISÓRIO "
+                        "até validação com o dono. Máximo 2 frases.",
+                        historico_str
+                    )
+                    historico_str += f"\nLucas: {sem_resposta}"
+
+            # ── FASE 1: Lucas abre formalmente com 5W2H ───────────────────
             lucas_abertura = await self._fala_agente(
                 "lucas",
-                f"Você está abrindo uma reunião de diretoria sobre: {self.tema}\n"
+                f"Você está abrindo a discussão sobre: {self.tema}\n"
                 f"Presentes: {', '.join([VOZES[a]['nome'] for a in self.agentes if a in VOZES])}\n"
-                f"Empresa: {empresa_str}\n\n"
-                "Faça a abertura em 2-3 frases:\n"
-                "1. Apresente o tema e a urgência\n"
-                "2. Deixe claro que a reunião SÓ termina com o 5W2H definido (O quê, Por quê, Quem, Onde, Quando, Como, Quanto)\n"
-                "3. Passe a palavra para o primeiro diretor\n"
-                "Seja direto. Português brasileiro.",
+                f"Contexto da empresa disponível:\n{empresa_str[:600]}\n\n"
+                f"Contexto de mercado disponível:\n{contexto_empresa[:400]}\n\n"
+                "Abra o debate em 2-3 frases:\n"
+                "1. Sintetize o que vocês sabem e o que ainda é incerto\n"
+                "2. Defina a pergunta central que precisa ser respondida hoje\n"
+                "3. Lembre que a reunião SÓ encerra com 5W2H completo\n"
+                "4. Passe a palavra para o primeiro diretor\n"
+                "Português brasileiro. Direto.",
                 historico_str
             )
             historico_str += f"\nLucas: {lucas_abertura}"
             await asyncio.sleep(2)
 
-            # Fase 2: Cada agente fala na sua vez (2 rodadas)
+            # ── FASE 2: Debate com conflito estruturado ───────────────────
             agentes_sem_lucas = [a for a in self.agentes if a != "lucas"]
 
-            # Mapa de conflitos estruturados — quem questiona quem
             CONFLITOS = {
-                "pedro":   {"alvo": "mariana", "angulo": "Questione o custo e ROI do que a Mariana propôs. Qual o impacto no caixa?"},
-                "rafael":  {"alvo": "mariana", "angulo": "Questione se o que foi proposto resolve dor real do usuário ou é só hype."},
-                "carla":   {"alvo": "rafael",  "angulo": "Questione se o produto proposto é operacionalmente viável. Como escala?"},
-                "dani":    {"alvo": None,       "angulo": "Questione qualquer afirmação sem dado concreto feita na reunião."},
-                "beto":    {"alvo": "mariana",  "angulo": "Existe forma mais barata de testar essa ideia antes de investir?"},
+                "pedro":   "Questione o custo e ROI do que foi proposto. Se não há número, diga que não pode aprovar.",
+                "rafael":  "Questione se isso resolve dor real do usuário. Se não conhece o produto suficientemente, diga isso.",
+                "carla":   "Questione se é operacionalmente viável com o que temos hoje.",
+                "dani":    "Questione qualquer afirmação sem dado. Se não tem dado, proponha como medir.",
+                "beto":    "Existe forma mais barata de validar isso antes de investir?",
+                "diana":   "Quais dados de mercado e concorrentes apoiam ou contradizem o que foi proposto?",
+                "ana":     "Qual o impacto disso nas pessoas envolvidas na execução?",
+                "ze":      "O que está impedindo a decisão agora? Qual o menor próximo passo concreto?",
+                "mariana": "Qual a hipótese testável? Qual o experimento mínimo antes de escalar?",
             }
-            
+
             for rodada in range(2):
                 if self.mensagens_externas:
                     msg_cliente = self.mensagens_externas.pop(0)
                     await self.broadcast({
                         "tipo": "mensagem_cliente",
-                        "texto": f"💬 Direção do proprietário: {msg_cliente}"
+                        "texto": f"💬 Proprietário: {msg_cliente}"
                     })
                     historico_str += f"\n[PROPRIETÁRIO]: {msg_cliente}"
 
                 for agente in agentes_sem_lucas:
-                    conflito_info = CONFLITOS.get(agente, {})
+                    angulo = CONFLITOS.get(agente, "Contribua com sua perspectiva e questione o que estiver vago.")
 
                     if rodada == 0:
-                        angulo = f"Contribua com sua análise da área de {VOZES[agente]['cargo']}."
+                        instrucao = (
+                            "Primeira rodada: apresente sua análise.\n"
+                            "SE FALTAR informação crítica para opinar, diga exatamente o que precisa saber e de onde pode buscar.\n"
+                            "NÃO invente dados. NÃO simule conhecimento que não tem."
+                        )
                     else:
-                        # Rodada 2: conflito estruturado
-                        angulo = conflito_info.get("angulo",
-                            f"Reaja ao que foi dito. Proponha algo concreto ou questione o que está vago.")
+                        instrucao = (
+                            "Segunda rodada: questione, contradiga se necessário, proponha concreto.\n"
+                            "Se alguém propôs algo sem base, exija a evidência antes de concordar."
+                        )
 
                     prompt_agente = (
                         f"Reunião sobre: {self.tema}\n"
-                        f"Empresa: {empresa_str}\n"
-                        f"Histórico da reunião:\n{historico_str}\n\n"
-                        f"{angulo}\n"
-                        f"{'Primeira rodada: apresente sua análise com dados.' if rodada == 0 else 'Segunda rodada: questione, contradiga se necessário, proponha algo concreto.'}"
-                        f"\nSeja direto. Máximo 3 frases. Português brasileiro."
+                        f"Informações disponíveis da empresa:\n{empresa_str[:400]}\n"
+                        f"Histórico:\n{historico_str[-1200:]}\n\n"
+                        f"Seu ângulo: {angulo}\n"
+                        f"{instrucao}\n"
+                        f"Máximo 3 frases. Português brasileiro."
                     )
                     fala = await self._fala_agente(agente, prompt_agente, historico_str)
                     historico_str += f"\n{VOZES[agente]['nome']}: {fala}"
@@ -357,7 +481,7 @@ class SalaReuniao:
 
         system = f"""{estilo}
 {REGRAS_GERAIS}
-{pers[:300] if pers else 'startup de tech brasileira'}
+{pers[:2000] if pers else 'startup de tech brasileira'}
 
 CONTEXTO PERMANENTE DA EMPRESA:
 {self.contexto_persistente}
