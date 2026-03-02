@@ -948,7 +948,7 @@ async def ver_knowledge_base():
 app.include_router(auto_router)
 
 # ── Endpoints Colegiado ──────────────────────────────────────────
-@auto_router.post("/api/v1/colegiado")
+@app.post("/api/v1/colegiado")
 async def convocar_reuniao(request: Request):
     """Convoca reunião colegiada para uma decisão."""
     from nucleo.colegiado import reuniao_colegiada
@@ -961,21 +961,21 @@ async def convocar_reuniao(request: Request):
     )
     return resultado
 
-@auto_router.get("/api/v1/colegiado/pautas")
+@app.get("/api/v1/colegiado/pautas")
 async def ver_pautas():
     """Ver histórico de pautas do colegiado."""
     import json
     f = Path("nucleo/data/pautas_colegiado.json")
     return {"pautas": json.loads(f.read_text())[-20:] if f.exists() else []}
 
-@auto_router.post("/api/v1/autodev/{agente}")
+@app.post("/api/v1/autodev/{agente}")
 async def disparar_autodev(agente: str):
     """Dispara ciclo de autodesenvolvimento de um agente."""
     from nucleo.colegiado import ciclo_autodesenvolvimento
     resultado = await ciclo_autodesenvolvimento(agente)
     return {"ok": True, "agente": agente, "reflexao": resultado}
 
-@auto_router.get("/api/v1/reflexoes")
+@app.get("/api/v1/reflexoes")
 async def ver_reflexoes():
     """Ver reflexões de autodesenvolvimento dos agentes."""
     import json
