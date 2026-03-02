@@ -10,18 +10,18 @@ logger = logging.getLogger("nucleo.tts")
 
 # ── Vozes por provedor ───────────────────────────────────────────
 
-# ElevenLabs — vozes mais humanizadas
+# ElevenLabs — vozes premium multilingual (melhor suporte ao português)
 VOZES_ELEVENLABS = {
-    "lucas":   "nPczCjzI2devNBz1zQrb",  # Brian — masculino profissional
-    "pedro":   "onwK4e9ZLuTAKqWW03F9",  # Daniel — masculino sério
-    "rafael":  "N2lVS1w4EtoT3dr4eOWO",  # Callum — masculino jovem
-    "ze":      "CwhRBWXzGAHq8TQ4Fs17",  # Roger — masculino energético
-    "beto":    "JBFqnCBsd6RMkjVDRZzb",  # George — masculino direto
-    "diana":   "EXAVITQu4vr4xnSDxMaL",  # Sarah — feminina articulada
-    "mariana": "XB0fDUnXU5powFXDhCwa",  # Charlotte — feminina expressiva
-    "carla":   "Xb7hH8MSUJpSbSDYk0k2",  # Alice — feminina executiva
-    "ana":     "21m00Tcm4TlvDq8ikWAM",  # Rachel — feminina empática
-    "dani":    "AZnzlk1XvdvUeBnXmlld",  # Domi — feminina analítica
+    "lucas":   "pNInz6obpgDQGcFmaJgB",  # Adam — masculino profissional, versátil
+    "pedro":   "TxGEqnHWrfWFTfGW9XjX",  # Josh — masculino sério, grave
+    "rafael":  "ErXwobaYiN019PkySvjV",  # Antoni — masculino jovem, dinâmico
+    "ze":      "VR6AewLTigWG4xSOukaG",  # Arnold — masculino motivador, forte
+    "beto":    "yoZ06aMxZJJ28mfd3POQ",  # Sam — masculino direto, claro
+    "diana":   "EXAVITQu4vr4xnSDxMaL",  # Sarah — feminina articulada, natural
+    "mariana": "MF3mGyEYCl7XYWbV9V6O",  # Elli — feminina jovem, expressiva
+    "carla":   "21m00Tcm4TlvDq8ikWAM",  # Rachel — feminina executiva, calma
+    "ana":     "AZnzlk1XvdvUeBnXmlld",  # Domi — feminina empática, suave
+    "dani":    "zrHiDhphv9ZnVXBqCLjz",  # Glinda — feminina analítica, precisa
 }
 
 # Gemini TTS — vozes disponíveis no preview
@@ -88,7 +88,7 @@ async def tts_elevenlabs(texto: str, agente: str) -> bytes | None:
                 },
                 json={
                     "text": texto[:500],
-                    "model_id": "eleven_flash_v2_5",  # mais rápido
+                    "model_id": "eleven_multilingual_v2",  # melhor qualidade em português
                     "voice_settings": {
                         "stability": 0.5,
                         "similarity_boost": 0.8,
