@@ -468,9 +468,12 @@ function desbloquearAudio() {{
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume();
     audioDesbloqueado = true;
-    document.getElementById('audio-btn').innerHTML = '🔊 Áudio Ativo';
+    document.getElementById('audio-btn').innerHTML = '✅ Áudio Ativo';
     document.getElementById('audio-btn').style.background = 'var(--green)';
-    document.getElementById('status-bar').textContent = '🔊 Áudio ativado!';
+    document.getElementById('audio-btn').disabled = true;
+    document.getElementById('status-bar').textContent = '▶ Iniciando reunião...';
+    // Só inicia a reunião após áudio liberado
+    fetch(`/api/v1/sala/${{SALA_ID}}/iniciar`, {{method:'POST'}});
     if (audioQueue.length > 0) tocarProximoAudio();
   }} catch(e) {{
     // fallback sem AudioContext
@@ -492,9 +495,7 @@ function tocarProximoAudio() {{
 }}
 
 ws.onopen = () => {{
-  document.getElementById('status-bar').textContent = 'Conectado. Aguardando início...';
-  // Auto-iniciar reunião
-  fetch(`/api/v1/sala/${{SALA_ID}}/iniciar`, {{method:'POST'}});
+  document.getElementById('status-bar').textContent = '🔊 Toque em "Ativar Áudio" para iniciar a reunião';
 }};
 
 ws.onmessage = (e) => {{
