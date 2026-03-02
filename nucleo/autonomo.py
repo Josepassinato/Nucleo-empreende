@@ -338,51 +338,39 @@ Formato executivo, direto."""
 async def scheduler():
     """Motor principal — verifica horários e dispara ciclos."""
     logger.info("⚙️ Scheduler autônomo iniciado")
-    
-    ultimo = {}  # controle de última execução por agente
+
+    # Carregar rotinas diárias
+    from nucleo.rotinas_diarias import ROTINAS_DIARIAS
+
+    ultimo = {}  # controle de última execução por chave
 
     while True:
-        agora = datetime.now()
-        hora  = agora.hour
-        minuto = agora.minute
+        agora      = datetime.now()
+        hora       = agora.hour
+        minuto     = agora.minute
         dia_semana = agora.weekday()  # 0=segunda, 6=domingo
 
-        # Diana — todo dia às 7:00
-        if hora == 7 and minuto == 0 and ultimo.get("diana") != agora.date():
-            try:
-                await ciclo_diana()
-                registrar_heartbeat("diana")
-                ultimo["diana"] = agora.date()
-            except Exception as e:
-                logger.error(f"Diana erro: {e}")
+        # ── Rotinas diárias — todos os agentes ─────────────────────
+        for (h, m, chave, funcao) in ROTINAS_DIARIAS:
+            chave_dia = f"{chave}_{agora.date()}"
+            if hora == h and minuto == m and ultimo.get(chave_dia) != chave_dia:
+                try:
+                    logger.info(f"⏰ Disparando rotina: {chave}")
+                    await funcao()
+                    registrar_heartbeat(chave)
+                    ultimo[chave_dia] = chave_dia
+                except Exception as e:
+                    logger.error(f"Rotina {chave} erro: {e}")
 
-        # Pedro — todo dia às 8:00 e 18:00
-        chave_pedro = f"pedro_{agora.date()}_{hora}"
-        if hora in [8, 18] and minuto == 0 and ultimo.get("pedro") != chave_pedro:
-            try:
-                await ciclo_pedro()
-                registrar_heartbeat("pedro")
-                ultimo["pedro"] = chave_pedro
-            except Exception as e:
-                logger.error(f"Pedro erro: {e}")
-
-        # Mariana — todo dia às 8:30
-        if hora == 8 and minuto == 30 and ultimo.get("mariana") != agora.date():
-            try:
-                await ciclo_mariana()
-                registrar_heartbeat("mariana")
-                ultimo["mariana"] = agora.date()
-            except Exception as e:
-                logger.error(f"Mariana erro: {e}")
-
-        # Lucas — toda segunda-feira às 9:00
-        if dia_semana == 0 and hora == 9 and minuto == 0 and ultimo.get("lucas") != agora.date():
+        # ── Ciclos semanais ─────────────────────────────────────────
+        # Lucas — briefing semanal toda segunda-feira às 9:00
+        if dia_semana == 0 and hora == 9 and minuto == 0 and ultimo.get("lucas_semanal") != agora.date():
             try:
                 await ciclo_lucas()
-                registrar_heartbeat("lucas")
-                ultimo["lucas"] = agora.date()
+                registrar_heartbeat("lucas_semanal")
+                ultimo["lucas_semanal"] = agora.date()
             except Exception as e:
-                logger.error(f"Lucas erro: {e}")
+                logger.error(f"Lucas semanal erro: {e}")
 
         # Conhecimento — todo domingo às 20:00
         if dia_semana == 6 and hora == 20 and minuto == 0 and ultimo.get("conhecimento") != agora.date():
@@ -402,7 +390,7 @@ async def scheduler():
             except Exception as e:
                 logger.error(f"Autodev erro: {e}")
 
-        # Fix 3: Verificar saúde a cada hora (minuto 0)
+        # ── Health check — a cada hora ──────────────────────────────
         if minuto == 0 and ultimo.get("saude") != f"{agora.date()}_{hora}":
             try:
                 await verificar_saude_scheduler()
@@ -410,7 +398,6 @@ async def scheduler():
             except Exception as e:
                 logger.error(f"Saude check erro: {e}")
 
-        # Aguarda 1 minuto antes do próximo check
         await asyncio.sleep(60)
 
 if __name__ == "__main__":
