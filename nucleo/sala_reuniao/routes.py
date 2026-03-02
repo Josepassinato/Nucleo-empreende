@@ -514,7 +514,7 @@ body::after {{
 <!-- TEMA -->
 <div class="tema-bar">
   <span style="letter-spacing:2px;font-size:10px">PAUTA</span> &nbsp;
-  <strong id="tema-txt">TEMA_PLACEHOLDER</strong>
+  <strong id="tema-txt">{tema}</strong>
 </div>
 
 <!-- ARENA CIRCULAR -->
@@ -654,9 +654,9 @@ function ativarAgente(id, nome, cargo, genero, texto, audio, ts) {{
 
   adicionarHistorico({{agente:id, nome, cargo, genero, fala:texto, ts}});
 
-  if (audio && audioDesbloqueado) {{
+  if (audio) {{
     audioQueue.push(audio);
-    if (!tocandoAudio) tocarProximo();
+    if (audioDesbloqueado && !tocandoAudio) tocarProximo();
   }}
 }}
 
@@ -686,8 +686,8 @@ function ativarAudio() {{
   btn.disabled = true;
   document.getElementById('status-line').textContent = '▶ INICIANDO REUNIÃO...';
   document.getElementById('badge-txt').textContent = 'AO VIVO';
-  fetch(`/api/v1/sala/${{SALA_ID}}/iniciar`, {{method:'POST'}});
-  if (audioQueue.length > 0) tocarProximo();
+  fetch(`/api/v1/sala/${{SALA_ID}}/iniciar`, {{method:'POST'}})
+    .then(() => setTimeout(() => {{ if (audioQueue.length > 0 && !tocandoAudio) tocarProximo(); }}, 500));
 }}
 
 function tocarProximo() {{
