@@ -397,6 +397,7 @@ async def pagina_sala(sala_id: str):
     <div class="dot-live"></div>
     <span id="badge-text">Aguardando</span>
   </div>
+  <button id="audio-btn" onclick="desbloquearAudio()" style="background:var(--gold);color:var(--bg);border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">🔊 Ativar Áudio</button>
 </div>
 
 <div class="tema-bar">
@@ -459,6 +460,17 @@ agentes.forEach(a => {{
 // WebSocket
 const wsProto = location.protocol === 'https:' ? 'wss' : 'ws';
 const ws = new WebSocket(`${{wsProto}}://${{location.host}}/ws/sala/${{SALA_ID}}`);
+let audioDesbloqueado = false;
+
+// Desbloquear áudio com toque
+function desbloquearAudio() {{
+  const silence = new Audio("data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsgU291bmQgRWZmZWN0cwBFbmNvZGVkIGJ5AAAAAA==");
+  silence.play().then(() => {{
+    audioDesbloqueado = true;
+    document.getElementById('audio-btn').style.display = 'none';
+    document.getElementById('status-bar').textContent = '🔊 Áudio ativado!';
+  }}).catch(() => {{}});
+}}
 
 ws.onopen = () => {{
   document.getElementById('status-bar').textContent = 'Conectado. Aguardando início...';
@@ -530,7 +542,7 @@ function ativarAgente(id, nome, cargo, texto, audio, ts) {{
   // Reproduzir áudio
   if (audio) {{
     audioQueue.push(audio);
-    if (!tocandoAudio) tocarProximoAudio();
+    if (!tocandoAudio && audioDesbloqueado) tocarProximoAudio();
   }}
 }}
 
