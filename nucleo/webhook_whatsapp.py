@@ -8,7 +8,8 @@ from pathlib import Path
 from fastapi import APIRouter, Request
 from fastapi.responses import Response
 from dotenv import load_dotenv
-from nucleo.ferramentas import buscar_web, enviar_email_zoho, enviar_email_gmail
+from nucleo.ferramentas import (buscar_web, enviar_email_zoho, enviar_email_gmail,
+    telegram_enviar, hotmart_vendas, meta_ads_resumo)
 
 load_dotenv()
 logger = logging.getLogger("nucleo.whatsapp")
@@ -175,6 +176,7 @@ REGRAS DE COMPORTAMENTO:
         dest, assunto, corpo = email_match.group(1), email_match.group(2), email_match.group(3)
         resultado_email = enviar_email_zoho(dest, assunto, corpo)
         resp = re.sub(r'\[ENVIAR_EMAIL:[^\]]+\]', f'\n{resultado_email}', resp)
+        telegram_enviar(f"📧 Lucas enviou email para {dest}\nAssunto: {assunto}")
     
     return resp
 
@@ -200,11 +202,15 @@ async def resposta_agente(agente: str, mensagem: str) -> str:
     nome = agente.title()
 
     # Diana pesquisa web em tempo real
-    dados_mercado = ""
+    dados_externos = ""
     if agente == "diana":
         ramo = emp.get("ramo", "") or emp.get("produto", "")
         query = f"{ramo} tendências mercado brasil 2025" if ramo else mensagem[:80]
-        dados_mercado = buscar_web(query)
+        dados_externos = buscar_web(query)
+    elif agente == "pedro":
+        dados_externos = hotmart_vendas()
+    elif agente == "mariana":
+        dados_externos = meta_ads_resumo()
 
     system = f"""Você é {nome}, diretor(a) da empresa.
 
@@ -216,7 +222,7 @@ EMPRESA:
 CONTEXTO:
 {ctx}
 
-{f"DADOS DE MERCADO PESQUISADOS AGORA:{chr(10)}{dados_mercado}" if dados_mercado else ""}
+{f"DADOS EXTERNOS CONSULTADOS AGORA:{chr(10)}{dados_externos}" if dados_externos else ""}
 
 REGRAS:
 - Comece sua resposta com "{nome.title()} aqui —"
@@ -224,7 +230,9 @@ REGRAS:
 - Máximo 3 parágrafos
 - Natural, como WhatsApp
 - Nunca diga que é IA
-- Se for Diana, use os dados de mercado acima para dar insights reais e específicos"""
+- Se for Diana, use os dados de mercado acima para dar insights reais e específicos
+- Se for Pedro, use os dados do Hotmart para dar análise financeira real
+- Se for Mariana, use os dados do Meta Ads para dar análise de marketing real"""
 
     resp = await chamar_gemini(system, mensagem, temperatura=0.9)
     if agente == "diana" and not resp.startswith("Diana"):

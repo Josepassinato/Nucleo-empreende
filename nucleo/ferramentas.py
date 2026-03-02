@@ -110,3 +110,102 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     load_dotenv()
     print(testar_ferramentas())
+
+def navegar_web(instrucao: str, url: str = None) -> str:
+    """Diana navega em sites reais como humano."""
+    try:
+        from browser_use import BrowserUse
+        config = {
+            "browser": "chromium",
+            "headless": True,
+            "stealth": True,
+            "timeout": 60000
+        }
+        bu = BrowserUse(config=config)
+        result = bu.run_instruction(
+            instruction=instrucao,
+            start_url=url,
+            max_steps=15,
+            save_screenshot=False,
+            return_html=False
+        )
+        return result.text_content[:1000] if result.text_content else "Navegação concluída sem resultado"
+    except Exception as e:
+        return f"Erro navegação: {e}"
+
+def telegram_enviar(mensagem: str) -> str:
+    """Envia alerta via Telegram para o dono."""
+    import urllib.request, urllib.parse
+    token = os.getenv("TELEGRAM_BOT_TOKEN", "")
+    chat  = os.getenv("TELEGRAM_CHAT_DONO", "")
+    if not token or not chat:
+        return "❌ Telegram não configurado"
+    try:
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        data = urllib.parse.urlencode({"chat_id": chat, "text": mensagem, "parse_mode": "HTML"}).encode()
+        req = urllib.request.Request(url, data=data)
+        urllib.request.urlopen(req, timeout=10)
+        return "✅ Alerta Telegram enviado"
+    except Exception as e:
+        return f"❌ Erro Telegram: {e}"
+
+def hotmart_vendas(dias: int = 30) -> str:
+    """Pedro consulta vendas reais do Hotmart."""
+    client_id     = os.getenv("HOTMART_CLIENT_ID", "")
+    client_secret = os.getenv("HOTMART_CLIENT_SECRET", "")
+    if not client_id:
+        return "❌ Hotmart não configurado"
+    try:
+        auth = httpx.post(
+            "https://api-sec-vlc.hotmart.com/security/oauth/token",
+            params={"grant_type": "client_credentials",
+                    "client_id": client_id,
+                    "client_secret": client_secret},
+            timeout=10
+        )
+        token = auth.json().get("access_token")
+        if not token:
+            return f"❌ Hotmart auth falhou: {auth.text[:100]}"
+        r = httpx.get(
+            "https://developers.hotmart.com/payments/api/v1/sales/summary",
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=10
+        )
+        d = r.json()
+        total = d.get("total_value", {}).get("value", 0)
+        qtd   = d.get("total_items", 0)
+        return f"📊 Hotmart últimos {dias}d:\n💰 R$ {total:,.2f}\n🛒 {qtd} vendas"
+    except Exception as e:
+        return f"❌ Erro Hotmart: {e}"
+
+def meta_ads_resumo() -> str:
+    """Mariana consulta campanhas do Meta Ads."""
+    token      = os.getenv("META_ACCESS_TOKEN", "")
+    account_id = os.getenv("META_AD_ACCOUNT_ID", "")
+    if not token or not account_id:
+        return "❌ Meta Ads não configurado"
+    try:
+        r = httpx.get(
+            f"https://graph.facebook.com/v18.0/act_{account_id}/insights",
+            params={
+                "access_token": token,
+                "fields": "campaign_name,impressions,clicks,spend,ctr",
+                "date_preset": "last_30d",
+                "level": "campaign"
+            },
+            timeout=10
+        )
+        data = r.json().get("data", [])
+        if not data:
+            return "📊 Meta Ads: nenhuma campanha ativa no período"
+        linhas = [f"📊 Meta Ads — últimos 30 dias:"]
+        for c in data[:5]:
+            linhas.append(
+                f"• {c.get('campaign_name','?')}: "
+                f"R${c.get('spend','0')} | "
+                f"{c.get('impressions','0')} impressões | "
+                f"CTR {c.get('ctr','0')}%"
+            )
+        return "\n".join(linhas)
+    except Exception as e:
+        return f"❌ Erro Meta Ads: {e}"
