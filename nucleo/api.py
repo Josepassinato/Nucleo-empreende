@@ -44,6 +44,14 @@ app = FastAPI(title="Nucleo Empreende", version="1.0.0", lifespan=lifespan)
 from nucleo.webhook_whatsapp import router as whatsapp_router
 app.include_router(whatsapp_router)
 
+# Sala de Reunião Virtual
+try:
+    from nucleo.sala_reuniao.routes import router as sala_router
+    app.include_router(sala_router)
+    print("🏛️ Sala de Reunião ativada")
+except Exception as e:
+    print(f"⚠️ Sala não carregada: {e}")
+
 # Remote Control — acesso direto para Claude
 try:
     from nucleo.remote_control import router as rc_router

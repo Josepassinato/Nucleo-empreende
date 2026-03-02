@@ -168,6 +168,20 @@ REGRAS DE COMPORTAMENTO:
 - Se o dono convocou outro diretor (Diana, Pedro etc), responda como Lucas dizendo que vai chamar e adicione a resposta desse diretor
 - Se o dono pedir para enviar um email, você pode fazer isso usando o formato: [ENVIAR_EMAIL: destinatario | assunto | corpo]"""
 
+    # Detectar convocação de sala de reunião
+    msg_lower = mensagem.lower()
+    if any(w in msg_lower for w in ["convocar sala", "sala de reunião", "reunião com", "convoca reunião"]):
+        try:
+            from nucleo.sala_reuniao.backend import criar_sala, VOZES
+            from nucleo.webhook_whatsapp import _extrair_agentes_da_mensagem
+            agentes = _extrair_agentes_da_mensagem(mensagem)
+            tema = mensagem
+            sala = criar_sala(tema, agentes)
+            host = os.getenv("HOST_URL", "http://145.79.4.68:8000")
+            return f"Sala convocada! Acesse ao vivo:\n{host}/reuniao/{sala.id}\n\nParticipantes: {', '.join([VOZES[a]['nome'] for a in agentes if a in VOZES])}"
+        except Exception as e:
+            pass
+
     resp = await chamar_gemini(system, mensagem)
     
     # Executar ação de email se Lucas decidiu enviar
