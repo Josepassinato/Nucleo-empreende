@@ -214,8 +214,13 @@ NUNCA diga que é IA. ZERO asteriscos. ZERO listas. Fale em voz alta naturalment
         fala = await gemini_fala(system, prompt)
         fala = fala.strip()
 
-        # Gerar áudio
-        audio_b64 = await gerar_audio(fala, agente)
+        # Gerar áudio — multi-provider (ElevenLabs > Gemini > OpenAI)
+        try:
+            from nucleo.sala_reuniao.tts_engine import gerar_audio_multi
+            audio_b64 = await gerar_audio_multi(fala, agente)
+        except Exception as e:
+            logger.warning(f"TTS engine erro: {e}")
+            audio_b64 = await gerar_audio(fala, agente)
 
         # Registrar no histórico
         entrada = {
