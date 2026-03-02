@@ -51,6 +51,75 @@ def carregar_empresa() -> dict:
         return json.loads(mem.read_text()).get("empresa", {}) if mem.exists() else {}
     except: return {}
 
+def carregar_contexto_completo() -> str:
+    """Carrega memória persistente completa para injetar nas reuniões."""
+    linhas = []
+
+    # Dados da empresa
+    mem_file = BASE_DIR / "nucleo" / "data" / "memoria.json"
+    if mem_file.exists():
+        try:
+            mem = json.loads(mem_file.read_text())
+            emp = mem.get("empresa", {})
+            if emp:
+                linhas.append("=== EMPRESA ===")
+                for k, v in emp.items():
+                    if v: linhas.append(f"  {k}: {v}")
+            decisoes = mem.get("decisoes", [])[-5:]
+            if decisoes:
+                linhas.append("=== DECISÕES ANTERIORES ===")
+                for d in decisoes: linhas.append(f"  • {d}")
+        except: pass
+
+    # Pendências 5W2H de reuniões anteriores
+    pendencias = carregar_pendencias_5w2h()
+    if pendencias:
+        linhas.append("=== COMPROMISSOS PENDENTES (5W2H reuniões anteriores) ===")
+        for p in pendencias[:5]:
+            linhas.append(f"  ⚠ [{p['responsavel']}] {p['descricao'][:100]} — prazo: {p.get('prazo','indefinido')}")
+
+    # Ações autônomas recentes
+    acoes_file = BASE_DIR / "nucleo" / "data" / "acoes_autonomas.json"
+    if acoes_file.exists():
+        try:
+            acoes = json.loads(acoes_file.read_text())[-5:]
+            if acoes:
+                linhas.append("=== AÇÕES RECENTES DA DIRETORIA ===")
+                for a in acoes:
+                    ts = a.get("ts","")[:16]
+                    linhas.append(f"  [{ts}] {a.get('agente','')}: {a.get('acao','')[:80]}")
+        except: pass
+
+    return "\n".join(linhas) if linhas else ""
+
+def carregar_pendencias_5w2h() -> list:
+    """Carrega tarefas pendentes das atas anteriores."""
+    pendencias = []
+
+    # Da ata local (JSON)
+    salas_files = list(SALAS_DIR.glob("*.json"))
+    for f in sorted(salas_files, reverse=True)[:10]:
+        try:
+            sala = json.loads(f.read_text())
+            if sala.get("status") == "encerrada":
+                decisao = sala.get("decisao_final", "")
+                # Extrair itens 5W2H da decisão
+                if "✅ QUEM:" in decisao or "QUEM:" in decisao:
+                    linhas = decisao.split("\n")
+                    tarefa = {"descricao": sala.get("tema",""), "sala_id": sala.get("id","")}
+                    for linha in linhas:
+                        if "QUEM:" in linha:
+                            tarefa["responsavel"] = linha.split("QUEM:")[-1].strip()
+                        if "QUANDO:" in linha:
+                            tarefa["prazo"] = linha.split("QUANDO:")[-1].strip()
+                        if "O QUÊ:" in linha or "O QUE:" in linha:
+                            tarefa["descricao"] = linha.split(":")[-1].strip()
+                    if tarefa.get("responsavel"):
+                        pendencias.append(tarefa)
+        except: pass
+
+    return pendencias
+
 # ── TTS — gera áudio mp3 base64 ──────────────────────────────────
 async def gerar_audio(texto: str, agente: str) -> Optional[str]:
     """Retorna áudio em base64 ou None se falhar."""
@@ -94,13 +163,16 @@ class SalaReuniao:
         self.tema = tema
         self.agentes = agentes  # lista de nomes
         self.empresa = empresa
-        self.historico = []  # [{agente, fala, ts}]
-        self.status = "aguardando"  # aguardando | em_andamento | encerrada
+        self.historico = []
+        self.status = "aguardando"
         self.decisao_final = ""
-        self.mensagens_externas = []  # mensagens do cliente via WhatsApp
+        self.mensagens_externas = []
         self.ws_connections = set()
         self.turno_atual = 0
         self.criado_em = datetime.now().isoformat()
+        # Memória persistente carregada no início de cada reunião
+        self.contexto_persistente = carregar_contexto_completo()
+        logger.info(f"📋 Contexto persistente carregado: {len(self.contexto_persistente)} chars")
 
     def to_dict(self):
         return {
@@ -149,6 +221,15 @@ class SalaReuniao:
 
             # Fase 2: Cada agente fala na sua vez (2 rodadas)
             agentes_sem_lucas = [a for a in self.agentes if a != "lucas"]
+
+            # Mapa de conflitos estruturados — quem questiona quem
+            CONFLITOS = {
+                "pedro":   {"alvo": "mariana", "angulo": "Questione o custo e ROI do que a Mariana propôs. Qual o impacto no caixa?"},
+                "rafael":  {"alvo": "mariana", "angulo": "Questione se o que foi proposto resolve dor real do usuário ou é só hype."},
+                "carla":   {"alvo": "rafael",  "angulo": "Questione se o produto proposto é operacionalmente viável. Como escala?"},
+                "dani":    {"alvo": None,       "angulo": "Questione qualquer afirmação sem dado concreto feita na reunião."},
+                "beto":    {"alvo": "mariana",  "angulo": "Existe forma mais barata de testar essa ideia antes de investir?"},
+            }
             
             for rodada in range(2):
                 if self.mensagens_externas:
@@ -160,14 +241,22 @@ class SalaReuniao:
                     historico_str += f"\n[PROPRIETÁRIO]: {msg_cliente}"
 
                 for agente in agentes_sem_lucas:
+                    conflito_info = CONFLITOS.get(agente, {})
+
+                    if rodada == 0:
+                        angulo = f"Contribua com sua análise da área de {VOZES[agente]['cargo']}."
+                    else:
+                        # Rodada 2: conflito estruturado
+                        angulo = conflito_info.get("angulo",
+                            f"Reaja ao que foi dito. Proponha algo concreto ou questione o que está vago.")
+
                     prompt_agente = (
                         f"Reunião sobre: {self.tema}\n"
                         f"Empresa: {empresa_str}\n"
-                        f"Histórico da reunião até agora:\n{historico_str}\n\n"
-                        f"É sua vez de falar. Contribua com sua perspectiva da área de "
-                        f"{VOZES[agente]['cargo']}. "
-                        f"{'Primeira rodada: apresente sua análise.' if rodada == 0 else 'Segunda rodada: reaja ao que foi dito e proponha algo concreto.'}"
-                        f"\nSeja direto, natural, máximo 3 frases."
+                        f"Histórico da reunião:\n{historico_str}\n\n"
+                        f"{angulo}\n"
+                        f"{'Primeira rodada: apresente sua análise com dados.' if rodada == 0 else 'Segunda rodada: questione, contradiga se necessário, proponha algo concreto.'}"
+                        f"\nSeja direto. Máximo 3 frases. Português brasileiro."
                     )
                     fala = await self._fala_agente(agente, prompt_agente, historico_str)
                     historico_str += f"\n{VOZES[agente]['nome']}: {fala}"
@@ -238,8 +327,14 @@ class SalaReuniao:
 
         system = f"""{estilo}
 {REGRAS_GERAIS}
-Empresa: {pers[:150] if pers else 'startup de tech brasileira'}
-NUNCA diga que é IA. ZERO asteriscos. ZERO listas. Fale em voz alta naturalmente."""
+{pers[:300] if pers else 'startup de tech brasileira'}
+
+CONTEXTO PERMANENTE DA EMPRESA:
+{self.contexto_persistente}
+
+NUNCA diga que é IA. ZERO asteriscos. ZERO listas. Fale em voz alta naturalmente.
+Se nao souber algo com certeza, diga: "Nao tenho esse dado. Precisamos medir." ou "Isso vai alem da minha area - sugiro consultar um especialista."
+"""
 
         fala = await gemini_fala(system, prompt)
         fala = fala.strip()

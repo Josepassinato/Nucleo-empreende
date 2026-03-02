@@ -228,11 +228,23 @@ async def ciclo_lucas():
     if log_file.exists():
         try:
             logs = json.loads(log_file.read_text())
-            acoes_semana = logs[-50:]  # últimas 50 ações
+            acoes_semana = logs[-50:]
         except: pass
 
-    system = """Você é Lucas, CEO. Todo início de semana você consolida o trabalho da diretoria
-e define as prioridades estratégicas. Seja executivo, direto e motivador."""
+    # Carregar pendências 5W2H das reuniões anteriores
+    from nucleo.sala_reuniao.backend import carregar_pendencias_5w2h
+    pendencias = carregar_pendencias_5w2h()
+    pendencias_str = ""
+    if pendencias:
+        pendencias_str = "\n\nCOMPROMISSOS 5W2H PENDENTES DE REUNIÕES ANTERIORES:\n"
+        for p in pendencias:
+            pendencias_str += f"  ⚠ [{p.get('responsavel','?')}] {p.get('descricao','')[:100]} — prazo: {p.get('prazo','não definido')}\n"
+
+    system = """Você é Lucas, CEO da Increase Future Tech. Todo início de semana você:
+1. Cobra compromissos pendentes das reuniões anteriores
+2. Consolida o trabalho da diretoria
+3. Define prioridades estratégicas com base nos dados
+Seja executivo e direto. Use 5W2H quando definir prioridades."""
 
     prompt = f"""
 Empresa: {json.dumps(empresa, ensure_ascii=False) if empresa else 'em configuração'}
@@ -240,16 +252,17 @@ Data: {datetime.now().strftime('%d/%m/%Y')} — Início de semana
 
 AÇÕES DA DIRETORIA NA ÚLTIMA SEMANA:
 {json.dumps(acoes_semana[-20:], ensure_ascii=False, indent=2)[:1000]}
+{pendencias_str}
 
 Gere o briefing executivo semanal:
-1. Resumo do que a diretoria fez
-2. 3 prioridades desta semana
-3. Uma decisão estratégica que você tomou
-4. Mensagem motivacional para o dono
+1. Cobranças: quais compromissos do 5W2H estão pendentes e quem é o responsável?
+2. Resumo do que a diretoria executou
+3. 3 prioridades desta semana (cada uma com responsável e prazo)
+4. Uma decisão estratégica que você tomou baseada nos dados
 
-Formato WhatsApp, máximo 4 parágrafos."""
+Formato WhatsApp. Máximo 5 parágrafos. Português brasileiro."""
 
-    briefing = await gemini(system, prompt, 500)
+    briefing = await gemini(system, prompt, 600)
 
     if briefing:
         msg = f"👔 *Lucas — Briefing Executivo Semanal {datetime.now().strftime('%d/%m')}*\n\n{briefing}"
