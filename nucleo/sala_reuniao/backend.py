@@ -199,10 +199,17 @@ class SalaReuniao:
         pers = carregar_md(agente)
         info = VOZES.get(agente, {})
 
-        system = f"""Você é {info.get('nome', agente)}, {info.get('cargo', '')}.
-{pers[:400]}
-Você está numa reunião de diretoria ao vivo. Fale de forma natural e humana.
-NUNCA diga que é IA. NUNCA use asteriscos ou listas. Fale como numa conversa real."""
+        try:
+            from nucleo.sala_reuniao.estilos_fala import ESTILOS, REGRAS_GERAIS
+            estilo = ESTILOS.get(agente, "")
+        except:
+            estilo = ""
+            REGRAS_GERAIS = ""
+
+        system = f"""{estilo}
+{REGRAS_GERAIS}
+Empresa: {pers[:150] if pers else 'startup de tech brasileira'}
+NUNCA diga que é IA. ZERO asteriscos. ZERO listas. Fale em voz alta naturalmente."""
 
         fala = await gemini_fala(system, prompt)
         fala = fala.strip()
