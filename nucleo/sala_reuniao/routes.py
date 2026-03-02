@@ -565,7 +565,7 @@ const AGENTES = {agentes_json};
 
 let audioDesbloqueado = false;
 let audioCtx = null;
-let audioQueue = []; // cada item: {audio, id, nome, cargo, genero, texto, ts}
+let audioQueue = []; // cada item: {{audio, id, nome, cargo, genero, texto, ts}}
 let tocandoAudio = false;
 
 // ── Posicionar avatares em círculo ──────────────────────────────
