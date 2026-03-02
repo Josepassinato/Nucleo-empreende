@@ -190,8 +190,17 @@ class SalaReuniao:
             "historico_completo": self.historico
         })
 
-        # Salvar sala
+        # Salvar sala em disco
         self._salvar()
+        
+        # Salvar ata digital no Supabase
+        try:
+            from nucleo.sala_reuniao.ata import salvar_ata
+            import asyncio
+            asyncio.create_task(salvar_ata(self))
+            logger.info(f"📋 Ata sendo salva no Supabase — sala {self.id}")
+        except Exception as e:
+            logger.warning(f"Ata não salva: {e}")
         logger.info(f"✅ Sala {self.id} encerrada")
 
     async def _fala_agente(self, agente: str, prompt: str, historico: str, encerramento: bool = False) -> str:

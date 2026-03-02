@@ -782,3 +782,49 @@ posicionarAvatares();
 </body>
 </html>"""
     return HTMLResponse(html)
+
+# ── Rotas de Ata ─────────────────────────────────────────────────
+
+@router.get("/api/v1/atas")
+async def listar_atas_route():
+    from nucleo.sala_reuniao.ata import listar_atas
+    atas = await listar_atas()
+    return {"ok": True, "atas": atas, "total": len(atas)}
+
+@router.get("/api/v1/atas/{sala_id}")
+async def buscar_ata_route(sala_id: str):
+    from nucleo.sala_reuniao.ata import buscar_ata
+    ata = await buscar_ata(sala_id)
+    if not ata:
+        return {"ok": False, "erro": "Ata não encontrada"}
+    return {"ok": True, "ata": ata}
+
+@router.patch("/api/v1/atas/{sala_id}/tarefa/{idx}")
+async def atualizar_tarefa_route(sala_id: str, idx: int, body: dict):
+    from nucleo.sala_reuniao.ata import atualizar_tarefa
+    status = body.get("status", "concluido")
+    ok = await atualizar_tarefa(sala_id, idx, status)
+    return {"ok": ok}
+
+@router.post("/api/v1/tarefas/mariana/influenciadores")
+async def executar_tarefa_mariana():
+    """Executa tarefa da Mariana: levantamento de micro-influenciadores."""
+    from nucleo.tarefas.mariana_influenciadores import gerar_relatorio
+    result = await gerar_relatorio()
+    return result
+
+@router.get("/api/v1/relatorios")
+async def listar_relatorios():
+    """Lista relatórios gerados pelos agentes."""
+    SUPABASE_URL = os.getenv("SUPABASE_URL", "https://armabaquiyqmdgwflslq.supabase.co")
+    SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+    if not SUPABASE_KEY:
+        return {"ok": False, "erro": "Supabase não configurado"}
+    async with httpx.AsyncClient(timeout=10) as c:
+        r = await c.get(
+            f"{SUPABASE_URL}/rest/v1/relatorios_agentes?order=criado_em.desc&limit=20",
+            headers={"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
+        )
+        if r.status_code == 200:
+            return {"ok": True, "relatorios": r.json()}
+        return {"ok": False, "erro": f"Supabase {r.status_code}"}
