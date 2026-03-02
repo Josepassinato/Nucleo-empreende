@@ -215,11 +215,12 @@ body::after {{
   position:relative; z-index:5;
   flex:1;
   display:flex; align-items:center; justify-content:center;
+  min-height: 300px;
 }}
 .arena-inner {{
   position:relative;
-  width: min(70vw, 380px);
-  height: min(70vw, 380px);
+  width: min(75vw, 420px);
+  height: min(75vw, 420px);
 }}
 
 /* Mesa central */
@@ -304,33 +305,33 @@ body::after {{
 .avatar-pic {{
   width:64px; height:64px;
   border-radius:50%;
-  background: var(--surface);
-  border: 2px solid rgba(255,255,255,0.05);
+  background: #1a2030;
+  border: 2px solid rgba(0,229,255,0.2);
   display:flex; align-items:center; justify-content:center;
   font-size:28px;
   overflow:hidden;
   transition: all 0.4s;
   position:relative; z-index:2;
 }}
-.avatar-pic.F {{ background: radial-gradient(135deg, #1a0a14 0%, #0d0a14 100%); }}
-.avatar-pic.M {{ background: radial-gradient(135deg, #0a1214 0%, #0a0d14 100%); }}
+.avatar-pic.F {{ background: radial-gradient(135deg, #2a1520 0%, #1a0f1a 100%); border-color: rgba(244,143,177,0.2); }}
+.avatar-pic.M {{ background: radial-gradient(135deg, #0f2028 0%, #0f1828 100%); border-color: rgba(0,229,255,0.2); }}
 
-.avatar-info {{ text-align:center; }}
+.avatar-info {{ text-align:center; margin-top:6px; }}
 .avatar-nome {{
   font-family:'Rajdhani',sans-serif;
-  font-size:11px; font-weight:600; letter-spacing:1px;
-  color:var(--muted);
+  font-size:12px; font-weight:700; letter-spacing:1px;
+  color:rgba(205,214,244,0.8);
   transition: color 0.3s;
   white-space:nowrap;
 }}
 .avatar-cargo {{
-  font-size:9px; letter-spacing:2px; color:rgba(100,100,120,0.6);
+  font-size:9px; letter-spacing:2px; color:rgba(150,160,180,0.5);
   text-transform:uppercase;
   transition: color 0.3s;
 }}
 
 /* Estado: aguardando */
-.avatar-node.aguardando {{ opacity:0.35; transform:translate(-50%,-50%) scale(0.92); }}
+.avatar-node.aguardando {{ opacity:0.75; transform:translate(-50%,-50%) scale(0.95); }}
 
 /* Estado: falando */
 .avatar-node.falando {{ opacity:1; transform:translate(-50%,-50%) scale(1.1); z-index:10; }}
@@ -491,7 +492,7 @@ body::after {{
 
 /* Layout flex vertical */
 .page {{ display:flex; flex-direction:column; height:100vh; padding-bottom:60px; }}
-.arena-wrap {{ flex:0 0 auto; display:flex; justify-content:center; align-items:center; padding:12px 0; }}
+.arena-wrap {{ flex:1; display:flex; justify-content:center; align-items:center; padding:8px 0; min-height:280px; }}
 </style>
 </head>
 <body>
@@ -520,7 +521,7 @@ body::after {{
 
 <!-- ARENA CIRCULAR -->
 <div class="arena-wrap">
-  <div class="arena-inner" id="arena">
+  <div class="arena-inner" id="arena-inner">
     <div class="orbit-ring-2"></div>
     <div class="orbit-ring"></div>
     <div class="mesa-center">
@@ -528,7 +529,7 @@ body::after {{
       <div class="mesa-logo">⬡ NE</div>
     </div>
     <!-- SVG para linhas de conexão -->
-    <svg class="connection-svg" id="conn-svg" viewBox="0 0 380 380"></svg>
+    <svg class="connection-svg" id="conn-svg" viewBox="0 0 420 420"></svg>
     <!-- Avatares serão inseridos via JS -->
   </div>
 </div>
@@ -570,7 +571,7 @@ let tocandoAudio = false;
 
 // ── Posicionar avatares em círculo ──────────────────────────────
 function posicionarAvatares() {{
-  const arena = document.getElementById('arena');
+  const arena = document.getElementById('arena-inner');
   const n = AGENTES.length;
   const cx = 50, cy = 50, r = 38; // % do container
 
@@ -611,16 +612,17 @@ function desenharBeam(agenteId) {{
   const node = document.getElementById(`av-${{agenteId}}`);
   if (!node) return;
 
-  const arena = document.getElementById('arena');
+  const arena = document.getElementById('arena-inner');
   const aRect = arena.getBoundingClientRect();
   const nRect = node.getBoundingClientRect();
 
-  const cx = (aRect.width / 2);
-  const cy = (aRect.height / 2);
+  const cx = aRect.width / 2;
+  const cy = aRect.height / 2;
   const nx = nRect.left - aRect.left + nRect.width / 2;
   const ny = nRect.top - aRect.top + nRect.height / 2;
 
-  const scale = 380 / aRect.width;
+  const vbSize = 420;
+  const scale = vbSize / aRect.width;
   const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
   line.setAttribute('class', 'beam');
   line.setAttribute('x1', nx * scale);
