@@ -90,6 +90,19 @@ def carregar_contexto_completo() -> str:
                     linhas.append(f"  [{ts}] {a.get('agente','')}: {a.get('acao','')[:80]}")
         except: pass
 
+    # Shared context — o que os outros agentes descobriram recentemente
+    shared_file = BASE_DIR / "nucleo" / "data" / "contexto_compartilhado.json"
+    if shared_file.exists():
+        try:
+            ctx = json.loads(shared_file.read_text())
+            linhas.append("=== DESCOBERTAS RECENTES DA DIRETORIA ===")
+            for agente, dados in ctx.items():
+                if agente.startswith("_"): continue
+                for chave, info in list(dados.items())[:3]:
+                    ts = info.get("ts","")[:16]
+                    linhas.append(f"  [{agente.upper()} | {ts}] {chave}: {info.get('valor','')[:100]}")
+        except: pass
+
     return "\n".join(linhas) if linhas else ""
 
 def carregar_pendencias_5w2h() -> list:
@@ -140,21 +153,38 @@ async def gerar_audio(texto: str, agente: str) -> Optional[str]:
         logger.error(f"TTS erro: {e}")
     return None
 
-# ── Gemini para fala dos agentes ─────────────────────────────────
-async def gemini_fala(system: str, prompt: str) -> str:
-    try:
-        async with httpx.AsyncClient(timeout=25) as c:
-            r = await c.post(
-                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GOOGLE_API_KEY}",
-                json={
-                    "system_instruction": {"parts": [{"text": system}]},
-                    "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-                    "generationConfig": {"temperature": 0.9, "maxOutputTokens": 200}
-                }
-            )
-            return r.json()["candidates"][0]["content"]["parts"][0]["text"]
-    except Exception as e:
-        return f"[{e}]"
+# ── Gemini para fala dos agentes — com circuit breaker ───────────
+async def gemini_fala(system: str, prompt: str, tentativas: int = 3) -> str:
+    """
+    Gera fala do agente com retry automático.
+    NUNCA retorna o erro como texto — levanta exceção para o caller tratar.
+    """
+    ultimo_erro = None
+    for tentativa in range(tentativas):
+        try:
+            async with httpx.AsyncClient(timeout=30) as c:
+                r = await c.post(
+                    f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GOOGLE_API_KEY}",
+                    json={
+                        "system_instruction": {"parts": [{"text": system}]},
+                        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+                        "generationConfig": {"temperature": 0.9, "maxOutputTokens": 200}
+                    }
+                )
+                if r.status_code == 200:
+                    texto = r.json()["candidates"][0]["content"]["parts"][0]["text"]
+                    if texto and len(texto.strip()) > 5:
+                        return texto.strip()
+                    raise ValueError(f"Resposta vazia ou muito curta: '{texto}'")
+                else:
+                    raise ValueError(f"HTTP {r.status_code}: {r.text[:100]}")
+        except Exception as e:
+            ultimo_erro = e
+            logger.warning(f"gemini_fala tentativa {tentativa+1}/{tentativas} falhou: {e}")
+            if tentativa < tentativas - 1:
+                await asyncio.sleep(2 * (tentativa + 1))  # backoff: 2s, 4s
+    # Todas as tentativas falharam — levanta exceção real
+    raise RuntimeError(f"gemini_fala falhou após {tentativas} tentativas: {ultimo_erro}")
 
 # ── Sessão de Sala ───────────────────────────────────────────────
 class SalaReuniao:
@@ -336,10 +366,22 @@ NUNCA diga que é IA. ZERO asteriscos. ZERO listas. Fale em voz alta naturalment
 Se nao souber algo com certeza, diga: "Nao tenho esse dado. Precisamos medir." ou "Isso vai alem da minha area - sugiro consultar um especialista."
 """
 
-        fala = await gemini_fala(system, prompt)
-        fala = fala.strip()
+        # Circuit breaker: se gemini_fala falhar, pausa reunião e notifica
+        try:
+            fala = await gemini_fala(system, prompt)
+            fala = fala.strip()
+        except RuntimeError as e:
+            logger.error(f"❌ Circuit breaker ativado — {agente}: {e}")
+            # Notifica no frontend que este agente falhou
+            await self.broadcast({
+                "tipo": "aviso",
+                "mensagem": f"⚠ {info.get('nome', agente)} teve problema de conexão. Continuando sem ele."
+            })
+            # Retorna fala de fallback segura — não o erro
+            return f"[Conexão instável. Continuando.]"
 
         # Gerar áudio — multi-provider (ElevenLabs > Gemini > OpenAI)
+        audio_b64 = None
         try:
             from nucleo.sala_reuniao.tts_engine import gerar_audio_multi
             audio_b64 = await gerar_audio_multi(fala, agente)

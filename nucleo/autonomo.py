@@ -351,6 +351,7 @@ async def scheduler():
         if hora == 7 and minuto == 0 and ultimo.get("diana") != agora.date():
             try:
                 await ciclo_diana()
+                registrar_heartbeat("diana")
                 ultimo["diana"] = agora.date()
             except Exception as e:
                 logger.error(f"Diana erro: {e}")
@@ -360,6 +361,7 @@ async def scheduler():
         if hora in [8, 18] and minuto == 0 and ultimo.get("pedro") != chave_pedro:
             try:
                 await ciclo_pedro()
+                registrar_heartbeat("pedro")
                 ultimo["pedro"] = chave_pedro
             except Exception as e:
                 logger.error(f"Pedro erro: {e}")
@@ -368,6 +370,7 @@ async def scheduler():
         if hora == 8 and minuto == 30 and ultimo.get("mariana") != agora.date():
             try:
                 await ciclo_mariana()
+                registrar_heartbeat("mariana")
                 ultimo["mariana"] = agora.date()
             except Exception as e:
                 logger.error(f"Mariana erro: {e}")
@@ -376,6 +379,7 @@ async def scheduler():
         if dia_semana == 0 and hora == 9 and minuto == 0 and ultimo.get("lucas") != agora.date():
             try:
                 await ciclo_lucas()
+                registrar_heartbeat("lucas")
                 ultimo["lucas"] = agora.date()
             except Exception as e:
                 logger.error(f"Lucas erro: {e}")
@@ -384,6 +388,7 @@ async def scheduler():
         if dia_semana == 6 and hora == 20 and minuto == 0 and ultimo.get("conhecimento") != agora.date():
             try:
                 await ciclo_conhecimento()
+                registrar_heartbeat("conhecimento")
                 ultimo["conhecimento"] = agora.date()
             except Exception as e:
                 logger.error(f"Conhecimento erro: {e}")
@@ -392,9 +397,18 @@ async def scheduler():
         if dia_semana == 5 and hora == 10 and minuto == 0 and ultimo.get("autodev") != agora.date():
             try:
                 await ciclo_autodev_todos()
+                registrar_heartbeat("autodev")
                 ultimo["autodev"] = agora.date()
             except Exception as e:
                 logger.error(f"Autodev erro: {e}")
+
+        # Fix 3: Verificar saúde a cada hora (minuto 0)
+        if minuto == 0 and ultimo.get("saude") != f"{agora.date()}_{hora}":
+            try:
+                await verificar_saude_scheduler()
+                ultimo["saude"] = f"{agora.date()}_{hora}"
+            except Exception as e:
+                logger.error(f"Saude check erro: {e}")
 
         # Aguarda 1 minuto antes do próximo check
         await asyncio.sleep(60)
@@ -415,3 +429,96 @@ async def ciclo_autodev_todos():
         except Exception as e:
             logger.error(f"Autodev {agente} erro: {e}")
     logger.info("✅ Ciclo de autodesenvolvimento completo para toda diretoria")
+
+
+# ── Fix 3: Heartbeat — prova de vida do scheduler ────────────────
+import time
+
+HEARTBEAT_FILE = BASE_DIR / "nucleo" / "data" / "heartbeat.json"
+HEARTBEAT_FILE.parent.mkdir(exist_ok=True)
+
+def registrar_heartbeat(ciclo: str):
+    """Registra timestamp do último ciclo executado."""
+    try:
+        hb = json.loads(HEARTBEAT_FILE.read_text()) if HEARTBEAT_FILE.exists() else {}
+        hb[ciclo] = datetime.now().isoformat()
+        hb["ultimo_ciclo"] = ciclo
+        hb["ts"] = datetime.now().isoformat()
+        HEARTBEAT_FILE.write_text(json.dumps(hb, ensure_ascii=False, indent=2))
+    except Exception as e:
+        logger.error(f"Heartbeat write erro: {e}")
+
+async def verificar_saude_scheduler():
+    """
+    Roda a cada hora. Se qualquer ciclo ficou mais de 26h sem rodar,
+    manda alerta no WhatsApp do dono.
+    """
+    if not HEARTBEAT_FILE.exists():
+        return
+
+    try:
+        hb = json.loads(HEARTBEAT_FILE.read_text())
+        agora = datetime.now()
+        alertas = []
+
+        ciclos_esperados = {
+            "diana":       26,   # deve rodar diariamente
+            "pedro":       14,   # deve rodar 2x/dia
+            "mariana":     26,
+            "lucas":       170,  # semanal
+            "conhecimento": 170,
+        }
+
+        for ciclo, max_horas in ciclos_esperados.items():
+            ts_str = hb.get(ciclo)
+            if ts_str:
+                ts = datetime.fromisoformat(ts_str)
+                horas = (agora - ts).total_seconds() / 3600
+                if horas > max_horas:
+                    alertas.append(f"⚠ Ciclo '{ciclo}' não rodou há {horas:.0f}h (máx: {max_horas}h)")
+
+        if alertas:
+            msg = f"🚨 *ALERTA — Scheduler Nucleo*\n\n" + "\n".join(alertas)
+            msg += "\n\nVerifique: `tail -f /root/Nucleo-empreende/logs/app.log`"
+            await notificar_dono(msg, via="whatsapp")
+            logger.warning(f"Heartbeat alerta enviado: {alertas}")
+
+    except Exception as e:
+        logger.error(f"verificar_saude_scheduler erro: {e}")
+
+
+# ── Fix 4: Shared context — agentes escrevem, todos leem ─────────
+SHARED_CTX_FILE = BASE_DIR / "nucleo" / "data" / "contexto_compartilhado.json"
+
+def atualizar_shared_context(agente: str, chave: str, valor: str):
+    """
+    Qualquer agente pode atualizar o contexto compartilhado.
+    Todos os outros agentes leem antes de agir.
+    """
+    try:
+        ctx = json.loads(SHARED_CTX_FILE.read_text()) if SHARED_CTX_FILE.exists() else {}
+        ctx.setdefault(agente, {})[chave] = {
+            "valor": valor[:500],
+            "ts": datetime.now().isoformat()
+        }
+        ctx["_atualizado"] = datetime.now().isoformat()
+        SHARED_CTX_FILE.write_text(json.dumps(ctx, ensure_ascii=False, indent=2))
+    except Exception as e:
+        logger.error(f"Shared context write erro: {e}")
+
+def ler_shared_context() -> str:
+    """Lê o contexto compartilhado formatado para injetar em prompts."""
+    if not SHARED_CTX_FILE.exists():
+        return ""
+    try:
+        ctx = json.loads(SHARED_CTX_FILE.read_text())
+        linhas = ["=== O QUE A DIRETORIA DESCOBRIU RECENTEMENTE ==="]
+        for agente, dados in ctx.items():
+            if agente.startswith("_"):
+                continue
+            for chave, info in dados.items():
+                ts = info.get("ts", "")[:16]
+                linhas.append(f"  [{agente.upper()} | {ts}] {chave}: {info.get('valor','')}")
+        return "\n".join(linhas)
+    except:
+        return ""
