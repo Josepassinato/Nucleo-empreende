@@ -25,7 +25,20 @@ LOGS_DIR = BASE_DIR / "nucleo" / "logs"
 SITE_DIR = BASE_DIR / "site"
 
 # ── App ──────────────────────────────────────────────────────────
-app = FastAPI(title="Nucleo Empreende", version="1.0.0")
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app):
+    # Iniciar scheduler autônomo em background
+    try:
+        from nucleo.autonomo import scheduler
+        asyncio.create_task(scheduler())
+        print("⚙️ Scheduler autônomo iniciado")
+    except Exception as e:
+        print(f"⚠️ Scheduler não iniciado: {e}")
+    yield
+
+app = FastAPI(title="Nucleo Empreende", version="1.0.0", lifespan=lifespan)
 
 # WhatsApp webhook router
 from nucleo.webhook_whatsapp import router as whatsapp_router
@@ -886,3 +899,50 @@ setInterval(loadDashboard, 30000);
 </script>
 </body>
 </html>"""
+
+# ── Endpoints Autônomos ──────────────────────────────────────────
+from fastapi import APIRouter
+auto_router = APIRouter()
+
+@auto_router.post("/api/v1/autonomo/{agente}")
+async def disparar_ciclo(agente: str):
+    """Dispara manualmente o ciclo autônomo de um agente."""
+    from nucleo.autonomo import (ciclo_diana, ciclo_pedro, 
+                                  ciclo_mariana, ciclo_lucas, 
+                                  ciclo_conhecimento)
+    ciclos = {
+        "diana":       ciclo_diana,
+        "pedro":       ciclo_pedro,
+        "mariana":     ciclo_mariana,
+        "lucas":       ciclo_lucas,
+        "conhecimento": ciclo_conhecimento,
+    }
+    if agente not in ciclos:
+        return {"erro": f"Agente '{agente}' não encontrado"}
+    try:
+        resultado = await ciclos[agente]()
+        return {"ok": True, "agente": agente, "resultado": resultado}
+    except Exception as e:
+        return {"erro": str(e)}
+
+@auto_router.get("/api/v1/autonomo/logs")
+async def ver_logs_autonomos():
+    """Ver últimas ações autônomas da diretoria."""
+    from pathlib import Path
+    import json
+    log_file = Path("nucleo/data/acoes_autonomas.json")
+    if not log_file.exists():
+        return {"acoes": []}
+    return {"acoes": json.loads(log_file.read_text())[-50:]}
+
+@auto_router.get("/api/v1/conhecimento")
+async def ver_knowledge_base():
+    """Ver knowledge base atualizado da diretoria."""
+    from pathlib import Path
+    import json
+    kb_file = Path("nucleo/data/knowledge_base.json")
+    if not kb_file.exists():
+        return {"updates": []}
+    return {"updates": json.loads(kb_file.read_text())[-10:]}
+
+app.include_router(auto_router)
