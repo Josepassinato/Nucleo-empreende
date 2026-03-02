@@ -461,15 +461,26 @@ agentes.forEach(a => {{
 const wsProto = location.protocol === 'https:' ? 'wss' : 'ws';
 const ws = new WebSocket(`${{wsProto}}://${{location.host}}/ws/sala/${{SALA_ID}}`);
 let audioDesbloqueado = false;
+let audioCtx = null;
 
-// Desbloquear áudio com toque
 function desbloquearAudio() {{
-  const silence = new Audio("data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsgU291bmQgRWZmZWN0cwBFbmNvZGVkIGJ5AAAAAA==");
-  silence.play().then(() => {{
+  // iOS requer Web Audio Context criado dentro de um toque direto
+  try {{
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Toca silêncio para desbloquear
+    const buf = audioCtx.createBuffer(1, 1, 22050);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    src.start(0);
     audioDesbloqueado = true;
-    document.getElementById('audio-btn').style.display = 'none';
+    document.getElementById('audio-btn').innerHTML = '🔊 Áudio Ativo';
+    document.getElementById('audio-btn').style.background = 'var(--green)';
     document.getElementById('status-bar').textContent = '🔊 Áudio ativado!';
-  }}).catch(() => {{}});
+    if (audioQueue.length > 0) tocarProximoAudio();
+  }} catch(e) {{
+    document.getElementById('status-bar').textContent = 'Erro ao ativar áudio: ' + e.message;
+  }}
 }}
 
 ws.onopen = () => {{
@@ -560,12 +571,22 @@ function adicionarHistorico(h) {{
 
 function tocarProximoAudio() {{
   if (audioQueue.length === 0) {{ tocandoAudio = false; return; }}
+  if (!audioDesbloqueado) {{ tocandoAudio = false; return; }}
   tocandoAudio = true;
   const b64 = audioQueue.shift();
-  const audio = new Audio(`data:audio/mp3;base64,${{b64}}`);
-  audio.onended = tocarProximoAudio;
-  audio.onerror = tocarProximoAudio;
-  audio.play().catch(tocarProximoAudio);
+  
+  // Decodifica base64 para ArrayBuffer e usa Web Audio API (funciona no iOS)
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  
+  audioCtx.decodeAudioData(bytes.buffer, (buffer) => {{
+    const src = audioCtx.createBufferSource();
+    src.buffer = buffer;
+    src.connect(audioCtx.destination);
+    src.onended = tocarProximoAudio;
+    src.start(0);
+  }}, () => tocarProximoAudio());
 }}
 
 function enviarDirecao() {{
