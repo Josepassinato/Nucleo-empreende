@@ -8,6 +8,7 @@ from pathlib import Path
 from fastapi import APIRouter, Request
 from fastapi.responses import Response
 from dotenv import load_dotenv
+from nucleo.ferramentas import buscar_web, enviar_email_zoho, enviar_email_gmail
 
 load_dotenv()
 logger = logging.getLogger("nucleo.whatsapp")
@@ -163,9 +164,19 @@ REGRAS DE COMPORTAMENTO:
 - Responda em português natural, como mensagem de WhatsApp
 - Máximo 3 parágrafos curtos
 - Nunca diga que é IA
-- Se o dono convocou outro diretor (Diana, Pedro etc), responda como Lucas dizendo que vai chamar e adicione a resposta desse diretor"""
+- Se o dono convocou outro diretor (Diana, Pedro etc), responda como Lucas dizendo que vai chamar e adicione a resposta desse diretor
+- Se o dono pedir para enviar um email, você pode fazer isso usando o formato: [ENVIAR_EMAIL: destinatario | assunto | corpo]"""
 
-    return await chamar_gemini(system, mensagem)
+    resp = await chamar_gemini(system, mensagem)
+    
+    # Executar ação de email se Lucas decidiu enviar
+    email_match = re.search(r'\[ENVIAR_EMAIL:\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)\]', resp, re.DOTALL)
+    if email_match:
+        dest, assunto, corpo = email_match.group(1), email_match.group(2), email_match.group(3)
+        resultado_email = enviar_email_zoho(dest, assunto, corpo)
+        resp = re.sub(r'\[ENVIAR_EMAIL:[^\]]+\]', f'\n{resultado_email}', resp)
+    
+    return resp
 
 # ── Resposta de agente específico ───────────────────────────
 async def resposta_agente(agente: str, mensagem: str) -> str:
@@ -188,6 +199,13 @@ async def resposta_agente(agente: str, mensagem: str) -> str:
     pers = carregar_md(arquivos.get(agente, ""))
     nome = agente.title()
 
+    # Diana pesquisa web em tempo real
+    dados_mercado = ""
+    if agente == "diana":
+        ramo = emp.get("ramo", "") or emp.get("produto", "")
+        query = f"{ramo} tendências mercado brasil 2025" if ramo else mensagem[:80]
+        dados_mercado = buscar_web(query)
+
     system = f"""Você é {nome}, diretor(a) da empresa.
 
 {pers if pers else f'Você é {nome}, especialista na sua área.'}
@@ -198,13 +216,15 @@ EMPRESA:
 CONTEXTO:
 {ctx}
 
+{f"DADOS DE MERCADO PESQUISADOS AGORA:{chr(10)}{dados_mercado}" if dados_mercado else ""}
+
 REGRAS:
 - Comece sua resposta com "{nome.title()} aqui —"
 - Responda sobre sua área de especialidade
 - Máximo 3 parágrafos
 - Natural, como WhatsApp
 - Nunca diga que é IA
-- Se for Diana, pesquise oportunidades reais do mercado mencionado"""
+- Se for Diana, use os dados de mercado acima para dar insights reais e específicos"""
 
     resp = await chamar_gemini(system, mensagem, temperatura=0.9)
     if agente == "diana" and not resp.startswith("Diana"):
