@@ -43,6 +43,14 @@ async def lifespan(app):
 
 app = FastAPI(title="Increase Team", version="1.0.0", lifespan=lifespan)
 
+# ── Auth router ──────────────────────────────────────────────
+try:
+    from nucleo.auth import router as auth_router
+    app.include_router(auth_router)
+    print("🔐 Auth ativado")
+except Exception as e:
+    print(f"⚠️ Auth não carregado: {e}")
+
 # WhatsApp webhook router
 from nucleo.webhook_whatsapp import router as whatsapp_router
 app.include_router(whatsapp_router)

@@ -44,6 +44,37 @@ except:
 # ══════════════════════════════════════════════════════════════
 
 SCHEMA = """
+-- ─────────────────────────────────────────
+-- MULTI-TENANT: Contas e Empresas
+-- ─────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS contas (
+    id            TEXT PRIMARY KEY,           -- uuid
+    nome          TEXT NOT NULL,
+    email         TEXT NOT NULL UNIQUE,
+    senha_hash    TEXT NOT NULL,
+    whatsapp      TEXT,
+    plano         TEXT DEFAULT 'starter',     -- starter | pro | enterprise
+    ativo         INTEGER DEFAULT 1,
+    criado_em     TEXT NOT NULL,
+    ultimo_acesso TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_contas_email ON contas(email);
+
+CREATE TABLE IF NOT EXISTS empresas (
+    id          TEXT PRIMARY KEY,             -- uuid
+    conta_id    TEXT NOT NULL,               -- FK → contas.id
+    nome        TEXT NOT NULL,
+    segmento    TEXT,
+    porte       TEXT,
+    status      TEXT DEFAULT 'onboarding',   -- onboarding | ativo | pausado
+    canal_wa    TEXT,                        -- número WhatsApp configurado
+    canal_tg    TEXT,                        -- bot token Telegram
+    criado_em   TEXT NOT NULL,
+    FOREIGN KEY (conta_id) REFERENCES contas(id)
+);
+CREATE INDEX IF NOT EXISTS idx_empresas_conta ON empresas(conta_id);
+
 -- Configuração da empresa
 CREATE TABLE IF NOT EXISTS empresa (
     chave     TEXT PRIMARY KEY,
