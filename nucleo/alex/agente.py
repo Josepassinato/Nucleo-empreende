@@ -173,7 +173,7 @@ def salvar_sessao(tenant_id: str, sessao: dict):
 # GEMINI — LLM DO ALEX
 # ══════════════════════════════════════════════════════════════════
 
-ALEX_SYSTEM = """Você é Alex, o Agente Consultor do Nucleo Empreende.
+ALEX_SYSTEM = """Você é Alex, o Agente Consultor do Increase Team.
 
 Seu papel: entender profundamente o negócio do empreendedor em uma conversa natural e acolhedora.
 
@@ -240,7 +240,7 @@ async def iniciar_conversa(tenant_id: str) -> dict:
     # Saudação inicial (primeira vez)
     if not sessao["historico"]:
         boas_vindas = (
-            "👋 Olá! Sou o **Alex**, seu Consultor de IA do Nucleo Empreende.\n\n"
+            "👋 Olá! Sou o **Alex**, seu Consultor de IA do Increase Team.\n\n"
             "Nos próximos minutos, vou fazer algumas perguntas sobre o seu negócio. "
             "Com base nas suas respostas, vou configurar uma **equipe completa de agentes de IA** "
             "— CEO, CFO, CMO, COO e mais — para gerenciar e fazer sua empresa crescer.\n\n"

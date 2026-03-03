@@ -1,5 +1,5 @@
 """
-Nucleo Empreende — Loader Dinâmico de Agentes e Tarefas
+Increase Team — Loader Dinâmico de Agentes e Tarefas
 Carrega agents.yaml e tasks.yaml e cria objetos CrewAI dinamicamente.
 """
 

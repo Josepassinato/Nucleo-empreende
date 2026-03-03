@@ -6,7 +6,7 @@ tasks:
 
   pesquisa_tendencias:
     description: |
-      Pesquise as últimas tendências de mercado relevantes para o negócio atual da Nucleo Empreende.
+      Pesquise as últimas tendências de mercado relevantes para o negócio atual da Increase Team.
       Identifique os 5 principais concorrentes diretos e analise suas estratégias de marketing digital,
       posicionamento de preço e diferencial de produto.
       Use a ferramenta de navegação para acessar sites reais, redes sociais e notícias recentes.
@@ -15,7 +15,7 @@ tasks:
       Um resumo executivo detalhado em Markdown contendo:
       1. Top 5 tendências de mercado (com fontes)
       2. Tabela comparativa dos 5 concorrentes (nome, diferenciais, fraquezas, preço estimado)
-      3. 3 oportunidades concretas para a Nucleo Empreende explorar
+      3. 3 oportunidades concretas para a Increase Team explorar
     agent: dani_ferreira
 
   analise_custos_api:

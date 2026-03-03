@@ -49,7 +49,7 @@ O instalador executa automaticamente:
 ```
 [1/7] Verificando sistema operacional
 [2/7] Verificando dependências
-[3/7] Baixando Nucleo Empreende v1.0.0
+[3/7] Baixando Increase Team v1.0.0
 [4/7] Instalando dependências Python
 [5/7] Configurando API Keys         ← Setup Wizard abre aqui
 [6/7] Criando atalhos e comandos

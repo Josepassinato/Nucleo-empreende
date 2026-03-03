@@ -1,5 +1,5 @@
 """
-Nucleo Empreende — Motor Autônomo
+Increase Team — Motor Autônomo
 Cada agente pensa, decide e age sozinho no horário certo.
 Loop: OBSERVAR → PENSAR → DECIDIR → AGIR → REPORTAR
 """
@@ -284,7 +284,7 @@ async def ciclo_conhecimento():
         "produtos":    buscar_web("novos produtos saas brasil startups 2026"),
     }
 
-    system = """Você é o sistema de inteligência do Nucleo Empreende.
+    system = """Você é o sistema de inteligência do Increase Team.
 Sua função: transformar atualizações de mercado em aprendizados para a diretoria.
 Seja específico, cite ferramentas reais, leis reais, tendências reais."""
 

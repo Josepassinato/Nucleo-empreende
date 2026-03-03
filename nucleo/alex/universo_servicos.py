@@ -1,5 +1,5 @@
 """
-Nucleo Empreende - Universo de Servicos Configuráveis por Agentes
+Increase Team - Universo de Servicos Configuráveis por Agentes
 Referência completa para o Agente Alex usar no onboarding.
 automacao: "automatico" | "parcial" | "manual"
 """

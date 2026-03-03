@@ -1,5 +1,5 @@
 """
-Nucleo Empreende — Sistema Colegiado
+Increase Team — Sistema Colegiado
 Decisões importantes são debatidas pela diretoria antes de chegar ao dono.
 
 Fluxo:

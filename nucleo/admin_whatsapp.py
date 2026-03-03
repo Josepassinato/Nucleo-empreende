@@ -1,6 +1,6 @@
 """
 ╔══════════════════════════════════════════════════════════════╗
-║   NUCLEO EMPREENDE — Admin pelo WhatsApp                    ║
+║   INCREASE TEAM — Admin pelo WhatsApp                    ║
 ║                                                             ║
 ║   Permite configurar o sistema conversando com o Lucas:     ║
 ║   → Definir ramo de atividade da empresa                    ║

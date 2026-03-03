@@ -105,7 +105,7 @@ PERFIS_AGENTES = {
 
 PERFIL_DEFAULT = {
     "nome_exibido": "Equipe Núcleo",
-    "assinatura": "Nucleo Empreende",
+    "assinatura": "Increase Team",
     "tom": "profissional",
     "velocidade_digitacao": 50,
     "chance_erro_typo": 0.05,

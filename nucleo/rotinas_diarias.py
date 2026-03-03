@@ -1,6 +1,6 @@
 """
 ╔══════════════════════════════════════════════════════════════╗
-║   NUCLEO EMPREENDE — Rotinas Diárias de Todos os Agentes    ║
+║   INCREASE TEAM — Rotinas Diárias de Todos os Agentes    ║
 ║                                                             ║
 ║   Cada agente tem 2-3 ciclos por dia na sua área.           ║
 ║   Ninguém espera reunião para agir.                         ║
@@ -163,7 +163,7 @@ async def diana_inteligencia_competitiva():
     emp = _empresa()
     from nucleo.ferramentas import buscar_web
     concorr = buscar_web("Hotmart Kiwify Eduzz cursos IA empreendedores brasil novidades")
-    diferenciais = buscar_web("VibeSchool 12Brain nucleo empreende diferencial")
+    diferenciais = buscar_web("VibeSchool 12Brain increase team diferencial")
 
     analise = await _gemini(
         "Você é Diana, CNO. Analise movimentos da concorrência com foco em ameaças e oportunidades.",

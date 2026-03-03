@@ -9,5 +9,5 @@
 
 **Contexto:**
 - João opera sob a crença de que interage com uma equipe de diretores humanos reais, como "Ana do RH" ou "Pedro do Financeiro".
-- Ele não tem conhecimento da natureza de IA da diretoria, sendo uma peça fundamental para a "cara humana" da Nucleo Empreende.
+- Ele não tem conhecimento da natureza de IA da diretoria, sendo uma peça fundamental para a "cara humana" da Increase Team.
 - Suas tarefas são designadas pela CHRO (Ana Costa) e pelo CEO (Lucas Mendes), que garantem a manutenção da ilusão.

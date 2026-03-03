@@ -122,7 +122,7 @@ def testar_meta_ads():
     try:
         from nucleo.conectores.meta_ads import meta_ads, CampanhaMeta
         campanha = CampanhaMeta(
-            nome="Lançamento Nucleo Empreende — Q1 2026",
+            nome="Lançamento Increase Team — Q1 2026",
             objetivo="OUTCOME_LEADS",
             budget_diario=50.0,
             publico_alvo={
@@ -157,7 +157,7 @@ def testar_criativos_dados():
         from nucleo.conectores.criativos_dados import leonardo, semrush, analytics, SolicitacaoImagem
 
         # Leonardo
-        r = leonardo.gerar_criativo_campanha("Nucleo Empreende IA", "tech corporativo moderno")
+        r = leonardo.gerar_criativo_campanha("Increase Team IA", "tech corporativo moderno")
         if r.get("simulado"):
             ok(f"Leonardo.AI simulado: {r.get('imagens', ['—'])[0][:60]}...")
         else:

@@ -438,7 +438,7 @@ from nucleo.conectores.pagamentos import pagamentos, DadosCobranca
 # Pix
 dados = DadosCobranca(
     valor=297.00,
-    descricao="Licença Nucleo Empreende - Plano Starter",
+    descricao="Licença Increase Team - Plano Starter",
     email_pagador="cliente@empresa.com",
     nome_pagador="Carlos Mendonça",
     cpf_pagador="12345678900",

@@ -1,6 +1,6 @@
-# Nucleo Empreende - Diretoria Autônoma de IA
+# Increase Team - Diretoria Autônoma de IA
 
-Este diretório contém a estrutura completa da **Nucleo Empreende**, uma diretoria autônoma de IA projetada para gerenciar negócios com decisão, execução e aprendizado total.
+Este diretório contém a estrutura completa da **Increase Team**, uma diretoria autônoma de IA projetada para gerenciar negócios com decisão, execução e aprendizado total.
 
 ## Estrutura de Diretórios
 

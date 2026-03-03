@@ -1,5 +1,5 @@
 """
-Nucleo Empreende — API REST + Dashboard
+Increase Team — API REST + Dashboard
 FastAPI na porta 8000
 """
 
@@ -41,7 +41,7 @@ async def lifespan(app):
     print("⏸️  Scheduler pausado — aguardando onboarding")
     yield
 
-app = FastAPI(title="Nucleo Empreende", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Increase Team", version="1.0.0", lifespan=lifespan)
 
 # WhatsApp webhook router
 from nucleo.webhook_whatsapp import router as whatsapp_router
@@ -280,10 +280,10 @@ def _ultimo_log_linhas(n: int = 50) -> list[str]:
 @app.get("/api/v1/health")
 def health():
     return {
-        "sistema": "Nucleo Empreende",
+        "sistema": "Increase Team",
         "versao": "1.0.0",
         "status": "online",
-        "empresa": os.getenv("EMPRESA_NOME", "Nucleo Empreende"),
+        "empresa": os.getenv("EMPRESA_NOME", "Increase Team"),
         "ts": datetime.now().isoformat(),
     }
 
@@ -521,7 +521,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nucleo Empreende — Dashboard</title>
+<title>Increase Team — Dashboard</title>
 <style>
   :root {
     --bg: #0f1117;
@@ -1106,7 +1106,7 @@ MURAL_HTML = '''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mural — Nucleo Empreende</title>
+<title>Mural — Increase Team</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -1444,7 +1444,7 @@ MURAL_HTML = '''<!DOCTYPE html>
   <div class="logo">
     <div class="logo-icon">⬡</div>
     <div>
-      <div class="logo-text">NUCLEO EMPREENDE</div>
+      <div class="logo-text">INCREASE TEAM</div>
       <div class="logo-sub">MURAL DIGITAL — DIRETORIA</div>
     </div>
   </div>

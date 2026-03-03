@@ -94,7 +94,7 @@ bash kill_switch.sh
 Útil em emergências. Todos os processos são encerrados e o serviço systemd é pausado.
 
 **Meus dados ficam seguros?**
-Você usa suas próprias credenciais de API. Nenhum dado trafega pelos servidores do Nucleo Empreende. O arquivo `.env` é armazenado localmente com permissão `600` (somente leitura pelo seu usuário).
+Você usa suas próprias credenciais de API. Nenhum dado trafega pelos servidores do Increase Team. O arquivo `.env` é armazenado localmente com permissão `600` (somente leitura pelo seu usuário).
 
 ---
 

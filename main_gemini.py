@@ -283,7 +283,7 @@ def verificar_kill_switch():
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Nucleo Empreende — Diretoria Autônoma de IA"
+        description="Increase Team — Diretoria Autônoma de IA"
     )
     parser.add_argument(
         "--modo",

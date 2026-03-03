@@ -1,5 +1,5 @@
 """
-Nucleo Empreende — Reunião Semanal Simulada
+Increase Team — Reunião Semanal Simulada
 Lucas Mendes (CEO) lidera. Todos os diretores participam.
 Gera ata em Markdown e salva em nucleo/docs/
 """
@@ -16,7 +16,7 @@ logger = logging.getLogger("nucleo.reuniao")
 ATA_DIR = Path("nucleo/docs")
 
 PAUTA_BASE = """
-Você está conduzindo a reunião semanal da diretoria da Nucleo Empreende.
+Você está conduzindo a reunião semanal da diretoria da Increase Team.
 
 PARTICIPANTES (você interpreta cada um em sequência):
 - Lucas Mendes (CEO) — abre e fecha a reunião, define prioridades

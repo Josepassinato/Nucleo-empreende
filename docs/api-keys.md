@@ -1,6 +1,6 @@
 # Guia de API Keys
 
-Todas as integrações do Nucleo Empreende usam **suas próprias credenciais**. Nenhum dado trafega pelos servidores do Núcleo. Você tem controle total.
+Todas as integrações do Increase Team usam **suas próprias credenciais**. Nenhum dado trafega pelos servidores do Núcleo. Você tem controle total.
 
 ---
 

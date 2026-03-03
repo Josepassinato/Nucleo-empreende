@@ -1,6 +1,6 @@
 """
 ╔══════════════════════════════════════════════════════════════╗
-║   NUCLEO EMPREENDE — Sistema de Memória Longa               ║
+║   INCREASE TEAM — Sistema de Memória Longa               ║
 ║                                                             ║
 ║   Cada conversa é salva e resumida.                         ║
 ║   O Lucas lembra de tudo que você disse em todas as         ║

@@ -1,5 +1,5 @@
 """
-Nucleo Empreende — Mecanismo de Alma v1.0
+Increase Team — Mecanismo de Alma v1.0
 Estresse, Proatividade, Leaderboard e Reunião Semanal
 """
 

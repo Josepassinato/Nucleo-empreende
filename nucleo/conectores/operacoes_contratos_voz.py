@@ -278,15 +278,15 @@ class ClickSignConnector:
     def gerar_contrato_licenca(self, cliente_nome: str, cliente_email: str,
                                 cliente_cpf: str, plano: str, valor: float) -> dict:
         """
-        Atalho: gera contrato de licença do Nucleo Empreende.
+        Atalho: gera contrato de licença do Increase Team.
         Em produção, substitua o PDF base64 pelo PDF real gerado.
         """
         # Template básico em texto (substitua por PDF real)
         texto_contrato = f"""
-CONTRATO DE LICENÇA DE SOFTWARE — NUCLEO EMPREENDE
+CONTRATO DE LICENÇA DE SOFTWARE — INCREASE TEAM
 
 Data: {datetime.now().strftime("%d/%m/%Y")}
-Licenciante: Nucleo Empreende LTDA
+Licenciante: Increase Team LTDA
 Licenciado: {cliente_nome}
 
 Plano: {plano}
@@ -305,7 +305,7 @@ Valor: R$ {valor:,.2f}
                 Signatario(nome=cliente_nome, email=cliente_email, cpf=cliente_cpf),
                 Signatario(nome="Lucas Mendes", email=os.getenv("GMAIL_LUCAS", "lucas@nucleo.dev")),
             ],
-            mensagem=f"Olá {cliente_nome.split()[0]}! Segue o contrato de licença do Nucleo Empreende — Plano {plano}.",
+            mensagem=f"Olá {cliente_nome.split()[0]}! Segue o contrato de licença do Increase Team — Plano {plano}.",
             deadline_dias=5,
         )
         return self.criar_e_enviar_contrato(contrato)

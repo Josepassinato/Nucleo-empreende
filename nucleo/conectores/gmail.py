@@ -19,49 +19,49 @@ logger = logging.getLogger("nucleo.gmail")
 ASSINATURAS = {
     "ana_costa": {
         "nome": "Ana Costa", "cargo": "Gestão de Pessoas",
-        "empresa": "Nucleo Empreende", "email": os.getenv("GMAIL_ANA", ""),
+        "empresa": "Increase Team", "email": os.getenv("GMAIL_ANA", ""),
         "tel": os.getenv("TEL_ANA", ""),
         "cor": "#a855f7",
     },
     "pedro_lima": {
         "nome": "Pedro Lima", "cargo": "Diretor Financeiro",
-        "empresa": "Nucleo Empreende", "email": os.getenv("GMAIL_PEDRO", ""),
+        "empresa": "Increase Team", "email": os.getenv("GMAIL_PEDRO", ""),
         "tel": os.getenv("TEL_PEDRO", ""),
         "cor": "#ef4444",
     },
     "mariana_oliveira": {
         "nome": "Mariana Oliveira", "cargo": "Diretora de Marketing",
-        "empresa": "Nucleo Empreende", "email": os.getenv("GMAIL_MARIANA", ""),
+        "empresa": "Increase Team", "email": os.getenv("GMAIL_MARIANA", ""),
         "tel": os.getenv("TEL_MARIANA", ""),
         "cor": "#ec4899",
     },
     "carla_santos": {
         "nome": "Carla Santos", "cargo": "Diretora de Operações",
-        "empresa": "Nucleo Empreende", "email": os.getenv("GMAIL_CARLA", ""),
+        "empresa": "Increase Team", "email": os.getenv("GMAIL_CARLA", ""),
         "tel": os.getenv("TEL_CARLA", ""),
         "cor": "#10b981",
     },
     "lucas_mendes": {
         "nome": "Lucas Mendes", "cargo": "CEO",
-        "empresa": "Nucleo Empreende", "email": os.getenv("GMAIL_LUCAS", ""),
+        "empresa": "Increase Team", "email": os.getenv("GMAIL_LUCAS", ""),
         "tel": os.getenv("TEL_LUCAS", ""),
         "cor": "#f59e0b",
     },
     "rafael_torres": {
         "nome": "Rafael Torres", "cargo": "Diretor de Produto",
-        "empresa": "Nucleo Empreende", "email": os.getenv("GMAIL_RAFAEL", ""),
+        "empresa": "Increase Team", "email": os.getenv("GMAIL_RAFAEL", ""),
         "cor": "#8b5cf6",
     },
     "dani_ferreira": {
         "nome": "Dani Ferreira", "cargo": "Analista de Dados",
-        "empresa": "Nucleo Empreende", "email": os.getenv("GMAIL_DANI", ""),
+        "empresa": "Increase Team", "email": os.getenv("GMAIL_DANI", ""),
         "cor": "#06b6d4",
     },
 }
 
 
 def _gerar_assinatura_html(agente_id: str) -> str:
-    a = ASSINATURAS.get(agente_id, {"nome": "Equipe Núcleo", "cargo": "", "empresa": "Nucleo Empreende", "cor": "#f59e0b", "email": "", "tel": ""})
+    a = ASSINATURAS.get(agente_id, {"nome": "Equipe Núcleo", "cargo": "", "empresa": "Increase Team", "cor": "#f59e0b", "email": "", "tel": ""})
     tel_html = f'<span style="color:#64748b"> · {a.get("tel")}</span>' if a.get("tel") else ""
     email_html = f'<a href="mailto:{a.get("email")}" style="color:{a["cor"]}">{a.get("email")}</a>' if a.get("email") else ""
     return f"""

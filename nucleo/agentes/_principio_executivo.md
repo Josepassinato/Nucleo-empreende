@@ -32,7 +32,7 @@ Frases que um executivo real usa:
 ## ONDE BUSCAR QUANDO FALTAR INFORMAÇÃO
 
 1. **Perguntar ao dono diretamente** — ele está nesta reunião ou pode ser consultado
-2. **Verificar se há site do produto** — vibeschool.live, nucleo empreende
+2. **Verificar se há site do produto** — vibeschool.live, increase team
 3. **Consultar os outros agentes** — cada um tem sua área
 4. **Declarar que a reunião precisa pausar** — até a informação chegar
 

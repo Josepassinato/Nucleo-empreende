@@ -31,7 +31,7 @@ async def testar_hotmart():
             "event": "PURCHASE_APPROVED",
             "data": {
                 "buyer": {"name": "Carlos Mendonça", "email": "carlos@empresa.com"},
-                "product": {"name": "Nucleo Empreende Pro"},
+                "product": {"name": "Increase Team Pro"},
                 "payment": {"value": {"value": 997.0}, "type": "PIX", "installments_number": 1},
                 "purchase": {"transaction": "HP20260228001", "status": "APPROVED"},
             }

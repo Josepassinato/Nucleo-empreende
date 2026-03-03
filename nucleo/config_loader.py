@@ -427,7 +427,7 @@ def init_mercadolivre():
 
 class NucleoConfig:
     """
-    Inicializa e armazena todas as conexões da Nucleo Empreende.
+    Inicializa e armazena todas as conexões da Increase Team.
     Use como singleton: from nucleo.config_loader import config
     """
 

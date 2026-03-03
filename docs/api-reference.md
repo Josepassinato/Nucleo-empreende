@@ -15,7 +15,7 @@ Health check.
 **Resposta:**
 ```json
 {
-  "sistema": "Nucleo Empreende",
+  "sistema": "Increase Team",
   "versao": "1.0.0",
   "status": "online",
   "empresa": "Sua Empresa",

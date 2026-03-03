@@ -1,1 +1,1 @@
-# Sala de Reunião Virtual — Nucleo Empreende
+# Sala de Reunião Virtual — Increase Team

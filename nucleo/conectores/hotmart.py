@@ -340,8 +340,8 @@ class HotmartConnector:
         })
         if dados.get("simulado") or not dados:
             return [
-                {"nome": "Lead 1", "email": "lead1@email.com", "produto": "Nucleo Empreende", "data": datetime.now().strftime("%Y-%m-%d")},
-                {"nome": "Lead 2", "email": "lead2@email.com", "produto": "Nucleo Empreende", "data": datetime.now().strftime("%Y-%m-%d")},
+                {"nome": "Lead 1", "email": "lead1@email.com", "produto": "Increase Team", "data": datetime.now().strftime("%Y-%m-%d")},
+                {"nome": "Lead 2", "email": "lead2@email.com", "produto": "Increase Team", "data": datetime.now().strftime("%Y-%m-%d")},
             ]
         return dados.get("items", [])
 
@@ -511,7 +511,7 @@ class HotmartConnector:
 
     def _simular_vendas(self, dias: int) -> list[VendaHotmart]:
         import random
-        produtos = ["Nucleo Empreende Starter", "Nucleo Empreende Pro", "Nucleo Empreende Enterprise"]
+        produtos = ["Increase Team Starter", "Increase Team Pro", "Increase Team Enterprise"]
         status_lista = ["APPROVED"] * 8 + ["CANCELLED"] + ["REFUNDED"]
         return [
             VendaHotmart(
@@ -537,7 +537,7 @@ class HotmartConnector:
     def _simular_assinaturas(self) -> list[dict]:
         return [
             {"subscriber_code": f"SUB_{i:04d}", "status": "ACTIVE",
-             "email": f"assinante{i}@email.com", "produto": "Nucleo Empreende Pro"}
+             "email": f"assinante{i}@email.com", "produto": "Increase Team Pro"}
             for i in range(12)
         ]
 

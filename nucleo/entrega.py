@@ -134,7 +134,7 @@ def montar_email_entrega(compra: Compra, licenca: str) -> dict:
 <body>
 <div class="container">
   <div class="header">
-    <h1>Nucleo Empreende</h1>
+    <h1>Increase Team</h1>
     <p>Sua diretoria autônoma de IA está pronta</p>
   </div>
   <div class="body">
@@ -190,7 +190,7 @@ def montar_email_entrega(compra: Compra, licenca: str) -> dict:
     </p>
   </div>
   <div class="footer">
-    <p>Nucleo Empreende · <a href="https://nucleoempreende.com.br" style="color:#f59e0b;">nucleoempreende.com.br</a><br>
+    <p>Increase Team · <a href="https://nucleoempreende.com.br" style="color:#f59e0b;">nucleoempreende.com.br</a><br>
     Dúvidas? <a href="{url_suporte}" style="color:#f59e0b;">WhatsApp</a> ou <a href="mailto:suporte@nucleoempreende.com.br" style="color:#f59e0b;">suporte@nucleoempreende.com.br</a><br>
     Você está recebendo este e-mail porque realizou uma compra.</p>
   </div>
@@ -201,7 +201,7 @@ def montar_email_entrega(compra: Compra, licenca: str) -> dict:
 
     return {
         "para": compra.email,
-        "assunto": f"🚀 Seu Nucleo Empreende está pronto, {primeiro_nome}! — Chave de licença inclusa",
+        "assunto": f"🚀 Seu Increase Team está pronto, {primeiro_nome}! — Chave de licença inclusa",
         "corpo_html": corpo_html,
     }
 
@@ -214,7 +214,7 @@ def montar_whatsapp_boas_vindas(compra: Compra, licenca: str) -> str:
     primeiro_nome = compra.nome.split()[0]
     return (
         f"Olá {primeiro_nome}! 🎉\n\n"
-        f"Sua compra do *Nucleo Empreende* ({compra.plano.upper()}) foi confirmada!\n\n"
+        f"Sua compra do *Increase Team* ({compra.plano.upper()}) foi confirmada!\n\n"
         f"🔑 *Sua licença:*\n`{licenca}`\n\n"
         f"⚡ *Para instalar, rode no terminal:*\n"
         f"`curl -fsSL https://install.nucleoempreende.com.br | bash -s {licenca}`\n\n"

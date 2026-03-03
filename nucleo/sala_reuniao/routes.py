@@ -108,7 +108,7 @@ async def pagina_sala(sala_id: str):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Sala Executiva — Nucleo Empreende</title>
+<title>Sala Executiva — Increase Team</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {{

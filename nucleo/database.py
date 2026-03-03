@@ -1,6 +1,6 @@
 """
 ╔══════════════════════════════════════════════════════════════╗
-║   NUCLEO EMPREENDE — Banco de Dados Central                 ║
+║   INCREASE TEAM — Banco de Dados Central                 ║
 ║                                                             ║
 ║   SQLite: persistência permanente                           ║
 ║   Redis:  contexto rápido por agente                        ║

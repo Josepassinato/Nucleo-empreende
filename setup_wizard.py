@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ╔═══════════════════════════════════════════════════════════════════╗
-║          NUCLEO EMPREENDE — Setup Wizard v1.0                    ║
+║          INCREASE TEAM — Setup Wizard v1.0                    ║
 ║          Assistente de configuração para novos clientes           ║
 ╚═══════════════════════════════════════════════════════════════════╝
 
@@ -498,7 +498,7 @@ def gerar_env():
 
     linhas = [
         "# ════════════════════════════════════════════════════════",
-        f"# NUCLEO EMPREENDE — {estado.empresa}",
+        f"# INCREASE TEAM — {estado.empresa}",
         f"# Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}",
         f"# Dono: {estado.dono_nome}",
         "# ════════════════════════════════════════════════════════",
@@ -535,7 +535,7 @@ def gerar_env():
 
     env_text = [
         "# ════════════════════════════════════════════════════════",
-        f"# NUCLEO EMPREENDE — {estado.empresa}",
+        f"# INCREASE TEAM — {estado.empresa}",
         f"# Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}",
         f"# Dono: {estado.dono_nome}",
         "# ════════════════════════════════════════════════════════",
@@ -683,7 +683,7 @@ def criar_servico_systemd():
     python_path = sys.executable
 
     servico = f"""[Unit]
-Description=Nucleo Empreende — {estado.empresa}
+Description=Increase Team — {estado.empresa}
 After=network.target redis.service
 
 [Service]
@@ -714,7 +714,7 @@ WantedBy=multi-user.target
 def exibir_resumo_final():
     """Exibe resumo completo do setup."""
     limpar()
-    titulo("✅  SETUP CONCLUÍDO — NUCLEO EMPREENDE", estado.empresa)
+    titulo("✅  SETUP CONCLUÍDO — INCREASE TEAM", estado.empresa)
 
     configuradas = [k for k, v in estado.env.items() if v and k not in ("EMPRESA_NOME", "DONO_NOME", "EMPRESA_SETOR", "NUCLEO_FASE")]
     total_possiveis = sum(len(f["apis"]) for f in APIS.values())
@@ -747,7 +747,7 @@ def exibir_resumo_final():
     print()
 
     duracao = (datetime.now() - estado.ts_inicio).seconds
-    print(f"  {clr(f'Setup concluído em {duracao}s — Bem-vindo ao Nucleo Empreende! 🚀', C.GREEN, C.BOLD)}")
+    print(f"  {clr(f'Setup concluído em {duracao}s — Bem-vindo ao Increase Team! 🚀', C.GREEN, C.BOLD)}")
     print()
 
 
@@ -775,7 +775,7 @@ def splash():
     linha("═", 62, C.AMBER)
     print()
     print(f"  Este assistente vai guiar você pela instalação e configuração")
-    print(f"  completa do Nucleo Empreende na sua máquina/VPS.")
+    print(f"  completa do Increase Team na sua máquina/VPS.")
     print()
     print(f"  {clr('Tempo estimado:', C.AMBER)} 10-20 minutos")
     print(f"  {clr('O que você precisa ter em mãos:', C.AMBER)}")

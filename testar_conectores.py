@@ -97,7 +97,7 @@ def testar_pagamentos():
 
     dados_teste = DadosCobranca(
         valor=297.00,
-        descricao="Teste — Licença Nucleo Empreende",
+        descricao="Teste — Licença Increase Team",
         email_pagador="teste@nucleo.dev",
         nome_pagador="Cliente Teste",
         cpf_pagador="12345678900",

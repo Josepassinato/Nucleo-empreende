@@ -1,4 +1,4 @@
-# 🧠 Nucleo Empreende
+# 🧠 Increase Team
 
 **Diretoria autônoma de IA para empresários brasileiros.**
 
@@ -10,7 +10,7 @@ curl -fsSL https://install.nucleoempreende.com.br | bash -s SUA_LICENCA
 
 ---
 
-## O que é o Nucleo Empreende
+## O que é o Increase Team
 
 A maioria das ferramentas de IA são chatbots. O Núcleo é diferente: é uma **organização de agentes** que opera de forma autônoma, toma decisões, executa tarefas e reporta para você — exatamente como uma diretoria real, mas disponível 24h e a uma fração do custo.
 
@@ -326,5 +326,5 @@ Distribuído sob licença comercial. Cada licença autoriza instalação em **um
 ---
 
 <p align="center">
-  Feito com ⚡ por <a href="https://nucleoempreende.com.br">Nucleo Empreende</a>
+  Feito com ⚡ por <a href="https://nucleoempreende.com.br">Increase Team</a>
 </p>
