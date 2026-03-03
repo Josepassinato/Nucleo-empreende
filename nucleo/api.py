@@ -989,3 +989,652 @@ async def ver_reflexoes():
     import json
     f = Path("nucleo/data/reflexoes_agentes.json")
     return {"reflexoes": json.loads(f.read_text())[-30:] if f.exists() else []}
+
+# ══════════════════════════════════════════════════════════════════
+# MURAL DIGITAL — CRM de Tarefas da Diretoria
+# ══════════════════════════════════════════════════════════════════
+
+@app.get("/api/v1/mural")
+def mural_data():
+    """Retorna todos os dados do mural: tarefas do dia + abertas + agentes."""
+    hoje = datetime.now().strftime("%Y-%m-%d")
+    agora_str = datetime.now().strftime("%d/%m/%Y %H:%M")
+
+    # ── Ações do dia (rotinas autônomas) ─────────────────────────
+    acoes_hoje = []
+    acoes_file = Path("nucleo/data/acoes_autonomas.json")
+    if acoes_file.exists():
+        try:
+            todas = json.loads(acoes_file.read_text())
+            acoes_hoje = [a for a in todas if a.get("ts","").startswith(hoje)]
+        except: pass
+
+    # ── Tarefas abertas das atas (5W2H) ──────────────────────────
+    tarefas_abertas = []
+    tarefas_concluidas = []
+    salas_dir = Path("nucleo/data/salas")
+    if salas_dir.exists():
+        for arq in sorted(salas_dir.glob("*.json"), reverse=True)[:20]:
+            try:
+                sala = json.loads(arq.read_text())
+                tema = sala.get("tema","")
+                data_sala = sala.get("criado_em","")[:10]
+                decisao = sala.get("decisao_final","")
+                # Extrair 5W2H da decisão
+                if "QUEM:" in decisao or "O QUÊ:" in decisao or "O QUE:" in decisao:
+                    tarefa = {
+                        "sala_id": sala.get("id",""),
+                        "tema": tema,
+                        "data": data_sala,
+                        "o_que": "", "quem": "", "quando": "",
+                        "por_que": "", "onde": "", "como": "", "quanto": "",
+                        "status": "aberta"
+                    }
+                    for linha in decisao.split("\n"):
+                        for campo, chaves in [
+                            ("o_que",   ["O QUÊ:","O QUE:"]),
+                            ("quem",    ["QUEM:"]),
+                            ("quando",  ["QUANDO:"]),
+                            ("por_que", ["POR QUÊ:","POR QUE:"]),
+                            ("onde",    ["ONDE:"]),
+                            ("como",    ["COMO:"]),
+                            ("quanto",  ["QUANTO:"]),
+                        ]:
+                            for chave in chaves:
+                                if chave in linha:
+                                    tarefa[campo] = linha.split(chave,1)[-1].strip()[:120]
+                    if tarefa["quem"] or tarefa["o_que"]:
+                        if data_sala == hoje:
+                            tarefas_concluidas.append(tarefa)
+                        else:
+                            tarefas_abertas.append(tarefa)
+            except: pass
+
+    # ── Contexto compartilhado (o que cada agente sabe) ──────────
+    shared = {}
+    shared_file = Path("nucleo/data/contexto_compartilhado.json")
+    if shared_file.exists():
+        try: shared = json.loads(shared_file.read_text())
+        except: pass
+
+    # ── Heartbeat (status de cada agente) ────────────────────────
+    heartbeat = {}
+    hb_file = Path("nucleo/data/heartbeat.json")
+    if hb_file.exists():
+        try: heartbeat = json.loads(hb_file.read_text())
+        except: pass
+
+    # ── Score de produtividade do dia ─────────────────────────────
+    total_ciclos_esperados = 24  # rotinas diárias planejadas
+    ciclos_executados = len(set(a.get("agente","") + a.get("acao","") for a in acoes_hoje))
+    score_dia = min(100, int((ciclos_executados / total_ciclos_esperados) * 100))
+
+    return {
+        "atualizado_em": agora_str,
+        "hoje": hoje,
+        "score_produtividade": score_dia,
+        "acoes_hoje": acoes_hoje[-50:],
+        "tarefas_abertas": tarefas_abertas,
+        "tarefas_concluidas_hoje": tarefas_concluidas,
+        "shared_context": shared,
+        "heartbeat": heartbeat,
+        "resumo": {
+            "acoes_hoje": len(acoes_hoje),
+            "tarefas_abertas": len(tarefas_abertas),
+            "tarefas_concluidas": len(tarefas_concluidas),
+            "agentes_ativos_hoje": len(set(a.get("agente","") for a in acoes_hoje)),
+        }
+    }
+
+
+@app.get("/mural", response_class=HTMLResponse)
+def mural_page():
+    """Mural digital — CRM público da diretoria."""
+    return HTMLResponse(MURAL_HTML)
+
+
+MURAL_HTML = '''<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mural — Nucleo Empreende</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080b0f;
+    --surface: #0e1318;
+    --border: #1a2330;
+    --accent: #00e5a0;
+    --accent2: #0099ff;
+    --warn: #ff6b35;
+    --text: #e8edf2;
+    --muted: #4a6070;
+    --card: #111820;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid de fundo */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(8,11,15,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+  }
+  .logo-text { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.5px; }
+  .logo-sub { font-size: 0.7rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+  }
+  .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.5; transform:scale(0.8); }
+  }
+  #clock { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--muted); }
+
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* Score bar */
+  .score-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    position: relative;
+  }
+  .score-section::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--accent);
+    border-radius: 4px 0 0 4px;
+  }
+  .score-num {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    min-width: 80px;
+  }
+  .score-label { font-size: 0.7rem; color: var(--muted); font-family: 'JetBrains Mono'; text-transform: uppercase; letter-spacing: 1px; }
+  .score-bar-wrap { flex: 1; }
+  .score-bar-track {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .score-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 4px;
+    transition: width 1s ease;
+  }
+  .score-stats {
+    display: flex;
+    gap: 2rem;
+    margin-left: auto;
+  }
+  .stat { text-align: center; }
+  .stat-num { font-size: 1.8rem; font-weight: 700; color: var(--text); line-height: 1; }
+  .stat-label { font-size: 0.65rem; color: var(--muted); font-family: 'JetBrains Mono'; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+  /* Grid de colunas */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+
+  .col-title {
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .col-title-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+
+  /* Cards de tarefa */
+  .task-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.75rem;
+    transition: border-color 0.2s, transform 0.2s;
+    animation: fadeIn 0.4s ease both;
+  }
+  .task-card:hover {
+    border-color: rgba(0,229,160,0.3);
+    transform: translateX(3px);
+  }
+  @keyframes fadeIn {
+    from { opacity:0; transform: translateY(8px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .task-card.aberta { border-left: 3px solid var(--warn); }
+  .task-card.concluida { border-left: 3px solid var(--accent); }
+  .task-card.acao { border-left: 3px solid var(--accent2); }
+
+  .task-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .task-tema {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .task-badge {
+    font-size: 0.6rem;
+    font-family: 'JetBrains Mono';
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .badge-aberta { background: rgba(255,107,53,0.15); color: var(--warn); }
+  .badge-concluida { background: rgba(0,229,160,0.12); color: var(--accent); }
+  .badge-acao { background: rgba(0,153,255,0.12); color: var(--accent2); }
+
+  .task-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    margin-top: 8px;
+  }
+  .task-field {
+    font-size: 0.7rem;
+    display: flex;
+    gap: 4px;
+  }
+  .task-field-key {
+    color: var(--muted);
+    font-family: 'JetBrains Mono';
+    flex-shrink: 0;
+  }
+  .task-field-val { color: var(--text); }
+
+  .task-ts {
+    font-size: 0.62rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono';
+    margin-top: 6px;
+  }
+
+  /* Agentes sidebar */
+  .agents-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 900px) { .agents-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .agent-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.2s;
+    animation: fadeIn 0.4s ease both;
+  }
+  .agent-card.ativo { border-color: rgba(0,229,160,0.4); }
+  .agent-card:hover { transform: translateY(-2px); }
+  .agent-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+  }
+  .agent-card.ativo .agent-avatar { border-color: var(--accent); }
+  .agent-nome { font-size: 0.75rem; font-weight: 600; }
+  .agent-cargo { font-size: 0.6rem; color: var(--muted); font-family: 'JetBrains Mono'; margin-top: 2px; }
+  .agent-acoes {
+    font-size: 0.65rem;
+    color: var(--accent);
+    font-family: 'JetBrains Mono';
+    margin-top: 6px;
+  }
+  .agent-ultima {
+    font-size: 0.6rem;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: 'JetBrains Mono';
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono';
+  }
+
+  /* Scrollable column */
+  .col-scroll {
+    max-height: 520px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: -0.3px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono';
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⬡</div>
+    <div>
+      <div class="logo-text">NUCLEO EMPREENDE</div>
+      <div class="logo-sub">MURAL DIGITAL — DIRETORIA</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      AO VIVO
+    </div>
+    <div id="clock">--:--:--</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Score do dia -->
+  <div class="score-section" id="score-section">
+    <div>
+      <div class="score-label">produtividade hoje</div>
+      <div class="score-num" id="score-num">--</div>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-label">ciclos executados / planejados</div>
+      <div class="score-bar-track">
+        <div class="score-bar-fill" id="score-bar" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="score-stats">
+      <div class="stat">
+        <div class="stat-num" id="stat-acoes">--</div>
+        <div class="stat-label">ações hoje</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-abertas">--</div>
+        <div class="stat-label">tarefas abertas</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-agentes">--</div>
+        <div class="stat-label">agentes ativos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agentes -->
+  <div class="section-title">Diretoria</div>
+  <div class="agents-grid" id="agents-grid">
+    <div class="empty">Carregando...</div>
+  </div>
+
+  <!-- Grid principal -->
+  <div class="grid">
+
+    <!-- Coluna 1: Ações do dia -->
+    <div>
+      <div class="col-title">
+        <div class="col-title-dot" style="background:#0099ff"></div>
+        Atividades do Dia
+      </div>
+      <div class="col-scroll" id="acoes-col">
+        <div class="empty">Carregando...</div>
+      </div>
+    </div>
+
+    <!-- Coluna 2: Tarefas abertas -->
+    <div>
+      <div class="col-title">
+        <div class="col-title-dot" style="background:#ff6b35"></div>
+        Tarefas em Aberto (5W2H)
+      </div>
+      <div class="col-scroll" id="abertas-col">
+        <div class="empty">Carregando...</div>
+      </div>
+    </div>
+
+    <!-- Coluna 3: Concluídas hoje -->
+    <div>
+      <div class="col-title">
+        <div class="col-title-dot" style="background:#00e5a0"></div>
+        Concluídas Hoje
+      </div>
+      <div class="col-scroll" id="concluidas-col">
+        <div class="empty">Carregando...</div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<footer id="footer">Atualizado em --</footer>
+
+<script>
+const AGENTES_META = {
+  lucas:   { nome: "Lucas",   cargo: "CEO",   icon: "👔" },
+  mariana: { nome: "Mariana", cargo: "CMO",   icon: "📣" },
+  pedro:   { nome: "Pedro",   cargo: "CFO",   icon: "💰" },
+  carla:   { nome: "Carla",   cargo: "COO",   icon: "⚙️" },
+  rafael:  { nome: "Rafael",  cargo: "CPO",   icon: "🚀" },
+  ana:     { nome: "Ana",     cargo: "CHRO",  icon: "🧘" },
+  dani:    { nome: "Dani",    cargo: "Dados", icon: "📊" },
+  ze:      { nome: "Zé",      cargo: "Coach", icon: "🎯" },
+  beto:    { nome: "Beto",    cargo: "Otim.", icon: "💡" },
+  diana:   { nome: "Diana",   cargo: "CNO",   icon: "🔍" },
+};
+
+function clock() {
+  document.getElementById("clock").textContent = new Date().toLocaleTimeString("pt-BR");
+}
+setInterval(clock, 1000); clock();
+
+function esc(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function renderAcoes(acoes) {
+  if (!acoes.length) return '<div class="empty">Nenhuma atividade ainda hoje</div>';
+  return acoes.slice().reverse().map((a, i) => `
+    <div class="task-card acao" style="animation-delay:${i*0.05}s">
+      <div class="task-header">
+        <div class="task-tema">${esc(a.acao || "ação executada")}</div>
+        <span class="task-badge badge-acao">${esc((AGENTES_META[a.agente]||{}).icon||"")} ${esc(a.agente||"")}</span>
+      </div>
+      <div class="task-ts">${esc((a.ts||"").replace("T"," ").slice(0,16))}</div>
+      ${a.resultado ? `<div class="task-field" style="margin-top:6px"><span class="task-field-val" style="font-size:0.68rem;color:#4a6070;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(a.resultado.slice(0,120))}</span></div>` : ""}
+    </div>
+  `).join("");
+}
+
+function renderTarefas(tarefas, tipo) {
+  if (!tarefas.length) return `<div class="empty">${tipo === "aberta" ? "Sem tarefas abertas 🎉" : "Nenhuma concluída hoje ainda"}</div>`;
+  return tarefas.map((t, i) => `
+    <div class="task-card ${tipo}" style="animation-delay:${i*0.07}s">
+      <div class="task-header">
+        <div class="task-tema">${esc(t.o_que || t.tema || "Tarefa")}</div>
+        <span class="task-badge ${tipo==="aberta"?"badge-aberta":"badge-concluida"}">${tipo==="aberta"?"⏳ ABERTA":"✅ FEITA"}</span>
+      </div>
+      <div class="task-fields">
+        ${t.quem    ? `<div class="task-field"><span class="task-field-key">quem</span><span class="task-field-val">${esc(t.quem)}</span></div>` : ""}
+        ${t.quando  ? `<div class="task-field"><span class="task-field-key">quando</span><span class="task-field-val">${esc(t.quando)}</span></div>` : ""}
+        ${t.onde    ? `<div class="task-field"><span class="task-field-key">onde</span><span class="task-field-val">${esc(t.onde)}</span></div>` : ""}
+        ${t.quanto  ? `<div class="task-field"><span class="task-field-key">quanto</span><span class="task-field-val">${esc(t.quanto)}</span></div>` : ""}
+        ${t.como    ? `<div class="task-field" style="grid-column:span 2"><span class="task-field-key">como</span><span class="task-field-val">${esc(t.como)}</span></div>` : ""}
+      </div>
+      <div class="task-ts">Reunião: ${esc(t.tema||"")} · ${esc(t.data||"")}</div>
+    </div>
+  `).join("");
+}
+
+function renderAgentes(acoes) {
+  const acosPorAgente = {};
+  acoes.forEach(a => {
+    if (!acosPorAgente[a.agente]) acosPorAgente[a.agente] = [];
+    acosPorAgente[a.agente].push(a);
+  });
+
+  return Object.entries(AGENTES_META).map(([id, meta], i) => {
+    const minhasAcoes = acosPorAgente[id] || [];
+    const ativo = minhasAcoes.length > 0;
+    const ultima = minhasAcoes.slice(-1)[0];
+    return `
+      <div class="agent-card ${ativo?"ativo":""}" style="animation-delay:${i*0.06}s">
+        <div class="agent-avatar">${meta.icon}</div>
+        <div class="agent-nome">${meta.nome}</div>
+        <div class="agent-cargo">${meta.cargo}</div>
+        <div class="agent-acoes">${minhasAcoes.length} ações</div>
+        ${ultima ? `<div class="agent-ultima">${esc(ultima.acao.slice(0,30))}</div>` : '<div class="agent-ultima" style="color:var(--border)">aguardando</div>'}
+      </div>
+    `;
+  }).join("");
+}
+
+async function atualizar() {
+  try {
+    const r = await fetch("/api/v1/mural");
+    const d = await r.json();
+
+    // Score
+    document.getElementById("score-num").textContent = d.score_produtividade + "%";
+    document.getElementById("score-bar").style.width = d.score_produtividade + "%";
+    document.getElementById("stat-acoes").textContent = d.resumo.acoes_hoje;
+    document.getElementById("stat-abertas").textContent = d.resumo.tarefas_abertas;
+    document.getElementById("stat-agentes").textContent = d.resumo.agentes_ativos_hoje;
+
+    // Agentes
+    document.getElementById("agents-grid").innerHTML = renderAgentes(d.acoes_hoje);
+
+    // Colunas
+    document.getElementById("acoes-col").innerHTML     = renderAcoes(d.acoes_hoje);
+    document.getElementById("abertas-col").innerHTML   = renderTarefas(d.tarefas_abertas, "aberta");
+    document.getElementById("concluidas-col").innerHTML = renderTarefas(d.tarefas_concluidas_hoje, "concluida");
+
+    document.getElementById("footer").textContent = "Atualizado em " + d.atualizado_em + " · refresh automático a cada 60s";
+  } catch(e) {
+    console.error("Erro ao carregar mural:", e);
+  }
+}
+
+atualizar();
+setInterval(atualizar, 60000);
+</script>
+</body>
+</html>'''
