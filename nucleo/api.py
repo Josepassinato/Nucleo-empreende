@@ -290,6 +290,13 @@ def health():
 # ── Home Page ─────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
 def home_page():
+    return HTMLResponse('<meta http-equiv="refresh" content="0;url=/login">')
+
+@app.get("/login", response_class=HTMLResponse)
+def login_page():
+    auth_path = Path(__file__).parent.parent / "site" / "auth.html"
+    if auth_path.exists():
+        return HTMLResponse(auth_path.read_text())
     return HTMLResponse(HOME_HTML)
 
 
