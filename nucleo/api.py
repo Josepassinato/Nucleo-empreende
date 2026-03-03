@@ -29,13 +29,16 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app):
-    # Iniciar scheduler autônomo em background
-    try:
-        from nucleo.autonomo import scheduler
-        asyncio.create_task(scheduler())
-        print("⚙️ Scheduler autônomo iniciado")
-    except Exception as e:
-        print(f"⚠️ Scheduler não iniciado: {e}")
+    # ── SCHEDULER DESATIVADO ─────────────────────────────────────
+    # Aguardando onboarding de empresa real.
+    # Para reativar: descomentar as 4 linhas abaixo.
+    # try:
+    #     from nucleo.autonomo import scheduler
+    #     asyncio.create_task(scheduler())
+    #     print("⚙️ Scheduler autônomo iniciado")
+    # except Exception as e:
+    #     print(f"⚠️ Scheduler não iniciado: {e}")
+    print("⏸️  Scheduler pausado — aguardando onboarding")
     yield
 
 app = FastAPI(title="Nucleo Empreende", version="1.0.0", lifespan=lifespan)
@@ -273,8 +276,8 @@ def _ultimo_log_linhas(n: int = 50) -> list[str]:
     return lines[-n:]
 
 
-# ── Health ───────────────────────────────────────────────────────
-@app.get("/")
+# ── Health (API) ─────────────────────────────────────────────────
+@app.get("/api/v1/health")
 def health():
     return {
         "sistema": "Nucleo Empreende",
@@ -283,6 +286,11 @@ def health():
         "empresa": os.getenv("EMPRESA_NOME", "Nucleo Empreende"),
         "ts": datetime.now().isoformat(),
     }
+
+# ── Home Page ─────────────────────────────────────────────────────
+@app.get("/", response_class=HTMLResponse)
+def home_page():
+    return HTMLResponse(HOME_HTML)
 
 
 # ── Status ───────────────────────────────────────────────────────
