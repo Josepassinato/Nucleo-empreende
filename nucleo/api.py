@@ -1638,3 +1638,9 @@ setInterval(atualizar, 60000);
 </script>
 </body>
 </html>'''
+
+# ══════════════════════════════════════════════════════════════════
+# ALEX — Agente Consultor de Onboarding
+# ══════════════════════════════════════════════════════════════════
+from nucleo.alex.routes import router as alex_router
+app.include_router(alex_router)
