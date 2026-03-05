@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Increase Team</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--black:#060608;--white:#f0ede8;--acid:#b8ff2e;--steel:#1a1a24;--muted:#5a5a6e;--card:#0d0d12;--online:#00e676}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;font-weight:300}
+a{color:inherit;text-decoration:none}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:16px 32px;background:rgba(6,6,8,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06)}
+.topbar-logo{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.15em;text-transform:uppercase}
+.topbar-logo span{color:var(--acid)}
+.topbar-right{display:flex;align-items:center;gap:20px}
+.topbar-user{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.topbar-company{color:var(--acid)}
+.btn-logout{background:none;border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .3s}
+.btn-logout:hover{border-color:var(--acid);color:var(--acid)}
+
+/* LAYOUT */
+.dashboard{padding:88px 32px 32px;max-width:1200px;margin:0 auto}
+
+/* WELCOME */
+.welcome{margin-bottom:40px}
+.welcome-tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--acid);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.welcome-tag .dot{width:6px;height:6px;background:var(--online);border-radius:50%;animation:pulse 2s infinite}
+.welcome h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,52px);line-height:1}
+.welcome p{font-size:14px;color:var(--muted);margin-top:8px}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);margin-bottom:32px}
+.stat{background:var(--black);padding:24px}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--acid);line-height:1}
+.stat-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+
+/* AGENTS SECTION */
+.section-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--acid);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.section-label::before{content:'';width:30px;height:1px;background:var(--acid)}
+
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);margin-bottom:40px}
+
+.agent{background:var(--black);padding:28px;cursor:pointer;transition:background .3s;position:relative}
+.agent:hover{background:var(--steel)}
+.agent-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.agent-avatar{width:40px;height:40px;border-radius:50%;background:var(--steel);display:flex;align-items:center;justify-content:center;font-size:18px;font-family:'Bebas Neue',sans-serif;border:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.agent-info{flex:1;min-width:0}
+.agent-role{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--acid)}
+.agent-name{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1}
+.agent-status{display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--online);margin-bottom:12px}
+.agent-status .dot{width:5px;height:5px;background:var(--online);border-radius:50%}
+.agent-last{font-size:12px;color:var(--muted);line-height:1.6}
+.agent-actions{display:flex;gap:8px;margin-top:14px}
+.agent-btn{flex:1;padding:10px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;text-align:center;border:1px solid rgba(255,255,255,.1);background:none;color:var(--muted);cursor:pointer;transition:all .3s}
+.agent-btn:hover{border-color:var(--acid);color:var(--acid)}
+.agent-btn.primary{background:var(--acid);color:var(--black);border-color:var(--acid);font-weight:700}
+.agent-btn.primary:hover{background:#d4ff6e}
+
+/* CHAT MODAL */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.open{display:flex}
+.modal{width:100%;max-width:560px;max-height:80vh;background:var(--steel);border:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acid)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06)}
+.modal-header-info{display:flex;align-items:center;gap:12px}
+.modal-header .agent-avatar{width:36px;height:36px;font-size:16px}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1}
+.modal-role{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--acid)}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;transition:color .3s}
+.modal-close:hover{color:var(--white)}
+.modal-body{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;min-height:300px}
+.chat-msg{max-width:85%;padding:14px 18px;font-size:13px;line-height:1.7}
+.chat-msg.agent{background:var(--black);border:1px solid rgba(255,255,255,.06);align-self:flex-start;color:var(--white)}
+.chat-msg.user{background:rgba(184,255,46,.1);border:1px solid rgba(184,255,46,.15);align-self:flex-end;color:var(--white)}
+.chat-msg .time{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);margin-top:6px;display:block}
+.modal-input{display:flex;gap:8px;padding:16px 24px;border-top:1px solid rgba(255,255,255,.06)}
+.modal-input input{flex:1;padding:12px 16px;background:var(--black);border:1px solid rgba(255,255,255,.1);color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;outline:none}
+.modal-input input:focus{border-color:var(--acid)}
+.modal-input button{padding:12px 20px;background:var(--acid);color:var(--black);border:none;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .3s}
+.modal-input button:hover{background:#d4ff6e}
+
+/* ACTIVITY */
+.activity{margin-bottom:32px}
+.activity-list{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06)}
+.activity-item{background:var(--black);padding:16px 20px;display:flex;align-items:center;gap:16px;border-bottom:1px solid rgba(255,255,255,.04)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.activity-dot.ceo{background:#b8ff2e}
+.activity-dot.cmo{background:#ff6eb4}
+.activity-dot.cfo{background:#6eb4ff}
+.activity-dot.coo{background:#ffb86e}
+.activity-dot.cpo{background:#b46eff}
+.activity-dot.chro{background:#6effb8}
+.activity-dot.coach{background:#ffe76e}
+.activity-dot.cto{background:#ff6e6e}
+.activity-dot.clo{background:#6efff5}
+.activity-text{flex:1;font-size:13px;color:var(--muted)}
+.activity-text strong{color:var(--white);font-weight:400}
+.activity-time{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;flex-shrink:0}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+@media(max-width:768px){
+  .topbar{padding:12px 16px}
+  .topbar-user{display:none}
+  .dashboard{padding:72px 16px 16px}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .agents-grid{grid-template-columns:1fr}
+  .modal{max-height:90vh}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">INCREASE<span>.</span>TEAM</div>
+  <div class="topbar-right">
+    <div class="topbar-user"><span class="topbar-company" id="topbar-company">Carregando...</span></div>
+    <button class="btn-logout" onclick="logout()">Sair</button>
+  </div>
+</div>
+
+<div class="dashboard">
+  <!-- WELCOME -->
+  <div class="welcome">
+    <div class="welcome-tag"><span class="dot"></span> Diretoria ativa</div>
+    <h1 id="welcome-title">Ola!</h1>
+    <p id="welcome-sub">Sua diretoria de IA esta trabalhando para voce.</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat"><div class="stat-val">9</div><div class="stat-label">Agentes ativos</div></div>
+    <div class="stat"><div class="stat-val">24/7</div><div class="stat-label">Disponibilidade</div></div>
+    <div class="stat"><div class="stat-val">0</div><div class="stat-label">Decisoes pendentes</div></div>
+    <div class="stat"><div class="stat-val">--</div><div class="stat-label">Saude do negocio</div></div>
+  </div>
+
+  <!-- AGENTS -->
+  <div class="section-label">Seus executivos</div>
+  <div class="agents-grid" id="agents-grid">
+    <!-- Rendered by JS -->
+  </div>
+
+  <!-- ACTIVITY -->
+  <div class="activity">
+    <div class="section-label">Atividade recente</div>
+    <div class="activity-list" id="activity-list">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- CHAT MODAL -->
+<div class="modal-overlay" id="chat-modal" onclick="if(event.target===this)closeChat()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="agent-avatar" id="modal-avatar"></div>
+        <div>
+          <div class="modal-role" id="modal-role"></div>
+          <div class="modal-title" id="modal-name"></div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeChat()">&times;</button>
+    </div>
+    <div class="modal-body" id="chat-body"></div>
+    <div class="modal-input">
+      <input type="text" id="chat-input" placeholder="Digite sua mensagem..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button onclick="sendMsg()">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://obbxihwnpgpdpusumvfs.supabase.co';
+const SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let profile = null;
+let activeAgent = null;
+
+const agents = [
+  { id:'ceo', initial:'L', role:'CEO', name:'Lucas', desc:'Visao estrategica, OKRs e plano semanal.', greeting:'Ola! Sou o Lucas, seu CEO de IA. Vou te ajudar com estrategia, priorizacao e a manter o foco no que realmente importa. Como posso ajudar hoje?' },
+  { id:'cmo', initial:'M', role:'CMO', name:'Mariana', desc:'Marketing, campanhas e conversao.', greeting:'Oi! Sou a Mariana, sua CMO. Posso te ajudar com posicionamento, campanhas e estrategias de aquisicao. O que precisa?' },
+  { id:'cfo', initial:'P', role:'CFO', name:'Pedro', desc:'Financas, fluxo de caixa e projecoes.', greeting:'Ola! Pedro aqui, seu CFO. Posso analisar seus numeros, projetar cenarios e te alertar sobre riscos financeiros. Me conta sua situacao.' },
+  { id:'coo', initial:'C', role:'COO', name:'Carla', desc:'Operacoes, processos e eficiencia.', greeting:'Oi! Sou a Carla, COO. Meu foco e otimizar seus processos e eliminar gargalos operacionais. Onde esta o maior atrito?' },
+  { id:'cpo', initial:'R', role:'CPO', name:'Rafael', desc:'Produto, roadmap e feedback.', greeting:'E ai! Rafael, CPO. Posso te ajudar a priorizar features, analisar feedback e definir o roadmap do seu produto. Bora?' },
+  { id:'chro', initial:'A', role:'CHRO', name:'Ana', desc:'Pessoas, cultura e contratacao.', greeting:'Ola! Ana, sua CHRO. Cuido de pessoas, cultura e desenvolvimento da equipe. Como esta seu time?' },
+  { id:'coach', initial:'Z', role:'Coach', name:'Ze', desc:'Mentoria, mindset e decisoes dificeis.', greeting:'Fala, empreendedor! Ze aqui, seu coach. To aqui pra te ajudar a pensar melhor, manter o foco e tomar decisoes dificeis com mais clareza. O que ta pegando?' },
+  { id:'cto', initial:'V', role:'CTO', name:'Victor', desc:'Tecnologia, ferramentas e escala.', greeting:'Ola! Victor, CTO. Posso recomendar ferramentas, arquiteturas e estrategias tech pro seu negocio escalar. Qual sua stack atual?' },
+  { id:'clo', initial:'J', role:'CLO', name:'Julia', desc:'Juridico, contratos e compliance.', greeting:'Ola! Julia aqui, CLO. Te ajudo com questoes juridicas, contratos, tributacao e compliance. Alguma duvida legal?' }
+];
+
+const activities = [
+  { agent:'ceo', text:'<strong>Lucas (CEO)</strong> gerou seu plano estrategico semanal.', time:'Agora' },
+  { agent:'cfo', text:'<strong>Pedro (CFO)</strong> esta aguardando dados financeiros para o primeiro relatorio.', time:'2min' },
+  { agent:'cmo', text:'<strong>Mariana (CMO)</strong> analisou seu setor e preparou recomendacoes iniciais.', time:'5min' },
+  { agent:'coo', text:'<strong>Carla (COO)</strong> mapeou seus processos com base no onboarding.', time:'8min' },
+  { agent:'coach', text:'<strong>Ze (Coach)</strong> preparou seu briefing matinal.', time:'10min' }
+];
+
+// Auth guard
+(async function() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    window.location.href = 'login.html';
+    return;
+  }
+  currentUser = session.user;
+
+  const { data } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', currentUser.id)
+    .single();
+
+  if (!data || !data.company_name) {
+    window.location.href = 'onboarding.html';
+    return;
+  }
+
+  profile = data;
+  renderDashboard();
+})();
+
+function renderDashboard() {
+  const firstName = (profile.full_name || currentUser.user_metadata?.full_name || 'Empreendedor').split(' ')[0];
+  document.getElementById('welcome-title').textContent = 'Ola, ' + firstName + '!';
+  document.getElementById('welcome-sub').textContent = 'Diretoria de IA da ' + profile.company_name + ' esta ativa e trabalhando.';
+  document.getElementById('topbar-company').textContent = profile.company_name;
+
+  // Render agents
+  const grid = document.getElementById('agents-grid');
+  grid.innerHTML = agents.map(a => `
+    <div class="agent" onclick="openChat('${a.id}')">
+      <div class="agent-header">
+        <div class="agent-avatar">${a.initial}</div>
+        <div class="agent-info">
+          <div class="agent-role">${a.role}</div>
+          <div class="agent-name">${a.name}</div>
+        </div>
+      </div>
+      <div class="agent-status"><span class="dot"></span> Online</div>
+      <div class="agent-last">${a.desc}</div>
+      <div class="agent-actions">
+        <button class="agent-btn primary" onclick="event.stopPropagation();openChat('${a.id}')">Conversar</button>
+        <button class="agent-btn" onclick="event.stopPropagation();openChat('${a.id}')">Briefing</button>
+      </div>
+    </div>
+  `).join('');
+
+  // Render activity
+  const list = document.getElementById('activity-list');
+  list.innerHTML = activities.map(a => `
+    <div class="activity-item">
+      <div class="activity-dot ${a.agent}"></div>
+      <div class="activity-text">${a.text}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>
+  `).join('');
+}
+
+function openChat(agentId) {
+  activeAgent = agents.find(a => a.id === agentId);
+  if (!activeAgent) return;
+
+  document.getElementById('modal-avatar').textContent = activeAgent.initial;
+  document.getElementById('modal-role').textContent = activeAgent.role;
+  document.getElementById('modal-name').textContent = activeAgent.name;
+
+  const body = document.getElementById('chat-body');
+  const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  body.innerHTML = `<div class="chat-msg agent">${activeAgent.greeting}<span class="time">${now}</span></div>`;
+
+  document.getElementById('chat-modal').classList.add('open');
+  document.getElementById('chat-input').focus();
+}
+
+function closeChat() {
+  document.getElementById('chat-modal').classList.remove('open');
+  activeAgent = null;
+}
+
+function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const body = document.getElementById('chat-body');
+  const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+  body.innerHTML += `<div class="chat-msg user">${escapeHtml(text)}<span class="time">${now}</span></div>`;
+  input.value = '';
+  body.scrollTop = body.scrollHeight;
+
+  // Simulated agent response
+  setTimeout(() => {
+    body.innerHTML += `<div class="chat-msg agent">Recebi sua mensagem. Em breve essa funcionalidade estara conectada ao motor de IA. Por enquanto, anote que estou no modo de validacao.<span class="time">${now}</span></div>`;
+    body.scrollTop = body.scrollHeight;
+  }, 1200);
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+
+async function logout() {
+  await supabase.auth.signOut();
+  window.location.href = 'login.html';
+}
+</script>
+
+</body>
+</html>

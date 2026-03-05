@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding — Increase Team</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--black:#060608;--white:#f0ede8;--acid:#b8ff2e;--steel:#1a1a24;--muted:#5a5a6e;--err:#ff5e5e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+a{color:var(--acid);text-decoration:none}
+
+.ob-container{width:100%;max-width:600px}
+.ob-logo{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.15em;text-transform:uppercase;text-align:center;margin-bottom:48px}
+.ob-logo span{color:var(--acid)}
+
+.ob-card{background:var(--steel);border:1px solid rgba(255,255,255,.06);padding:48px 40px;position:relative;overflow:hidden}
+.ob-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acid)}
+
+.ob-progress{display:flex;gap:4px;margin-bottom:32px}
+.ob-progress-bar{flex:1;height:3px;background:rgba(255,255,255,.08);transition:background .3s}
+.ob-progress-bar.done{background:var(--acid)}
+
+.ob-step-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--acid);margin-bottom:8px}
+.ob-title{font-family:'Bebas Neue',sans-serif;font-size:32px;margin-bottom:8px}
+.ob-desc{font-size:14px;color:var(--muted);margin-bottom:32px;line-height:1.6}
+
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:14px 16px;background:var(--black);border:1px solid rgba(255,255,255,.1);color:var(--white);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color .3s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--acid)}
+.form-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a5a6e' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+.form-group select option{background:var(--steel);color:var(--white)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-group .hint{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:.05em}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+.btn-row{display:flex;gap:12px;margin-top:8px}
+.btn{flex:1;padding:16px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:none;cursor:pointer;transition:all .3s;text-align:center}
+.btn-primary{background:var(--acid);color:var(--black)}
+.btn-primary:hover{background:#d4ff6e}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,.15)}
+.btn-ghost:hover{border-color:var(--acid);color:var(--acid)}
+
+.msg{font-family:'Space Mono',monospace;font-size:11px;text-align:center;margin-top:16px;padding:12px;display:none}
+.msg.error{display:block;color:var(--err);background:rgba(255,94,94,.08);border:1px solid rgba(255,94,94,.15)}
+
+.step{display:none}
+.step.active{display:block}
+
+@media(max-width:768px){
+  .ob-card{padding:32px 24px}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="ob-container">
+  <div class="ob-logo">INCREASE<span>.</span>TEAM</div>
+
+  <div class="ob-card">
+    <div class="ob-progress">
+      <div class="ob-progress-bar done" id="prog-1"></div>
+      <div class="ob-progress-bar" id="prog-2"></div>
+      <div class="ob-progress-bar" id="prog-3"></div>
+    </div>
+
+    <!-- STEP 1: EMPRESA -->
+    <div class="step active" id="step-1">
+      <div class="ob-step-label">Passo 1 de 3</div>
+      <div class="ob-title">Sobre sua empresa</div>
+      <div class="ob-desc">Essas informacoes ajudam os agentes a se calibrarem para o seu negocio.</div>
+
+      <div class="form-group">
+        <label>Nome da empresa</label>
+        <input type="text" id="company-name" placeholder="Ex: Padaria do Joao" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Setor</label>
+          <select id="company-sector">
+            <option value="">Selecione...</option>
+            <option value="servicos">Servicos</option>
+            <option value="comercio">Comercio</option>
+            <option value="industria">Industria</option>
+            <option value="tecnologia">Tecnologia</option>
+            <option value="saude">Saude</option>
+            <option value="educacao">Educacao</option>
+            <option value="alimentacao">Alimentacao</option>
+            <option value="construcao">Construcao</option>
+            <option value="agro">Agronegocio</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tamanho da equipe</label>
+          <select id="company-size">
+            <option value="">Selecione...</option>
+            <option value="solo">So eu</option>
+            <option value="2-5">2 a 5 pessoas</option>
+            <option value="6-15">6 a 15 pessoas</option>
+            <option value="16-50">16 a 50 pessoas</option>
+            <option value="50+">Mais de 50</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Faturamento mensal aproximado</label>
+        <select id="company-revenue">
+          <option value="">Selecione...</option>
+          <option value="pre-revenue">Pre-faturamento</option>
+          <option value="0-10k">Ate R$ 10 mil</option>
+          <option value="10-50k">R$ 10 a 50 mil</option>
+          <option value="50-200k">R$ 50 a 200 mil</option>
+          <option value="200k+">Acima de R$ 200 mil</option>
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="nextStep(2)">Proximo</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: DESAFIOS -->
+    <div class="step" id="step-2">
+      <div class="ob-step-label">Passo 2 de 3</div>
+      <div class="ob-title">Seus maiores desafios</div>
+      <div class="ob-desc">Selecione as areas onde voce mais precisa de ajuda. Os agentes vao priorizar essas frentes.</div>
+
+      <div class="form-group" id="challenges-group">
+        <!-- Generated by JS -->
+      </div>
+
+      <div class="form-group">
+        <label>Descreva seu principal desafio hoje</label>
+        <textarea id="main-challenge" placeholder="Ex: Nao consigo controlar o fluxo de caixa e tomo decisoes no escuro..."></textarea>
+        <div class="hint">Quanto mais detalhe, melhor os agentes se calibram</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="prevStep(1)">Voltar</button>
+        <button class="btn btn-primary" onclick="nextStep(3)">Proximo</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: CONTATO -->
+    <div class="step" id="step-3">
+      <div class="ob-step-label">Passo 3 de 3</div>
+      <div class="ob-title">Contato e WhatsApp</div>
+      <div class="ob-desc">Seus agentes vao se comunicar com voce via WhatsApp. Informe o numero correto.</div>
+
+      <div class="form-group">
+        <label>WhatsApp (com DDD)</label>
+        <input type="tel" id="whatsapp" placeholder="(11) 99999-9999">
+      </div>
+      <div class="form-group">
+        <label>Como conheceu a Increase Team?</label>
+        <select id="referral">
+          <option value="">Selecione...</option>
+          <option value="indicacao">Indicacao</option>
+          <option value="instagram">Instagram</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="google">Google</option>
+          <option value="whatsapp">Grupo de WhatsApp</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="prevStep(2)">Voltar</button>
+        <button class="btn btn-primary" id="submit-btn" onclick="submitOnboarding()">Ativar minha diretoria</button>
+      </div>
+    </div>
+
+    <div id="ob-msg" class="msg"></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://obbxihwnpgpdpusumvfs.supabase.co';
+const SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+
+// Auth guard
+(async function() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    window.location.href = 'login.html';
+    return;
+  }
+  currentUser = session.user;
+
+  // If already onboarded, go to dashboard
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('company_name')
+    .eq('id', currentUser.id)
+    .single();
+  if (profile && profile.company_name) {
+    window.location.href = 'dashboard.html';
+  }
+})();
+
+// Render challenge checkboxes
+const challenges = [
+  { id: 'financas', label: 'Financas e fluxo de caixa' },
+  { id: 'marketing', label: 'Marketing e vendas' },
+  { id: 'operacoes', label: 'Processos e operacoes' },
+  { id: 'pessoas', label: 'Gestao de pessoas' },
+  { id: 'estrategia', label: 'Estrategia e direcao' },
+  { id: 'produto', label: 'Produto e inovacao' },
+  { id: 'juridico', label: 'Juridico e compliance' },
+  { id: 'tecnologia', label: 'Tecnologia e automacao' }
+];
+
+const cg = document.getElementById('challenges-group');
+cg.innerHTML = '<label>Areas de maior dificuldade</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">' +
+  challenges.map(c =>
+    `<label style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--black);border:1px solid rgba(255,255,255,.08);cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s" onmouseover="this.style.borderColor='rgba(184,255,46,.3)'" onmouseout="this.querySelector('input').checked?null:this.style.borderColor='rgba(255,255,255,.08)'">
+      <input type="checkbox" value="${c.id}" style="accent-color:var(--acid);width:16px;height:16px"> ${c.label}
+    </label>`
+  ).join('') + '</div>';
+
+function nextStep(n) {
+  // Validate current step
+  if (n === 2) {
+    if (!document.getElementById('company-name').value.trim()) {
+      showMsg('Preencha o nome da empresa.', 'error');
+      return;
+    }
+  }
+
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  document.getElementById('ob-msg').className = 'msg';
+
+  // Update progress
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('prog-' + i).className = 'ob-progress-bar' + (i <= n ? ' done' : '');
+  }
+}
+
+function prevStep(n) {
+  nextStep(n);
+}
+
+function showMsg(text, type) {
+  const el = document.getElementById('ob-msg');
+  el.textContent = text;
+  el.className = 'msg ' + type;
+}
+
+async function submitOnboarding() {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  const selectedChallenges = Array.from(document.querySelectorAll('#challenges-group input:checked')).map(cb => cb.value);
+
+  const profileData = {
+    id: currentUser.id,
+    full_name: currentUser.user_metadata?.full_name || '',
+    email: currentUser.email,
+    company_name: document.getElementById('company-name').value.trim(),
+    company_sector: document.getElementById('company-sector').value,
+    company_size: document.getElementById('company-size').value,
+    company_revenue: document.getElementById('company-revenue').value,
+    challenges: selectedChallenges,
+    main_challenge: document.getElementById('main-challenge').value.trim(),
+    whatsapp: document.getElementById('whatsapp').value.trim(),
+    referral: document.getElementById('referral').value,
+    onboarded_at: new Date().toISOString()
+  };
+
+  const { error } = await supabase
+    .from('profiles')
+    .upsert(profileData, { onConflict: 'id' });
+
+  if (error) {
+    showMsg('Erro ao salvar: ' + error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Ativar minha diretoria';
+    return;
+  }
+
+  window.location.href = 'dashboard.html';
+}
+</script>
+
+</body>
+</html>
