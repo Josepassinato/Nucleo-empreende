@@ -314,6 +314,19 @@ async function submitOnboarding() {
     return;
   }
 
+  // Trigger CEO analysis in background
+  btn.textContent = 'Gerando analise...';
+  try {
+    const API_URL = 'https://increaseteam.com';
+    await fetch(API_URL + '/api/flow/onboarding-complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: currentUser.id })
+    });
+  } catch (e) {
+    console.warn('Flow trigger failed (non-blocking):', e);
+  }
+
   window.location.href = 'dashboard.html';
 }
 </script>

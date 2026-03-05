@@ -131,6 +131,23 @@ a{color:inherit;text-decoration:none}
     <div class="stat"><div class="stat-val">--</div><div class="stat-label">Saude do negocio</div></div>
   </div>
 
+  <!-- CEO ANALYSIS -->
+  <div id="ceo-analysis" style="display:none;margin-bottom:32px">
+    <div class="section-label">Analise do CEO Lucas</div>
+    <div style="background:var(--steel);border:1px solid rgba(255,255,255,.06);padding:28px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--acid)"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <div class="agent-avatar" style="width:36px;height:36px;font-size:15px">L</div>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--acid)">CEO</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px">Lucas Mendes</div>
+        </div>
+        <div id="ceo-date" style="margin-left:auto;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)"></div>
+      </div>
+      <div id="ceo-content" style="font-size:13px;line-height:1.8;color:var(--white);white-space:pre-wrap"></div>
+    </div>
+  </div>
+
   <div class="section-label">Seus executivos</div>
   <div class="agents-grid" id="agents-grid"></div>
 
@@ -219,6 +236,7 @@ const activities = [
   profile = p;
   company = c;
   renderDashboard();
+  loadCeoAnalysis();
 })();
 
 function renderDashboard() {
@@ -299,6 +317,25 @@ function escapeHtml(text) {
   const d = document.createElement('div');
   d.textContent = text;
   return d.innerHTML;
+}
+
+async function loadCeoAnalysis() {
+  try {
+    const API_URL = 'https://increaseteam.com';
+    const resp = await fetch(API_URL + '/api/flow/analise/' + currentUser.id);
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data && data.content) {
+        document.getElementById('ceo-analysis').style.display = 'block';
+        document.getElementById('ceo-content').textContent = data.content;
+        if (data.created_at) {
+          document.getElementById('ceo-date').textContent = new Date(data.created_at).toLocaleDateString('pt-BR') + ' ' + new Date(data.created_at).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('CEO analysis not available:', e);
+  }
 }
 
 async function logout() {
