@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Increase Team</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--black:#07070a;--white:#f0ede8;--acid:#b8ff2e;--steel:#12121a;--muted:#5a5a6e;--online:#00e676;--err:#ff5e5e;--warn:#f59e0b;--info:#6eb4ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;font-weight:300}
+a{color:inherit;text-decoration:none}
+
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:16px 32px;background:rgba(7,7,10,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06)}
+.topbar-logo{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.15em;text-transform:uppercase}
+.topbar-logo span{color:var(--acid)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.admin-badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--black);background:var(--acid);padding:4px 12px;font-weight:700}
+.btn-sm{background:none;border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .3s}
+.btn-sm:hover{border-color:var(--acid);color:var(--acid)}
+
+.admin{padding:88px 32px 32px;max-width:1300px;margin:0 auto}
+
+/* TABS */
+.admin-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:32px;gap:0}
+.admin-tab{padding:14px 24px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .3s;background:none;border-top:none;border-left:none;border-right:none}
+.admin-tab.active{color:var(--acid);border-bottom-color:var(--acid)}
+.admin-tab:hover{color:var(--white)}
+
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* SECTION */
+.section-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--acid);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.section-label::before{content:'';width:30px;height:1px;background:var(--acid)}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);margin-bottom:32px}
+.metric{background:var(--black);padding:24px}
+.metric-val{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--acid);line-height:1}
+.metric-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* TABLE */
+.table-wrap{border:1px solid rgba(255,255,255,.06);margin-bottom:32px;overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{background:var(--steel);padding:14px 18px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);text-align:left;border-bottom:1px solid rgba(255,255,255,.06)}
+td{padding:14px 18px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--white)}
+tr:hover td{background:rgba(255,255,255,.02)}
+.status-badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;display:inline-block}
+.status-badge.onboarded{color:var(--acid);background:rgba(184,255,46,.08);border:1px solid rgba(184,255,46,.15)}
+.status-badge.pending{color:var(--warn);background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15)}
+.status-badge.new{color:var(--info);background:rgba(110,180,255,.08);border:1px solid rgba(110,180,255,.15)}
+
+/* AGENTS CONFIG (admin's own board) */
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);margin-bottom:40px}
+.agent{background:var(--black);padding:28px;cursor:pointer;transition:background .3s}
+.agent:hover{background:var(--steel)}
+.agent-header{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.agent-avatar{width:40px;height:40px;border-radius:50%;background:var(--steel);display:flex;align-items:center;justify-content:center;font-size:18px;font-family:'Bebas Neue',sans-serif;border:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.agent-role{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--acid)}
+.agent-name{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1}
+.agent-status{display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--online);margin-bottom:12px}
+.agent-status .dot{width:5px;height:5px;background:var(--online);border-radius:50%}
+.agent-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.agent-actions{display:flex;gap:8px}
+.agent-btn{flex:1;padding:10px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;text-align:center;border:1px solid rgba(255,255,255,.1);background:none;color:var(--muted);cursor:pointer;transition:all .3s}
+.agent-btn:hover{border-color:var(--acid);color:var(--acid)}
+.agent-btn.primary{background:var(--acid);color:var(--black);border-color:var(--acid);font-weight:700}
+.agent-btn.primary:hover{background:#d4ff6e}
+
+/* CHAT MODAL */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.open{display:flex}
+.modal{width:100%;max-width:560px;max-height:80vh;background:var(--steel);border:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acid)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06)}
+.modal-header-info{display:flex;align-items:center;gap:12px}
+.modal-header .agent-avatar{width:36px;height:36px;font-size:16px}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1}
+.modal-role{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--acid)}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px}
+.modal-close:hover{color:var(--white)}
+.modal-body{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;min-height:300px}
+.chat-msg{max-width:85%;padding:14px 18px;font-size:13px;line-height:1.7}
+.chat-msg.agent{background:var(--black);border:1px solid rgba(255,255,255,.06);align-self:flex-start}
+.chat-msg.user{background:rgba(184,255,46,.1);border:1px solid rgba(184,255,46,.15);align-self:flex-end}
+.chat-msg .time{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);margin-top:6px;display:block}
+.modal-input{display:flex;gap:8px;padding:16px 24px;border-top:1px solid rgba(255,255,255,.06)}
+.modal-input input{flex:1;padding:12px 16px;background:var(--black);border:1px solid rgba(255,255,255,.1);color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;outline:none}
+.modal-input input:focus{border-color:var(--acid)}
+.modal-input button{padding:12px 20px;background:var(--acid);color:var(--black);border:none;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.modal-input button:hover{background:#d4ff6e}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px;color:var(--muted);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.1em}
+
+/* DENIED */
+.denied{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column;gap:16px;padding:24px;display:none}
+.denied h1{font-family:'Bebas Neue',sans-serif;font-size:48px}
+.denied p{color:var(--muted);font-size:14px}
+.denied a{color:var(--acid);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+@media(max-width:768px){
+  .topbar{padding:12px 16px}
+  .admin{padding:72px 16px 16px}
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .agents-grid{grid-template-columns:1fr}
+  .admin-tabs{overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ACCESS DENIED (shown if not admin) -->
+<div class="denied" id="denied">
+  <h1>Acesso negado</h1>
+  <p>Este painel e exclusivo para administradores.</p>
+  <a href="dashboard.html">Ir para o dashboard</a>
+</div>
+
+<!-- ADMIN PANEL (shown only to admin) -->
+<div id="admin-panel" style="display:none">
+
+<div class="topbar">
+  <a href="index.html" class="topbar-logo">INCREASE<span>.</span>TEAM</a>
+  <div class="topbar-right">
+    <span class="admin-badge">Admin</span>
+    <button class="btn-sm" onclick="goToDashboard()">Meu dashboard</button>
+    <button class="btn-sm" onclick="logout()">Sair</button>
+  </div>
+</div>
+
+<div class="admin">
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="showAdminTab('overview')">Visao geral</button>
+    <button class="admin-tab" onclick="showAdminTab('users')">Usuarios</button>
+    <button class="admin-tab" onclick="showAdminTab('board')">Minha diretoria</button>
+  </div>
+
+  <!-- TAB: OVERVIEW -->
+  <div class="tab-content active" id="tab-overview">
+    <div class="section-label">Metricas gerais</div>
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-val" id="m-total">0</div>
+        <div class="metric-label">Usuarios totais</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="m-onboarded">0</div>
+        <div class="metric-label">Onboarding completo</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="m-pending">0</div>
+        <div class="metric-label">Pendentes</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="m-rate">0%</div>
+        <div class="metric-label">Taxa de conversao</div>
+      </div>
+    </div>
+
+    <div class="section-label">Validadores (5 primeiros)</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Empresa</th>
+            <th>Setor</th>
+            <th>Status</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody id="validators-table">
+          <tr><td colspan="6" class="empty">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-label">Setores dos usuarios</div>
+    <div class="metrics" id="sector-metrics" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">
+    </div>
+  </div>
+
+  <!-- TAB: USERS -->
+  <div class="tab-content" id="tab-users">
+    <div class="section-label">Todos os usuarios</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>WhatsApp</th>
+            <th>Empresa</th>
+            <th>Faturamento</th>
+            <th>Desafios</th>
+            <th>Referral</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="all-users-table">
+          <tr><td colspan="8" class="empty">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: MY BOARD -->
+  <div class="tab-content" id="tab-board">
+    <div class="section-label">Minha diretoria de IA</div>
+    <div class="agents-grid" id="admin-agents-grid"></div>
+  </div>
+</div>
+
+</div>
+
+<!-- CHAT MODAL -->
+<div class="modal-overlay" id="chat-modal" onclick="if(event.target===this)closeChat()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="agent-avatar" id="modal-avatar"></div>
+        <div>
+          <div class="modal-role" id="modal-role"></div>
+          <div class="modal-title" id="modal-name"></div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeChat()">&times;</button>
+    </div>
+    <div class="modal-body" id="chat-body"></div>
+    <div class="modal-input">
+      <input type="text" id="chat-input" placeholder="Digite sua mensagem..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button onclick="sendMsg()">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://obbxihwnpgpdpusumvfs.supabase.co';
+const SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const ADMIN_EMAILS = ['jose@increaseteam.com', 'josepassinato@gmail.com'];
+
+let currentUser = null;
+let activeAgent = null;
+
+const agents = [
+  { id:'ceo', initial:'L', role:'CEO', name:'Lucas', desc:'Visao estrategica, OKRs e plano semanal.', greeting:'Ola Jose! Sou o Lucas, CEO da sua diretoria. Como posso ajudar com a estrategia hoje?' },
+  { id:'cmo', initial:'M', role:'CMO', name:'Mariana', desc:'Marketing, campanhas e conversao.', greeting:'Oi Jose! Mariana aqui. Posso te ajudar com posicionamento e campanhas da Increase Team.' },
+  { id:'cfo', initial:'P', role:'CFO', name:'Pedro', desc:'Financas, fluxo de caixa e projecoes.', greeting:'Ola Jose! Pedro, seu CFO. Vamos analisar os numeros e projecoes?' },
+  { id:'coo', initial:'C', role:'COO', name:'Carla', desc:'Operacoes, processos e eficiencia.', greeting:'Oi Jose! Carla, COO. Posso otimizar os processos da plataforma. O que precisa?' },
+  { id:'cpo', initial:'R', role:'CPO', name:'Rafael', desc:'Produto, roadmap e feedback.', greeting:'E ai Jose! Rafael, CPO. Vamos trabalhar no roadmap da Increase Team?' },
+  { id:'chro', initial:'A', role:'CHRO', name:'Ana', desc:'Pessoas, cultura e contratacao.', greeting:'Ola Jose! Ana, CHRO. Como esta a equipe? Posso ajudar com recrutamento e cultura.' },
+  { id:'coach', initial:'Z', role:'Coach', name:'Ze', desc:'Mentoria, mindset e decisoes dificeis.', greeting:'Fala Jose! Ze aqui. To junto pra te ajudar a pensar com clareza. O que ta pegando?' },
+  { id:'cto', initial:'V', role:'CTO', name:'Victor', desc:'Tecnologia, ferramentas e escala.', greeting:'Ola Jose! Victor, CTO. Posso ajudar com a infraestrutura e tech da Increase Team.' },
+  { id:'clo', initial:'J', role:'CLO', name:'Julia', desc:'Juridico, contratos e compliance.', greeting:'Ola Jose! Julia, CLO. Posso ajudar com contratos, termos de uso e compliance da plataforma.' }
+];
+
+// Auth guard — admin only
+(async function() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    window.location.href = 'login.html';
+    return;
+  }
+  currentUser = session.user;
+
+  if (!ADMIN_EMAILS.includes(currentUser.email)) {
+    document.getElementById('denied').style.display = 'flex';
+    return;
+  }
+
+  document.getElementById('admin-panel').style.display = 'block';
+  await loadAdminData();
+  renderAdminBoard();
+})();
+
+async function loadAdminData() {
+  // Load all profiles
+  const { data: profiles } = await supabase
+    .from('users_profile')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  // Load all companies
+  const { data: companies } = await supabase
+    .from('companies')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  const allProfiles = profiles || [];
+  const allCompanies = companies || [];
+
+  // Build lookup
+  const companyByUser = {};
+  allCompanies.forEach(c => companyByUser[c.user_id] = c);
+
+  const totalUsers = allProfiles.length;
+  const onboardedUsers = allProfiles.filter(p => companyByUser[p.id]).length;
+  const pendingUsers = totalUsers - onboardedUsers;
+  const convRate = totalUsers > 0 ? Math.round((onboardedUsers / totalUsers) * 100) : 0;
+
+  document.getElementById('m-total').textContent = totalUsers;
+  document.getElementById('m-onboarded').textContent = onboardedUsers;
+  document.getElementById('m-pending').textContent = pendingUsers;
+  document.getElementById('m-rate').textContent = convRate + '%';
+
+  // Validators table (first 5 onboarded)
+  const validators = allProfiles
+    .filter(p => companyByUser[p.id])
+    .slice(0, 5);
+
+  const vTable = document.getElementById('validators-table');
+  if (validators.length === 0) {
+    vTable.innerHTML = '<tr><td colspan="6" class="empty">Nenhum validador ainda</td></tr>';
+  } else {
+    vTable.innerHTML = validators.map(p => {
+      const c = companyByUser[p.id];
+      const date = p.onboarded_at ? new Date(p.onboarded_at).toLocaleDateString('pt-BR') : '--';
+      return `<tr>
+        <td>${escapeHtml(p.full_name || '--')}</td>
+        <td>${escapeHtml(p.email)}</td>
+        <td>${escapeHtml(c?.company_name || '--')}</td>
+        <td>${escapeHtml(c?.sector || '--')}</td>
+        <td><span class="status-badge onboarded">Onboarded</span></td>
+        <td>${date}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Sector metrics
+  const sectorCount = {};
+  allCompanies.forEach(c => {
+    const s = c.sector || 'outro';
+    sectorCount[s] = (sectorCount[s] || 0) + 1;
+  });
+
+  const sectorEl = document.getElementById('sector-metrics');
+  const sectorEntries = Object.entries(sectorCount).sort((a, b) => b[1] - a[1]);
+  if (sectorEntries.length === 0) {
+    sectorEl.innerHTML = '<div class="metric"><div class="metric-val">--</div><div class="metric-label">Sem dados</div></div>';
+  } else {
+    sectorEl.innerHTML = sectorEntries.map(([sector, count]) =>
+      `<div class="metric"><div class="metric-val">${count}</div><div class="metric-label">${escapeHtml(sector)}</div></div>`
+    ).join('');
+  }
+
+  // All users table
+  const uTable = document.getElementById('all-users-table');
+  if (allProfiles.length === 0) {
+    uTable.innerHTML = '<tr><td colspan="8" class="empty">Nenhum usuario</td></tr>';
+  } else {
+    uTable.innerHTML = allProfiles.map(p => {
+      const c = companyByUser[p.id];
+      const status = c
+        ? '<span class="status-badge onboarded">Onboarded</span>'
+        : (p.onboarded_at ? '<span class="status-badge pending">Pendente</span>' : '<span class="status-badge new">Novo</span>');
+      const challengeStr = c?.challenges ? (Array.isArray(c.challenges) ? c.challenges.join(', ') : c.challenges) : '--';
+      return `<tr>
+        <td>${escapeHtml(p.full_name || '--')}</td>
+        <td>${escapeHtml(p.email)}</td>
+        <td>${escapeHtml(p.whatsapp || '--')}</td>
+        <td>${escapeHtml(c?.company_name || '--')}</td>
+        <td>${escapeHtml(c?.revenue || '--')}</td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(challengeStr)}">${escapeHtml(challengeStr)}</td>
+        <td>${escapeHtml(p.referral || '--')}</td>
+        <td>${status}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function renderAdminBoard() {
+  const grid = document.getElementById('admin-agents-grid');
+  grid.innerHTML = agents.map(a => `
+    <div class="agent" onclick="openChat('${a.id}')">
+      <div class="agent-header">
+        <div class="agent-avatar">${a.initial}</div>
+        <div>
+          <div class="agent-role">${a.role}</div>
+          <div class="agent-name">${a.name}</div>
+        </div>
+      </div>
+      <div class="agent-status"><span class="dot"></span> Online</div>
+      <div class="agent-desc">${a.desc}</div>
+      <div class="agent-actions">
+        <button class="agent-btn primary" onclick="event.stopPropagation();openChat('${a.id}')">Conversar</button>
+        <button class="agent-btn" onclick="event.stopPropagation();openChat('${a.id}')">Configurar</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showAdminTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function openChat(agentId) {
+  activeAgent = agents.find(a => a.id === agentId);
+  if (!activeAgent) return;
+
+  document.getElementById('modal-avatar').textContent = activeAgent.initial;
+  document.getElementById('modal-role').textContent = activeAgent.role;
+  document.getElementById('modal-name').textContent = activeAgent.name;
+
+  const body = document.getElementById('chat-body');
+  const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  body.innerHTML = `<div class="chat-msg agent">${activeAgent.greeting}<span class="time">${now}</span></div>`;
+
+  document.getElementById('chat-modal').classList.add('open');
+  document.getElementById('chat-input').focus();
+}
+
+function closeChat() {
+  document.getElementById('chat-modal').classList.remove('open');
+  activeAgent = null;
+}
+
+function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const body = document.getElementById('chat-body');
+  const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+  body.innerHTML += `<div class="chat-msg user">${escapeHtml(text)}<span class="time">${now}</span></div>`;
+  input.value = '';
+  body.scrollTop = body.scrollHeight;
+
+  setTimeout(() => {
+    body.innerHTML += `<div class="chat-msg agent">Recebi sua mensagem, Jose. Motor de IA em fase de integracao. Em breve estarei conectado ao backend.<span class="time">${now}</span></div>`;
+    body.scrollTop = body.scrollHeight;
+  }, 1200);
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+
+function goToDashboard() {
+  window.location.href = 'dashboard.html';
+}
+
+async function logout() {
+  await supabase.auth.signOut();
+  window.location.href = 'login.html';
+}
+</script>
+
+</body>
+</html>

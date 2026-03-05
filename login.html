@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--black:#060608;--white:#f0ede8;--acid:#b8ff2e;--steel:#1a1a24;--muted:#5a5a6e;--err:#ff5e5e}
+:root{--black:#07070a;--white:#f0ede8;--acid:#b8ff2e;--steel:#12121a;--muted:#5a5a6e;--err:#ff5e5e}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative}
 body::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(184,255,46,.05) 0%,transparent 70%);pointer-events:none}
@@ -118,19 +118,33 @@ a{color:var(--acid);text-decoration:none}
 </div>
 
 <script>
-// SUPABASE CONFIG — substituir pelas credenciais reais
 const SUPABASE_URL = 'https://obbxihwnpgpdpusumvfs.supabase.co';
 const SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY';
-
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Check if already logged in
+const ADMIN_EMAILS = ['jose@increaseteam.com', 'josepassinato@gmail.com'];
+
 (async function checkSession() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
-    const profile = await getProfile(session.user.id);
-    if (profile && profile.company_name) {
-      window.location.href = 'dashboard.html';
+    const { data: profile } = await supabase
+      .from('users_profile')
+      .select('id')
+      .eq('id', session.user.id)
+      .single();
+
+    const { data: company } = await supabase
+      .from('companies')
+      .select('id')
+      .eq('user_id', session.user.id)
+      .single();
+
+    if (company) {
+      if (ADMIN_EMAILS.includes(session.user.email)) {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
     } else {
       window.location.href = 'onboarding.html';
     }
@@ -157,13 +171,21 @@ function showMsg(text, type) {
   el.className = 'msg ' + type;
 }
 
-async function getProfile(userId) {
-  const { data } = await supabase
-    .from('profiles')
-    .select('company_name')
-    .eq('id', userId)
+async function ensureProfile(user) {
+  const { data: existing } = await supabase
+    .from('users_profile')
+    .select('id')
+    .eq('id', user.id)
     .single();
-  return data;
+
+  if (!existing) {
+    await supabase.from('users_profile').insert({
+      id: user.id,
+      email: user.email,
+      full_name: user.user_metadata?.full_name || '',
+      role: ADMIN_EMAILS.includes(user.email) ? 'admin' : 'user'
+    });
+  }
 }
 
 async function handleLogin(e) {
@@ -179,16 +201,26 @@ async function handleLogin(e) {
 
   if (error) {
     showMsg(error.message === 'Invalid login credentials'
-      ? 'Email ou senha incorretos.'
-      : error.message, 'error');
+      ? 'Email ou senha incorretos.' : error.message, 'error');
     btn.disabled = false;
     btn.textContent = 'Entrar';
     return;
   }
 
-  const profile = await getProfile(data.user.id);
-  if (profile && profile.company_name) {
-    window.location.href = 'dashboard.html';
+  await ensureProfile(data.user);
+
+  const { data: company } = await supabase
+    .from('companies')
+    .select('id')
+    .eq('user_id', data.user.id)
+    .single();
+
+  if (company) {
+    if (ADMIN_EMAILS.includes(data.user.email)) {
+      window.location.href = 'admin.html';
+    } else {
+      window.location.href = 'dashboard.html';
+    }
   } else {
     window.location.href = 'onboarding.html';
   }
@@ -221,7 +253,8 @@ async function handleSignup(e) {
     showMsg('Conta criada! Verifique seu e-mail para confirmar.', 'success');
     btn.disabled = false;
     btn.textContent = 'Criar conta';
-  } else {
+  } else if (data.user) {
+    await ensureProfile(data.user);
     window.location.href = 'onboarding.html';
   }
 }
